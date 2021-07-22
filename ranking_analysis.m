@@ -9,9 +9,9 @@ ninit = 5;
 benchmarks_results = cell(1,nobj);
 scores = cell(1,nacq);
 for j = 1:nobj
-%     objective = objectives{j};
+    %     objective = objectives{j};
     objective = char(objectives(j));
-
+    
     if strcmp(objective, 'goldpr')
         options.semilogy = true; %true;
     else
@@ -34,7 +34,7 @@ for j = 1:nobj
         
     end
     benchmarks_results{j} = scores;
-%     [ranks, average_ranks]= compute_rank(scores, ninit);
+    %     [ranks, average_ranks]= compute_rank(scores, ninit);
 end
 
 
@@ -50,17 +50,19 @@ for k = 1:nobj
         AUC_i= mean(score_i,2);
         for j = 1:nacq
             try
-            best_j = S{j};
-            best_j = best_j(:,end);
-            [p,h] = signrank(best_i, best_j, 'tail','right', 'alpha', 5e-4); % Test whether i beats j
-            R_best(k, i, j) = h;
-            
-            score_j = S{j};
-            AUC_j = mean(score_j, 2);
-            
-            [p,h] = signrank(AUC_i, AUC_j, 'tail','right', 'alpha', 5e-4); % Test whether i beats j
-            R_AUC(k, i, j) = h;
-            catch 
+                best_j = S{j};
+                best_j = best_j(:,end);
+                %[p,h] = signrank(best_i, best_j, 'tail','right', 'alpha', 5e-4); % Test whether i beats j
+                [p,h] = ranksum(best_i, best_j, 'tail','right', 'alpha', 5e-4); % Test whether i beats j
+                R_best(k, i, j) = h;
+                
+                score_j = S{j};
+                AUC_j = mean(score_j, 2);
+                
+                %[p,h] = signrank(AUC_i, AUC_j, 'tail','right', 'alpha', 5e-4); % Test whether i beats j
+                [p,h] = ranksum(AUC_i, AUC_j, 'tail','right', 'alpha', 5e-4); % Test whether i beats j
+                R_AUC(k, i, j) = h;
+            catch
                 disp(k)
                 disp(i)
             end

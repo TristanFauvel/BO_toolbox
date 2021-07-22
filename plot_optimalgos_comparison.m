@@ -36,7 +36,7 @@ ninit = 5;
 
 for j = 1:nobj
     nexttile
-    objective = objectives{j};
+    objective = char(objectives(j));
     
     if strcmp(objective, 'goldpr')
         options.semilogy = true; %true;
@@ -64,7 +64,7 @@ for j = 1:nobj
     plots =  plot_areaerrorbar_grouped(scores, options);
     box off
     ylabel('Value $g(x^*)$');
-    title(objectives_names{j})
+    title(objectives_names(j))
     set(gca, 'Fontsize', Fontsize)
 end
 legend(plots, legends, 'Fontsize', Fontsize);

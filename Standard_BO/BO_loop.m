@@ -1,4 +1,4 @@
-function [xtrain, xtrain_norm, ytrain, score, cum_regret]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, max_x, min_x, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm)
+function [xtrain, xtrain_norm, ytrain, score, cum_regret]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, max_x, min_x, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm, seed)
 
 % Run a Bayesian optimization loop
 % g : objective function
@@ -27,6 +27,7 @@ nmean_hyp = numel(theta.mean);
 % theta_lb(end) = 0;
 % theta_ub = 10*ones(ncov_hyp  + nmean_hyp ,1);
 % theta_ub(end) = 0;
+rng(seed)
 
 new_x_norm = rand_interval(lb_norm,ub_norm);
 new_x = new_x_norm.*(max_x - min_x)+min_x;
@@ -43,7 +44,7 @@ nfeatures = 4096;
 % kernel_approx.dphi_dx : nfeatures x 2D
 [kernel_approx.phi, kernel_approx.dphi_dx]= sample_features_GP(theta.cov, D, kernelname, approximation_method, nfeatures);
 
-    
+rng(seed)
 for i =1:maxiter
     i
     new_y = g(new_x);

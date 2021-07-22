@@ -5,7 +5,7 @@ options.method = 'lbfgs';
 options.verbose = 1;
 new_x = multistart_minConf(@(x)adaptive_sampling_preference(x, theta, xtrain_norm, ctrain, kernelfun, modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
 D = (size(xtrain_norm,1)-1)/2;
-new_x = new_x.*(max_x(1:D)-min_x(1:D)) + min_x(1:D);
+new_x = new_x.*(max_x-min_x) + min_x;
 end
 
 function [I, dIdx]= adaptive_sampling_preference(x, theta, xtrain, ctrain, kernelfun, modeltype, post)

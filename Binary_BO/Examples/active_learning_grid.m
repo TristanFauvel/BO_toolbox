@@ -31,6 +31,8 @@ for i =1:maxiter
             [~, new_i, ~] = adaptive_sampling_binary_grid(x, theta,  x_tr, c_tr, kernelfun, modeltype);
         elseif strcmp(acquisition, 'maxvar')
             [~, new_i] = max(var_muc);
+        elseif strcmp(acquisition, 'TME')
+            [~, new_i, ~] = TME_sampling(x, theta,  x_tr, c_tr, kernelfun, modeltype);
         else
             error('This acquisition function is not supported')
         end

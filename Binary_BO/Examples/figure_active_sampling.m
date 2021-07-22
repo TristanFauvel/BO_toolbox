@@ -10,7 +10,7 @@ letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 legend_pos = [-0.07,1];
 
 
-n=1000;
+n=100;
 rng(2)
 
 kernelname = 'linear';
@@ -173,6 +173,6 @@ text(legend_pos(1)-0.1, legend_pos(2),['$\bf{', letters(i), '}$'],'Units','norma
 
 figname  = 'Active_learning';
 folder = [figure_path,figname];
-savefig(fig, [folder,'\', figname, '.fig'])
-exportgraphics(fig, [folder,'\' , figname, '.pdf']);
-exportgraphics(fig, [folder,'\' , figname, '.png'], 'Resolution', 300);
+savefig(fig, [folder,'/', figname, '.fig'])
+exportgraphics(fig, [folder,'/' , figname, '.pdf']);
+exportgraphics(fig, [folder,'/' , figname, '.png'], 'Resolution', 300);
