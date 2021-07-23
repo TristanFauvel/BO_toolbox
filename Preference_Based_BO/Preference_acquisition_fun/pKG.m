@@ -33,10 +33,10 @@ x_duel2 = new_duel(d+1:end,:);
 end
 
 function U = KG(xduel, theta, xtrain_norm, ctrain, condition, modeltype, post, kernelfun, options, lb_norm, ub_norm, ncandidates, init_guess, gm)
-mu_c = prediction_bin_preference(theta, xtrain_norm, ctrain, xduel, kernelfun, 'modeltype', modeltype, 'post', post);
-[~,~,~,~,~,~,~,~,~,~,post]= prediction_bin_preference(theta,[xtrain_norm, xduel], [ctrain, 1],xduel, kernelfun, 'modeltype', modeltype);
+mu_c = prediction_bin_preference(theta, xtrain_norm, ctrain, xduel, kernelfun, 'modeltype', modeltype, 'post', post,'regularization', 'false');
+[~,~,~,~,~,~,~,~,~,~,post]= prediction_bin_preference(theta,[xtrain_norm, xduel], [ctrain, 1],xduel, kernelfun, 'modeltype', modeltype,'regularization', 'false');
 [~, maxg1] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xduel], [ctrain, 1], x, kernelfun, condition.x0, modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
-[~,~,~,~,~,~,~,~,~,~,post]= prediction_bin_preference(theta,[xtrain_norm, xduel], [ctrain, 0],xduel, kernelfun, 'modeltype', modeltype);
+[~,~,~,~,~,~,~,~,~,~,post]= prediction_bin_preference(theta,[xtrain_norm, xduel], [ctrain, 0],xduel, kernelfun, 'modeltype', modeltype,'regularization', 'false');
 [~, maxg0] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xduel], [ctrain, 0], x, kernelfun, condition.x0, modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
 U = mu_c.*(maxg1-gm)+(1-mu_c).*(maxg0-gm);
 end

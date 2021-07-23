@@ -16,7 +16,7 @@ nreps = 20;
 maxiter = 50;
 t = ranking_analysis(data_dir, names, objectives, acquisition_funs, nreps, maxiter);
 
-table2latex(t, 'PBO_benchmark_results')
+table2latex(t, 'BO_benchmark_results')
 
 objectives = categorical({'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12'}); 
 objectives_names = benchmarks_table(any(benchmarks_table.fName == objectives',2),:).Name; 
