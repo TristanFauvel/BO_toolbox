@@ -4,7 +4,7 @@ close all
 add_bo_module;
 
 seed=1;
-maxiter= 30;% 100;
+maxiter= 50;% 100;
 rng(seed)
 
 
@@ -35,7 +35,6 @@ acquisition_funs = {'TME_sampling_binary', 'maxvar_binary_grid', 'random','BALD_
 nobj = numel(objectives);
 nacq = numel(acquisition_funs);
 for j = 1:nobj
-    bias = 0;
     objective = [objectives{j}, '_', kernelnames{j}, '_',lengthscales{j}];
     [x, y, theta, lb, ub, theta_lb, theta_ub, kernelfun] = load_benchmarks_active_learning_grid(objectives{j}, kernelnames{j}, lengthscales{j});
     for ji = 1:nacq

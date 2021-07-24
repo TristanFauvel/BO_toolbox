@@ -73,11 +73,27 @@ for j = 2:nobj
     
 end
 
-% japan_Matern32_long : -2.1738    -0.88348
-% japan_Matern32_short : -3.4928   -0.099319
-% japan_Matern52_long : -2.7098     -2.1358
-% japan_Matern52_short : -3.5252     0.55026
-% japan_Gaussian_long : 7.1851    -0.31328
-% japan_Gaussian_short : 8.7792    -0.58559
+japan_Matern32_long : -2.1738    -0.88348
+japan_Matern32_short : -3.4928   -0.099319
+japan_Matern52_long : -2.7098     -2.1358
+japan_Matern52_short : -3.5252     0.55026
+japan_Gaussian_long : 7.1851    -0.31328
+japan_Gaussian_short : 8.7792    -0.58559
 
+
+[ mu_y, sigma2_y] = prediction(theta.cov, x, y, x, kernelfun);
+
+xc = x;
+xc(2,:) = 1-xc(2,:);
+
+mr=1;
+mc = 3;
+fig = figure()
+fig.Color = [1,1,1];
+subplot(mr, mc,1)
+scatter(xc(1,:), xc(2,:), 5, y, 'filled');
+pbaspect([1,1,1])
+subplot(mr, mc,2)
+scatter(xc(1,:), xc(2,:), 5, mu_y, 'filled');
+pbaspect([1,1,1])
 

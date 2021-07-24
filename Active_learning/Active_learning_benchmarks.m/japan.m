@@ -18,34 +18,39 @@ classdef japan
             load('domain.mat', 'Solin')
             UNPACK_STRUCT(Solin, false)
             
-            
             if strcmp(kernelname, 'Matern32')
                 if strcmp(lengthscale, 'short')
                     k =1;
                     l =  0.01;
+                    theta = [-3.4928,-0.099319];
                 elseif strcmp(lengthscale, 'long')
                     k =2;
                     l =  0.1;
+                    theta = [-2.1738, -0.88348];
                 end
-                theta = [2*log(l) ,0];
+                %theta = [2*log(l) ,0];
             elseif strcmp(kernelname, 'Matern52')
                 if strcmp(lengthscale, 'short')
                     k =3 ;
                     l =  0.01;
+                    theta = [-3.5252,0.55026];
                 elseif strcmp(lengthscale, 'long')
                     k =4;
                     l =  0.1;
+                    theta = [-2.7098,-2.1358];
                 end
-                theta = [log(0.5*l^2),0];
+                %theta = [log(0.5*l^2),0];
             elseif strcmp(kernelname, 'Gaussian')
                 if strcmp(lengthscale, 'short')
                     k =5;
                     l =  0.01;
+                    theta = [8.7792,-0.58559];
                 elseif strcmp(lengthscale, 'long')
                     k =6;
                     l =  0.1;
+                    theta = [7.1851,-0.31328];
                 end
-                theta = [log(0.5*l^2),0.5*obj.D*log(2*pi*l)];
+                % theta = [log(0.5*l^2),0.5*obj.D*log(2*pi*l)];
             end
             f = fun{k};
             y = f(:);
@@ -55,7 +60,7 @@ classdef japan
             mask = logical(domain.mask(:));
             % Decrease resolution
             keep = 1:3:numel(y);
-            x = x(:,keep);            
+            x = x(:,keep);
             mask = mask(keep);
             y = y(keep);
             %

@@ -1,0 +1,61 @@
+add_bo_module
+data_dir =  [pathname,'/Standard_BO/Data_BO'];
+figure_folder = [pathname,'/Standard_BO/Figures/'];
+figname =  'Standard_BO_scores_benchmarks';
+
+acquisition_funs = {'TME_sampling_binary', 'maxvar_binary_grid', 'random','BALD_grid'};
+names = {'EI','GP-UCB','Thompson sampling', 'Random'};
+
+load('benchmarks_table.mat')
+objectives = benchmarks_table.fName; %; 'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12';'forretal08'};
+objectives_names = benchmarks_table(benchmarks_table.fName == objectives,:).Name; %{'GP1d','Forrester (2008)', 'Gramacy and Lee (2012)', 'Levy', 'Goldstein-Price', 'Six Hump Camel', 'Ursem-Waves'};
+nobj =numel(objectives);
+
+
+nreps = 5;
+maxiter = 30;
+t = ranking_analysis(data_dir, names, objectives, acquisition_funs, nreps, maxiter);
+
+table2latex(t, 'BO_benchmark_results')
+
+objectives = categorical({'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12'}); 
+objectives_names = benchmarks_table(any(benchmarks_table.fName == objectives',2),:).Name; 
+plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname, nreps, maxiter)
+
+
+clear all
+close all
+
+add_bo_module;
+
+seed=1;
+maxiter= 30;% 100;
+rng(seed)
+
+
+options_theta.method = 'lbfgs';
+options_theta.verbose = 1;
+
+update_period = maxiter+ 2;
+
+ninit = maxiter +2 ;
+nopt= 5;% number of time steps before starting using the acquisition functions.
+nrepets = 5; %20;
+seeds=1:nrepets;
+
+
+nobj = 6;
+objectives = cell(1,nobj);
+for i = 1:nobj
+    objectives{i} = 'japan';
+end
+kernelnames = {'Matern32', 'Matern32','Matern52','Matern52','Gaussian','Gaussian'};
+lengthscales = {'long', 'short','long', 'short','long', 'short'};
+
+
+acquisition_funs = {'TME_sampling_binary', 'maxvar_binary_grid', 'random','BALD_grid'};
+% acquisition_funs = {'random','BALD_grid'};
+
+objective = [objectives{j}, '_', kernelnames{j}, '_',lengthscales{j}];
+        filename = [pathname,'/Active_learning/Data_active_learning_binary_grid/',objective,'_',acquisition_name];
+        save(filename, 'experiment')

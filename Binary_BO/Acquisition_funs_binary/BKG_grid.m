@@ -1,4 +1,4 @@
-function [new_x, new_x_norm] = KG_binary(theta, xtrain_norm, ctrain, kernelfun, modeltype, max_x, min_x, lb_norm, ub_norm, post, kernel_approx)
+function [new_x, new_x_norm] = BKG_grid(theta, xtrain_norm, ctrain, kernelfun, modeltype, max_x, min_x, lb_norm, ub_norm, post, kernel_approx)
 
 nx = 30;
 d = size(xtrain_norm,1);
