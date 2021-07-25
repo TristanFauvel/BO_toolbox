@@ -12,7 +12,8 @@ ncandidates= 5;
 % x_best = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, kernelfun, condition.x0,modeltype, post), lb_norm, ub_norm, ncandidates, init_guess, options);
 % x_duel1 = x_best;
 x = [xtrain_norm(1:D,:), xtrain_norm((D+1):end,:)];
-[g_mu_c,  g_mu_y] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,2*n)], kernelfun, 'modeltype', modeltype, 'post', post);
+regularization = 'nugget';
+[g_mu_c,  g_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,2*n)], kernelfun, modeltype, post, regularization);
 [max_mu_y,b]= max(g_mu_y);
 x_duel1 = x(:,b);
 
@@ -21,7 +22,7 @@ x_duel1 = x(:,b);
 % x_duel2 = multistart_minfuncBC(@(x)expected_improvement_for_classification(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun,kernelname, x0, x_best, modeltype), lb_norm, ub_norm, ncandidates, options);
 
 init_guess = x_duel1;
-x_duel2 = multistart_minConf(@(x)expected_improvement_preference(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun, condition.x0, max_mu_y, modeltype, post), lb_norm, ub_norm, ncandidates, init_guess, options);
+x_duel2 = multistart_minConf(@(x)expected_improvement_preference(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun, condition.x0, max_mu_y, modeltype, post,regularization), lb_norm, ub_norm, ncandidates, init_guess, options);
 
 x_duel1 = x_duel1.*(max_x(1:D)-min_x(1:D)) + min_x(1:D);
 x_duel2 = x_duel2.*(max_x(D+1:end)-min_x(D+1:end)) + min_x(D+1:end);
@@ -30,10 +31,10 @@ new_duel = [x_duel1;x_duel2];
 
 end
 
-function [EI, dEI_dx] = expected_improvement_preference(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun, x0, max_mu_y, modeltype, post)
+function [EI, dEI_dx] = expected_improvement_preference(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun, x0, max_mu_y, modeltype, post, regularization)
 
 [D,n]= size(x);
-[g_mu_c,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2_y_dx] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], kernelfun,'modeltype', modeltype, 'post', post);
+[g_mu_c,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], kernelfun,modeltype, post, regularization);
 
 dmuc_dx = dmuc_dx(1:D,:); 
 dmuy_dx = dmuy_dx(1:D,:);

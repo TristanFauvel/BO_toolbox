@@ -1,9 +1,10 @@
 function [I, dIdx]= BALD(theta, xtrain, ctrain, kernelfun, modeltype, post)
 
+regularization = 'nugget';
 if nargout == 1
-    [mu_c,  mu_y, sigma2_y] =  prediction_bin(theta, xtrain, ctrain, x, kernelfun, 'modeltype', modeltype, 'post', post);
+    [mu_c,  mu_y, sigma2_y] =  prediction_bin(theta, xtrain, ctrain, x, kernelfun, modeltype, post, regularization);
 else
-    [mu_c,  mu_y, sigma2_y, ~, ~, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain, ctrain, x, kernelfun, 'modeltype', modeltype, 'post', post);
+    [mu_c,  mu_y, sigma2_y, ~, ~, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain, ctrain, x, kernelfun, modeltype, post, regularization);
 end
 h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps);
 

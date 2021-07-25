@@ -42,7 +42,7 @@ end
 %     new(:,k) = minFuncBC(@(x)deriv(x,sample_g, dsample_g_dx), x_init, lb_norm, ub_norm, options); %bounds constraints.
 % end
 % 
-% [~,  test_value, test_variance, ~] = prediction_bin_preference(theta, xtrain_norm, ctrain, [xtest_norm; x0.*ones(d,size(xtest_norm,2))], kernelfun, 'modeltype', modeltype);
+% [~,  test_value, test_variance, ~] = prediction_bin(theta, xtrain_norm, ctrain, [xtest_norm; x0.*ones(d,size(xtest_norm,2))], kernelfun, modeltype, post, regularization);
 % 
 % if d==1
 %     figure()
@@ -83,7 +83,7 @@ end
 % [p,q] = meshgrid(xrange1,xrange2);
 % x_array = [p(:),q(:)]';
 % 
-% [~,  test_value_array, test_variance_array, ~] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x_array; x0.*ones(1,size(x_array,2))], kernelfun,'modeltype', modeltype);
+% [~,  test_value_array, test_variance_array, ~] = prediction_bin(theta, xtrain_norm, ctrain, [x_array; x0.*ones(1,size(x_array,2))], kernelfun,modeltype, post, regularization);
 % 
 % 
 % test= zeros(nsamples,size(x_array,2));
@@ -152,7 +152,7 @@ end
 %         val(i,:) = sample_g(x);
 % end
 % 
-% [~,  mu_y, sigma2y, Sigma2_y] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x; x0*ones(1,n)], kernelfun, 'modeltype', modeltype);
+% [~,  mu_y, sigma2y, Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [x; x0*ones(1,n)], kernelfun, modeltype, post, regularization);
 % 
 % figure()
 % errorshaded(x, mu_y, sqrt(sigma2y));

@@ -1,6 +1,6 @@
 function new_duel = kernelselfsparring_grid(x, theta, xtrain, ctrain, kernelfun, modeltype,m,  kernelname, post)
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin_preference(theta, xtrain, ctrain, xtrain, kernelfun, kernelname, 'modeltype', modeltype, 'post', post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin(theta, xtrain, ctrain, xtrain, kernelfun, kernelname, modeltype, post, regularization);
 
 nsamples=m;
 gmax=zeros(1, nsamples);

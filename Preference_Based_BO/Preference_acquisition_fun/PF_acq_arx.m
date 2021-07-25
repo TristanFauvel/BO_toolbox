@@ -27,12 +27,12 @@ x_duel2 = new_duel(d+1:end);
 end
 
 function output =  multiobjective(theta, xtrain, ctrain, xduel, kernelfun, base_name, modeltype)
-[mu_c,  ~, sigma2_y, Sigma2_y] =  prediction_bin_preference(theta,xtrain, ctrain, xduel, kernelfun, base_name, 'modeltype',modeltype);
+[mu_c,  ~, sigma2_y, Sigma2_y] =  prediction_bin(theta,xtrain, ctrain, xduel, kernelfun, base_name, 'modeltype',modeltype);
 
 d= size(xtrain,1)/2;
 x0 = 0.5*ones(d,size(xduel,2));
-[~, mu_y1] =  prediction_bin_preference(theta,xtrain, ctrain, [xduel(1:d,:); x0], kernelfun, base_name, 'modeltype',modeltype);
-[~, mu_y2] =  prediction_bin_preference(theta,xtrain, ctrain,  [xduel(d+1:end,:); x0], kernelfun, base_name, 'modeltype',modeltype);
+[~, mu_y1] =  prediction_bin(theta,xtrain, ctrain, [xduel(1:d,:); x0], kernelfun, base_name, 'modeltype',modeltype);
+[~, mu_y2] =  prediction_bin(theta,xtrain, ctrain,  [xduel(d+1:end,:); x0], kernelfun, base_name, 'modeltype',modeltype);
 
 output = [(mu_c-0.5).^2,-sigma2_y, -mu_y1, -mu_y2]; %minimize (mu_c-0.5)^2, maximize, sigma2_y, mu_y1, mu_y2
 
@@ -42,7 +42,7 @@ end
 % x0 = 0.5;
 % x = linspace(0,1,N);
 % % xduels = [x;x0*ones(1,N)];
-% % [mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin_preference(theta, xtrain_norm, ctrain, xduels, kernelfun, base_name, 'modeltype', modeltype);
+% % [mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, xduels, kernelfun, base_name, modeltype, post, regularization);
 % % Fontsize=14;
 % % fig=figure();
 % % fig.Name = 'Acquisition function';
@@ -70,7 +70,7 @@ end
 % 
 % [p,q] = ndgrid(x);
 % xduels = [p(:),q(:)]';
-% [mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin_preference(theta, xtrain_norm, ctrain, xduels, kernelfun, base_name, 'modeltype', modeltype);
+% [mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, xduels, kernelfun, base_name, modeltype, post, regularization);
 % 
 % Fontsize=14;
 % fig=figure();
@@ -96,7 +96,7 @@ end
 % pbaspect([1 1 1])
 % colorbar
 % 
-% [mu_c_acq,  mu_y_acq, sigma2_y_acq] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x; 0.5*ones(size(x))], kernelfun, base_name, 'modeltype', modeltype);
+% [mu_c_acq,  mu_y_acq, sigma2_y_acq] = prediction_bin(theta, xtrain_norm, ctrain, [x; 0.5*ones(size(x))], kernelfun, base_name, modeltype, post, regularization);
 % Fontsize=14;
 % fig=figure();
 % fig.Color =  [1 1 1];

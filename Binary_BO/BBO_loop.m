@@ -28,14 +28,14 @@ ninit= maxiter + 2;
 options.method = 'lbfgs';
 ncandidates= 10;
 %% Compute the kernel approximation if needed
-    if strcmp(kernelname, 'Matern52') || strcmp(kernelname, 'Matern32') || strcmp(kernelname, 'ARD')
-        approximation_method = 'RRGP';
-    else
-        approximation_method = 'SSGP';
-    end
-    nfeatures = 256;
-    [kernel_approx.phi, kernel_approx.dphi_dx] = sample_features_GP(theta(:), D, kernelname, approximation_method, nfeatures);
-
+if strcmp(kernelname, 'Matern52') || strcmp(kernelname, 'Matern32') || strcmp(kernelname, 'ARD')
+    approximation_method = 'RRGP';
+else
+    approximation_method = 'SSGP';
+end
+nfeatures = 256;
+[kernel_approx.phi, kernel_approx.dphi_dx] = sample_features_GP(theta(:), D, kernelname, approximation_method, nfeatures);
+regularization = 'nugget';
 for i =1:maxiter
     disp(i)
     new_c = g(new_x)>rand;
@@ -43,7 +43,7 @@ for i =1:maxiter
     xtrain_norm = [xtrain_norm, new_x_norm];
     ctrain = [ctrain, new_c];
     
-    [~, ~, ~,~,~,~,~,~,~,~,post] =  prediction_bin(theta, xtrain_norm, ctrain, xtrain_norm, kernelfun, 'modeltype', modeltype);
+    post =  prediction_bin(theta, xtrain_norm, ctrain, [], kernelfun, modeltype, [], regularization);
     
     
     if i > ninit

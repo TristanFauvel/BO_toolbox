@@ -1,35 +1,42 @@
-function [new_x, new_x_norm] = PKG(theta, xtrain_norm, ctrain, kernelfun, modeltype, max_x, min_x, lb_norm, ub_norm, post, kernel_approx)
+function [new_x, new_x_norm] = PKG(theta, xtrain_norm, ctrain, kernelfun, base_kernelfun, modeltype, max_x, min_x, lb_norm, ub_norm, condition, post, kernel_approx)
+
 if ~strcmp(modeltype, 'laplace')
     error('This acquisition function is only implemented with Laplace approximation')
 end
 init_guess = [];
 options.method = 'lbfgs';
 options.verbose = 1;
-ncandidates = 10;
-[xbest, ybest] = multistart_minConf(@(x)to_maximize_value_GP(theta, xtrain_norm, ctrain, x, kernelfun,modeltype, post), lb_norm, ub_norm, ncandidates, init_guess, options);
+ncandidates = 5;
+[xbest, ybest] = multistart_minConf(@(x)to_maximize_value_GP(theta, xtrain_norm, ctrain, x, kernelfun, condition.x0, modeltype, post), lb_norm, ub_norm, ncandidates, init_guess, options);
 ybest = -ybest;
 
 c0 = [ctrain, 0];
 c1 = [ctrain,1];
 
-new_x_norm  = multistart_minConf(@(x)knowledge_grad(theta, xtrain_norm, ctrain, x, kernelfun, modeltype, post, c0, c1, ybest), lb_norm, ub_norm, ncandidates, init_guess, options);
+new_x_norm  = multistart_minConf(@(x)knowledge_grad(theta, xtrain_norm, ctrain, x, kernelfun, modeltype, post, c0, c1, xbest, ybest, condition), lb_norm, ub_norm, ncandidates, init_guess, options);
 
 new_x = new_x_norm.*(max_x-min_x) + min_x;
 
 end
 
-function [U, dUdx] = knowledge_grad(theta, xtrain_norm, ctrain, xt, kernelfun, modeltype, post, c0, c1, ybest)
-[mu_c,  ~, ~, ~, dmuc_dx] =  prediction_bin_preference(theta, xtrain_norm, ctrain, xt, kernelfun, 'modeltype', modeltype, 'post', post);
+function [U, dUdx] = knowledge_grad(theta, xtrain_norm, ctrain, xt, kernelfun, modeltype, post, c0, c1, xbest, ybest, condition)
+ncandidates = 2;
+init_guess = xbest;
+options.verbose= 1;
+options.method = 'lbfgs';
 
-[~, ~, ~, ~, ~, ~, ~, ~, ~, ~, post0] =  prediction_bin_preference(theta, [xtrain_norm,xt], c0, [], kernelfun, 'modeltype', modeltype);
-[~, ~, ~, ~, ~, ~, ~, ~, ~, ~, post1] =  prediction_bin_preference(theta, [xtrain_norm,xt], c1, [], kernelfun, 'modeltype', modeltype);
+[mu_c,  ~, ~, ~, dmuc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, xt, kernelfun, modeltype, post, regularization);
 
-[xbest1, ybest1] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c1, x, kernelfun,modeltype, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
-[xbest0, ybest0] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c0, x, kernelfun,modeltype, post0), lb_norm, ub_norm, ncandidates, init_guess, options);
+post0 =  prediction_bin(theta, [xtrain_norm,xt], c0, [], kernelfun, modeltype, post, regularization);
+post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], kernelfun, modeltype, post, regularization);
+
+[xbest1, ybest1] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c1, x, kernelfun, condition.x0, modeltype, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
+[xbest0, ybest0] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c0, x, kernelfun, condition.x0, modeltype, post0), lb_norm, ub_norm, ncandidates, init_guess, options);
 ybest1 = - ybest1; ybest0 = -ybest0;
 
-K = kernelfun(theta, [xtrain_norm, xt],[xtrain_norm, xt]);
-[k, ~, dkdx] = kernelfun(theta, [xtrain_norm, xt], xt);
+K = post0.K;
+k = post0.k;
+dkdx = post0.dk_dx;
 dkdx = squeeze(dkdx);
 n = size(K,1);
 D = size(xt,1);

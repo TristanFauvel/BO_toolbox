@@ -15,17 +15,17 @@ update_period = maxiter+ 2;
 
 ninit = maxiter +2 ;
 nopt= 5;% number of time steps before starting using the acquisition functions.
-nrepets = 5; %20;
+nrepets = 20; %20;
 seeds=1:nrepets;
 
 
-nobj = 6;
+nobj = 4;
 objectives = cell(1,nobj);
 for i = 1:nobj
     objectives{i} = 'japan';
 end
-kernelnames = {'Matern32', 'Matern32','Matern52','Matern52','Gaussian','Gaussian'};
-lengthscales = {'long', 'short','long', 'short','long', 'short'};
+kernelnames = {'Matern32', 'Matern32','Matern52','Matern52'};
+lengthscales = {'long', 'short','long', 'short'};
 
 
 acquisition_funs = {'TME_sampling_binary', 'maxvar_binary_grid', 'random','BALD_grid'};

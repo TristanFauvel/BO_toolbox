@@ -1,7 +1,8 @@
 function [new_x,new_x_norm, idx, L] = BALD_grid(x, theta, xtrain_norm, ctrain, kernelfun, modeltype,lb, ub, post)
 
 xnorm = (x - lb)./(ub-lb);
-[mu_c, mu_y, sigma2_y] =   prediction_bin(theta, xtrain_norm, ctrain, xnorm, kernelfun, 'post', post, 'modeltype', modeltype, 'regularization', 'false');
+regularization = 'false';
+[mu_c, mu_y, sigma2_y] =   prediction_bin(theta, xtrain_norm, ctrain, xnorm, kernelfun, modeltype, post, regularization);
 
 C = sqrt(pi*log(2)/2);
 

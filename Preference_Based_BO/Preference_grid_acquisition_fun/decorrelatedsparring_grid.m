@@ -1,6 +1,6 @@
 function new_tour = decorrelatedsparring_grid(x, theta, xtrain, ctrain, kernelfun,modeltype, m, kernelname, post)
 
-[~,  mu_y, ~, Sigma2_y] = prediction_bin_preference(theta, xtrain, ctrain, xtrain, kernelfun, kernelname, 'modeltype', modeltype, 'post', post);
+[~,  mu_y, ~, Sigma2_y] = prediction_bin(theta, xtrain, ctrain, xtrain, kernelfun, kernelname, modeltype, post, regularization);
 Sigma2 = exp(-15); % To regularize
 
 nsamples=6*m;
@@ -22,7 +22,7 @@ end
 
 idx = unique(idx);
 x0 = x(:,1);
-[~,  ~, sigma2_y, Sigma2_y]  =  prediction_bin_preference(theta, xtrain, ctrain, [x(:,idx);x0*ones(1,numel(idx))], kernelfun, kernelname, 'modeltype', modeltype, 'post', post); %kernelfun(theta, [x(:,idx);x0*ones(1,numel(idx))], [x(:,idx);x0*ones(1,numel(idx))]);
+[~,  ~, sigma2_y, Sigma2_y]  =  prediction_bin(theta, xtrain, ctrain, [x(:,idx);x0*ones(1,numel(idx))], kernelfun, kernelname, modeltype, post, regularization); %kernelfun(theta, [x(:,idx);x0*ones(1,numel(idx))], [x(:,idx);x0*ones(1,numel(idx))]);
 
 %% Compute the total correlation for any group of m inputs
 comb = nchoosek(1:numel(idx),m)'; %compute all possible groups of m

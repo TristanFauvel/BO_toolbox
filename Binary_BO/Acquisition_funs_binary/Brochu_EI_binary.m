@@ -18,7 +18,7 @@ end
 function [EI, dEI_dx] = expected_improvement_preference(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun, x0, x_best, modeltype, post)
 
 [nd,n]= size(x);
-[g_mu_c,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], kernelfun,kernelname, 'modeltype', modeltype, 'post', post);
+[g_mu_c,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], kernelfun,kernelname, modeltype, post, regularization);
 
 dmuc_dx = dmuc_dx(1:nd,:);
 dmuy_dx = dmuy_dx(1:nd,:);
@@ -26,7 +26,8 @@ dsigma2_y_dx = dsigma2_y_dx(1:nd,:);
 
 g_sigma_y = sqrt(g_sigma2_y);
 %% Find the maximum of the value function
-[~,  max_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x_best;x0], kernelfun, 'modeltype', modeltype, 'post', post);
+regularization = 'false';
+[~,  max_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x_best;x0], kernelfun, modeltype, post, regularization);
 
 
 sigma_y = sqrt(g_sigma2_y);

@@ -29,17 +29,17 @@ d = size(xtrain_norm,1)/2;
 ncandidates =5;
 init_guess = [];
 
-mu_c = prediction_bin_preference(theta, xtrain_norm, ctrain, xduels, kernelfun,kernelname, 'modeltype', modeltype, 'post', post);
+mu_c = prediction_bin(theta, xtrain_norm, ctrain, xduels, kernelfun,kernelname, modeltype, post, regularization);
 
 x_best_norm = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, kernelfun, x0,modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
 
 n= size(x,2);
-[~,  gm] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x_best_norm;x0*ones(1,n)], kernelfun,kernelname, 'modeltype', modeltype, 'post', post);
+[~,  gm] = prediction_bin(theta, xtrain_norm, ctrain, [x_best_norm;x0*ones(1,n)], kernelfun,kernelname, modeltype, post, regularization);
 
 KG = zeros(1, size(xduels, 2));
 for i = 1:size(xduels,2)
-    [~,  mu_y_1, ~] = prediction_bin_preference(theta, [xtrain, xduels(:,i)], [ctrain, 1], [x;x0*ones(1,n)], kernelfun, kernelname, 'modeltype', modeltype);
-    [~,  mu_y_0, ~] = prediction_bin_preference(theta, [xtrain, xduels(:,i)], [ctrain, 0], [x;x0*ones(1,n)], kernelfun, kernelname, 'modeltype', modeltype);
+    [~,  mu_y_1, ~] = prediction_bin(theta, [xtrain, xduels(:,i)], [ctrain, 1], [x;x0*ones(1,n)], kernelfun, kernelname, modeltype, post, regularization);
+    [~,  mu_y_0, ~] = prediction_bin(theta, [xtrain, xduels(:,i)], [ctrain, 0], [x;x0*ones(1,n)], kernelfun, kernelname, modeltype, post, regularization);
 
     [maxg1, ~]= max(mu_y_1);  
     [maxg0, ~]= max(mu_y_0);

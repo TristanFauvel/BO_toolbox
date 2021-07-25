@@ -8,8 +8,8 @@ x= xrange;
 xp=xrange;
 n= size(x,2);
 np= size(xp,2);
-[mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin_preference(theta, xtrain, ctrain, xtrain, kernelfun, kernelname 'modeltype', modeltype);
-[~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin_preference(theta, xtrain, ctrain, [x;x0*ones(1,n)], kernelfun, kernelname, 'modeltype', modeltype);
+[mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin(theta, xtrain, ctrain, xtrain, kernelfun, kernelname modeltype, post, regularization);
+[~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain, ctrain, [x;x0*ones(1,n)], kernelfun, kernelname, modeltype, post, regularization);
 
 h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps); %entropy of a binary variable
 

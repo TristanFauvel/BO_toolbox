@@ -2,9 +2,8 @@ function  [new_x, new_x_norm, idx, L] = maxvar_binary_grid(x, theta, xtrain_norm
 
 xnorm = (x - lb)./(ub-lb);
 
-
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] =  prediction_bin(theta, xtrain_norm, ctrain, xnorm, kernelfun, 'modeltype', modeltype, 'post', post, 'regularization', 'false');
-
+regularization = 'false';
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] =  prediction_bin(theta, xtrain_norm, ctrain, xnorm, kernelfun, modeltype, post, regularization);
 L = var_muc;
 [a,idx] = max(L);
 new_x = x(:,idx);

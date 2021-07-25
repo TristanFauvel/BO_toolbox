@@ -3,8 +3,8 @@ ncandidates = 10;
 init_guess = [];
 options.method = 'lbfgs';
 options.verbose = 1;
-new_x = multistart_minConf(@(x)adaptive_sampling_preference(x, theta, xtrain_norm, ctrain, kernelfun, modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
-new_x = new_x.*(max_x-min_x) + min_x;
+new_x_norm = multistart_minConf(@(x)adaptive_sampling_binary(x, theta, xtrain_norm, ctrain, kernelfun, modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
+new_x = new_x_norm.*(max_x-min_x) + min_x;
 end
 
 function [I, dIdx]= adaptive_sampling_binary(x, theta, xtrain, ctrain, kernelfun, modeltype, post)

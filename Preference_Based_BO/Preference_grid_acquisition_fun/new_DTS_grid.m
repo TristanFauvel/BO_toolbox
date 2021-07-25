@@ -1,7 +1,7 @@
 function new_duel = new_DTS_grid(x, theta, xtrain, ctrain, kernelfun,modeltype, m,  kernelname)
 
 d = size(x,1);
-[~,  mu_y, ~, Sigma2_y] = prediction_bin_preference(theta, xtrain, ctrain, xtrain, kernelfun, kernelname,'modeltype', modeltype);
+[~,  mu_y, ~, Sigma2_y] = prediction_bin(theta, xtrain, ctrain, xtrain, kernelfun, kernelname,modeltype, post, regularization);
 fsamples = mvnrnd(mu_y,  nearestSPD(Sigma2_y))'; %sample from the posterior at training points
 Sigma2 = exp(-15); % To regularize
 
@@ -16,7 +16,7 @@ new_duel = NaN(2*d,1);
 new_duel(1:d) = x(:,idxmax);
 
 %Monte-Carlo estimation of the variance of mu_c
-[mu_c_s,  my_s, ~, Sy_s ] = prediction_bin_preference(theta, xtrain, ctrain, [x(:,idxmax).*ones(d,size(x,2)); x], kernelfun,kernelname, 'modeltype', modeltype);
+[mu_c_s,  my_s, ~, Sy_s ] = prediction_bin(theta, xtrain, ctrain, [x(:,idxmax).*ones(d,size(x,2)); x], kernelfun,kernelname, modeltype, post, regularization);
 
 
 samples =mvnrnd(my_s, nearestSPD(Sy_s), 1000);%sample form the p(f|D)

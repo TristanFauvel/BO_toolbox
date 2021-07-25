@@ -11,7 +11,7 @@ sampling_kernelname = 'Gaussian_wnoise';
 kernelfun = @(theta, xi, xj, training) conditional_preference_kernelfun(theta, base_kernelfun, xi, xj, training);
 
 negloglike =   str2func('negloglike_bin'); %define the negative log-likelihood function
-prediction =   str2func('prediction_bin_preference');%define the prediction (posterior distribution)
+prediction =   str2func('prediction_bin');%define the prediction (posterior distribution)
 
 link = @normcdf; %inverse link function for the classification model
 
@@ -138,7 +138,7 @@ for i =1:maxiter
     xtrain = [xtrain, new_duels(:,idkeep)];
     ctrain = [ctrain, c(1,idkeep)];
     
-    [mu_c,  mu_g] = prediction(theta, xtrain, ctrain, [x; x0*ones(1,ntest^d)], kernelfun, kernelname, 'modeltype', modeltype);
+    [mu_c,  mu_g] = prediction(theta, xtrain, ctrain, [x; x0*ones(1,ntest^d)], kernelfun, kernelname, modeltype, post, regularization);
 
     
     [~, idxmaxg(i)]= max(mu_g);
@@ -162,7 +162,7 @@ for i =1:maxiter
         %         else % eif i>nfit && mod(i-ninit,5)==-1
         %             %% Update the model hyperparameters
         %             options=[];
-        %             theta= minFunc(negloglike, theta(:), options, xtrain, ctrain, kernelfun, 'modeltype', modeltype);
+        %             theta= minFunc(negloglike, theta(:), options, xtrain, ctrain, kernelfun, modeltype, post, regularization);
         %             if theta(2)>10
         %                 disp('stop')
         %             end
@@ -171,7 +171,7 @@ for i =1:maxiter
         %% Update the model hyperparameters
 %         options=[];
 %         if mod(i-ninit,5)==0
-%             theta= minFunc(negloglike, theta(:), options, xtrain, ctrain, kernelfun, 'modeltype', modeltype);
+%             theta= minFunc(negloglike, theta(:), options, xtrain, ctrain, kernelfun, modeltype, post, regularization);
 %             
 %             if theta(2)>50
 %                 disp('stop')

@@ -10,14 +10,15 @@ init_guess = [];
 options.method = 'lbfgs';
 options.verbose = 1;
 ncandidates= 5;
-new = multistart_minConf(@(x)pref_var(theta, xtrain_norm, ctrain, x_duel1_norm , x, kernelfun, modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
+regularization= 'nugget';
+new = multistart_minConf(@(x)pref_var(theta, xtrain_norm, ctrain, x_duel1_norm , x, kernelfun, modeltype, post, regularization), lb_norm, ub_norm, ncandidates,init_guess, options);
 
 x_duel2 = new.*(max_x(1:D)-min_x(1:D)) + min_x(1:D);
 new_duel = [x_duel1;x_duel2];
 end
 
-function [var_muc, dvar_muc_dx] = pref_var(theta, xtrain_norm, ctrain, x_duel1_norm, x, kernelfun, modeltype, post)
-[~,~,~,~,~,~,~,~, var_muc, dvar_muc_dx] =  prediction_bin_preference(theta, xtrain_norm, ctrain, [x;x_duel1_norm], kernelfun, 'modeltype', modeltype, 'post', post);
+function [var_muc, dvar_muc_dx] = pref_var(theta, xtrain_norm, ctrain, x_duel1_norm, x, kernelfun, modeltype, post, regularization)
+[~,~,~,~,~,~,~,~, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, [x;x_duel1_norm], kernelfun, modeltype, post, regularization);
 D = size(x,1);
 var_muc = -var_muc;
 dvar_muc_dx = -dvar_muc_dx(1:D)';

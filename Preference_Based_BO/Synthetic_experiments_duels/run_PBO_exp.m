@@ -7,7 +7,8 @@ close all
 
 data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
 
-acquisition_funs = {'DTS', 'random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI','bivariate_EI', 'Thompson_challenge'};
+acquisition_funs = {'random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI','bivariate_EI', 'Thompson_challenge','DTS'};
+
 
 % acquisition_funs = {'DTS'};
 

@@ -6,7 +6,7 @@ close all
 data_dir =  [pathname,'/Binary_BO/Data/'];
 
 
-acquisition_funs = {'TS_binary', 'random_acquisition_binary', 'KG_binary'};
+acquisition_funs = {'BKG','TS_binary','random_acquisition_binary'};
 
 maxiter = 60; %total number of iterations : 200
 
@@ -15,22 +15,19 @@ nreplicates = 40; %20;
 nacq = numel(acquisition_funs);
 nbo = 2;
 
-objectives = {'forretal08', 'grlee12', 'GP1d','levy', 'goldpr', 'camel6','Ursem_waves'};
-% objectives = {'levy', 'goldpr', 'camel6','Ursem_waves'};
-
+load('benchmarks_table.mat')
+objectives = benchmarks_table.fName; %; 'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12';'forretal08'};
 nobj =numel(objectives);
 seeds = 1:nreplicates;
 update_period = maxiter+2; % do not update the hyperparameters;
 for j = 1:nobj
-    objective = objectives{j};
+    objective = char(objectives(j));    
     
-    kernelfun = @ARD_kernelfun;
-    kernelname = 'ARD';
     link = @normcdf;
     modeltype = 'exp_prop';
-    [g, theta, lb, ub, lb_norm, ub_norm, theta_lb, theta_ub] = load_benchmarks(objective, kernelname);
+    [g, theta, lb, ub, lb_norm, ub_norm, theta_lb, theta_ub, kernelfun, kernelname] = load_benchmarks(objective, [], benchmarks_table);
     close all
-    for a =1:1%:nacq
+    for a =1:nacq
         acquisition_name = acquisition_funs{a};
         acquisition_fun = str2func(acquisition_name);
         clear('xtrain', 'xtrain_norm', 'ctrain', 'score');

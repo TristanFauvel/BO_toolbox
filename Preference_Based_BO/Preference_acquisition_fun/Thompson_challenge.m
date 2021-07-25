@@ -1,6 +1,6 @@
 function [x_duel1, x_duel2,new_duel] = Thompson_challenge(theta, xtrain_norm, ctrain, kernelfun, base_kernelfun,modeltype, max_x, min_x, lb_norm, ub_norm, condition, post, kernel_approx)
 
-options.method = 'sd';
+options.method = 'lbfgs';
 options.verbose = 1;
 D = size(xtrain_norm,1)/2;
 ncandidates =5;
@@ -43,7 +43,7 @@ end
 %     new(:,k) = minFuncBC(@(x)deriv(x,sample_g, dsample_g_dx), x_init, lb_norm, ub_norm, options); %bounds constraints.
 % end
 % 
-% [~,  test_value, test_variance, ~] = prediction_bin_preference(theta, xtrain_norm, ctrain, [xtest_norm; x0.*ones(d,size(xtest_norm,2))], kernelfun, kernelname, 'modeltype', modeltype);
+% [~,  test_value, test_variance, ~] = prediction_bin(theta, xtrain_norm, ctrain, [xtest_norm; x0.*ones(d,size(xtest_norm,2))], kernelfun, kernelname, modeltype, post, regularization);
 % 
 % if d==1
 %     figure()
@@ -84,7 +84,7 @@ end
 % [p,q] = meshgrid(xrange1,xrange2);
 % x_array = [p(:),q(:)]';
 % 
-% [~,  test_value_array, test_variance_array, ~] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x_array; x0.*ones(1,size(x_array,2))], kernelfun, kernelname, 'modeltype', modeltype);
+% [~,  test_value_array, test_variance_array, ~] = prediction_bin(theta, xtrain_norm, ctrain, [x_array; x0.*ones(1,size(x_array,2))], kernelfun, kernelname, modeltype, post, regularization);
 % 
 % 
 % test= zeros(nsamples,size(x_array,2));

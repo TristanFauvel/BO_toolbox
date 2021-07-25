@@ -7,7 +7,7 @@ end
 % Bivariate Expected Improvement, as proposed by Brochu (2010)
 x0 = x(:,1);
 n= size(x,2);
-[~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin_preference(theta, xtrain, ctrain, [x;x0*ones(1,n)], kernelfun,kernelname, 'modeltype', modeltype, 'post', post);
+[~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain, ctrain, [x;x0*ones(1,n)], kernelfun,kernelname, modeltype, post, regularization);
 
 [max_mu, id1]= max(g_mu_y);
 

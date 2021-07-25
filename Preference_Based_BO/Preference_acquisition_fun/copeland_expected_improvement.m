@@ -23,14 +23,14 @@ end
 
 %(x, theta, xtrain, ctrain, kernelfun, link, xduels,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq, modeltype, C, mu_c_acq)
 %C is the value of the Condorcet winner
-mu_c = prediction_bin_preference(theta, xtrain_norm, ctrain, xduels, kernelfun, 'modeltype', modeltype);
+mu_c = prediction_bin(theta, xtrain_norm, ctrain, xduels, kernelfun, modeltype, post, regularization);
 C= soft_copeland_score(reshape(mu_c, n, n));
 C= max(C);
 
 CEI = zeros(1, size(xduels, 2));
 for i = 1:size(xduels,2)
-    [mu_c_1, ~, ~] = prediction_bin_preference(theta, [xtrain_norm, xduels(:,i)], [ctrain, 1], xduels, kernelfun, 'modeltype', modeltype);
-    [mu_c_0, ~, ~] = prediction_bin_preference(theta, [xtrain_norm, xduels(:,i)], [ctrain, 0], xduels, kernelfun,'modeltype', modeltype);
+    [mu_c_1, ~, ~] = prediction_bin(theta, [xtrain_norm, xduels(:,i)], [ctrain, 1], xduels, kernelfun, modeltype, post, regularization);
+    [mu_c_0, ~, ~] = prediction_bin(theta, [xtrain_norm, xduels(:,i)], [ctrain, 0], xduels, kernelfun,modeltype, post, regularization);
 
     C1= soft_copeland_score(reshape(mu_c_1, n, n));
     [maxC1, ~]= max(C1); %value of the condorcet winner in case 1 is returned with the new duel

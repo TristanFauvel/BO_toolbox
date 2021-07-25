@@ -20,7 +20,7 @@ function [I, dIdx] = adaptive_sampling(theta, xtrain_norm, ctrain, x, x_best_nor
 d = size(xtrain_norm,1)/2;
 
 xduel = [x;x_best_norm];
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc, dvar_muc_dx] =  prediction_bin_preference(theta, xtrain_norm, ctrain, xduel, kernelfun, 'post', post, 'modeltype', modeltype);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, xduel, kernelfun, 'post', post, modeltype, post, regularization);
 
 % h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps);
 h = @(p) -p.*log(p) - (1-p).*log(1-p);
@@ -54,7 +54,7 @@ end
 % d = size(xtrain_norm,1)/2;
 % 
 % xduel = [x;x_best_norm];
-% [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc, dvar_muc_dx] =  prediction_bin_preference(theta, xtrain_norm, ctrain, xduel, kernelfun);
+% [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, xduel, kernelfun);
 % 
 % % h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps);
 % 
@@ -93,7 +93,7 @@ end
 % max((result(:) - test(:)).^2)
 % 
 % xduel = [xrange;x_best_norm.*ones(d,100)];
-% [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc, dvar_muc_dx] =  prediction_bin_preference(theta, xtrain_norm, ctrain, xduel, kernelfun);
+% [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, xduel, kernelfun);
 % 
 % figure();
 % errorshaded(xrange, mu_y,sigma2_y);

@@ -12,11 +12,13 @@ init_guess = [];
 
 % x_duel1 = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, kernelfun, condition.x0,modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
 x = [xtrain_norm(1:D,:), xtrain_norm((D+1):end,:)];
-[g_mu_c,  g_mu_y] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,2*n)], kernelfun, 'modeltype', modeltype, 'post', post);
+
+regularization = 'nugget';
+[g_mu_c,  g_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,2*n)], kernelfun, modeltype, post, regularization);
 [a,b]= max(g_mu_y);
 x_duel1 = x(:,b);
 
-x_duel2 = multistart_minConf(@(x)compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun, condition.x0, x_duel1, modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
+x_duel2 = multistart_minConf(@(x)compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun, condition.x0, x_duel1, modeltype, post,regularization), lb_norm, ub_norm, ncandidates,init_guess, options);
 x_duel1 = x_duel1.*(max_x(1:D)-min_x(1:D)) + min_x(1:D);
 x_duel2 = x_duel2.*(max_x(D+1:end)-min_x(D+1:end)) + min_x(D+1:end);
 
@@ -24,10 +26,10 @@ new_duel = [x_duel1;x_duel2];
 
 end
 
-function [BEI, dBEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, ~, ~, kernelfun, x0, x_duel1, modeltype, post)
+function [BEI, dBEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, ~, ~, kernelfun, x0, x_duel1, modeltype, post, regularization)
 
 [D,n]= size(x);
-[g_mu_c,  g_mu_y, g_sigma2_y,  ~, dmuc_dx, dmuy_dx, dsigma2_y_dx] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], kernelfun, 'modeltype', modeltype, 'post', post);
+[g_mu_c,  g_mu_y, g_sigma2_y,  ~, dmuc_dx, dmuy_dx, dsigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], kernelfun, modeltype, post, regularization);
 
 dmuc_dx = dmuc_dx(1:D,:); % A checker
 dmuy_dx = dmuy_dx(1:D,:);% A checker
@@ -35,8 +37,8 @@ dsigma2_y_dx = dsigma2_y_dx(1:D,:); % A checker
 
 g_sigma_y = sqrt(g_sigma2_y);
 %% Find the maximum of the value function
-% [~,  max_mu_y,  g_sigma2_y1] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x_duel1;x0], kernelfun,kernelname, 'modeltype', modeltype);
-[~, g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x_duel1, x;x0*ones(1,n),x0*ones(1,n)], kernelfun, 'modeltype', modeltype, 'post', post);
+% [~,  max_mu_y,  g_sigma2_y1] = prediction_bin(theta, xtrain_norm, ctrain, [x_duel1;x0], kernelfun,kernelname, modeltype, post, regularization);
+[~, g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [x_duel1, x;x0*ones(1,n),x0*ones(1,n)], kernelfun, modeltype, post, regularization);
 
 g_sigma2_y = g_sigma2_y(1);
 max_mu_y = g_mu_y(1);
@@ -57,7 +59,7 @@ BEI = (g_mu_y - max_mu_y).*normcdf_d+ sigma_I.*normpdf_d;%Brochu
 BEI(sigma_y==0) = 0;
 
 if nargout>1   
-    [~, ~, ~, g_Sigma2_y, ~, ~, ~, dSigma2_y_dx] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x_duel1, x;x0*ones(1,n),x0*ones(1,n)], kernelfun, 'modeltype', modeltype, 'post', post);
+    [~, ~, ~, g_Sigma2_y, ~, ~, ~, dSigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x_duel1, x;x0*ones(1,n),x0*ones(1,n)], kernelfun, modeltype, post, regularization);
 
     gaussder_d = -d.*normpdf_d; %derivative of the gaussian
     
@@ -92,7 +94,7 @@ end
 %      figure()
 %     plot(input,-dei)
 %     
-%     [~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin_preference(theta, xtrain_norm, ctrain, [input;x0*ones(1,N)], kernelfun,kernelname, 'modeltype', modeltype);
+%     [~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [input;x0*ones(1,N)], kernelfun,kernelname, modeltype, post, regularization);
 %     
 %     figure()
 %     errorshaded(input, g_mu_y, sqrt(g_sigma2_y))
@@ -116,8 +118,8 @@ end
 %     end
 %     figure()
 %     plot(input(di,:), -ei)
-%     [~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin_preference(theta, xtrain_norm, ctrain, [input;x0*ones(1,N)], kernelfun,kernelname, 'modeltype', modeltype);
-% %         [~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin_preference(theta, xtrain_norm, ctrain, [input(:,i);x0], kernelfun,kernelname, 'modeltype', modeltype);
+%     [~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [input;x0*ones(1,N)], kernelfun,kernelname, modeltype, post, regularization);
+% %         [~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [input(:,i);x0], kernelfun,kernelname, modeltype, post, regularization);
 % 
 %     figure()
 %     errorshaded(input(di,:), g_mu_y, sqrt(g_sigma2_y))

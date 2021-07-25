@@ -17,14 +17,15 @@ N = size(xtest,2);
 c0 = [ctrain, 0];
 c1 = [ctrain,1];
 
-[mu_c,  mu_y] =  prediction_bin(theta, xtrain_norm, ctrain, xtest, kernelfun, 'modeltype', modeltype, 'post', post);
+regularization = 'nugget';
+[mu_c,  mu_y] =  prediction_bin(theta, xtrain_norm, ctrain, xtest, kernelfun, modeltype, post, regularization);
 gmax = max(mu_y);
 
 N= size(mu_c,1);
 U = zeros(1,N);
 for i = 1:N
-    [mu_c0,  mu_y0] =  prediction_bin(theta, [xtrain_norm, xtest(:,i)], c0, xtest, kernelfun, 'modeltype', modeltype);
-    [mu_c1,  mu_y1] =  prediction_bin(theta, [xtrain_norm, xtest(:,i)], c1, xtest, kernelfun, 'modeltype', modeltype);
+    [mu_c0,  mu_y0] =  prediction_bin(theta, [xtrain_norm, xtest(:,i)], c0, xtest, kernelfun, modeltype, [], regularization);
+    [mu_c1,  mu_y1] =  prediction_bin(theta, [xtrain_norm, xtest(:,i)], c1, xtest, kernelfun, modeltype, [], regularization);
     u = (max(mu_y0)-gmax).*(1-mu_c(i)) + (max(mu_y1)-gmax).*mu_c(i);
     U(i) = u;
 end

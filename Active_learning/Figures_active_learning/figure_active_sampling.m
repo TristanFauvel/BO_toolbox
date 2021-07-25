@@ -67,7 +67,7 @@ for i =1:maxiter
     
 end
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc]= prediction_bin(theta, xtrain, ctrain, xtest, kernelfun,  'modeltype', modeltype);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc]= prediction_bin(theta, xtrain, ctrain, xtest, kernelfun, modeltype, post, regularization);
 [new_x, idx, L] = adaptive_sampling_binary_grid(x, theta, xtrain, ctrain, kernelfun, modeltype);
 
 

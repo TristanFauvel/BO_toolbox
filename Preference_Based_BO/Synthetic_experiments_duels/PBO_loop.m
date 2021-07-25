@@ -7,8 +7,7 @@ D= size(xbounds,1);
 x0 = zeros(D,1);
 condition.x0 = x0;
 condition.y0 = 0;
-kernelfun = @(theta, xi, xj, training) conditional_preference_kernelfun(theta, base_kernelfun, xi, xj, training, 'no', condition.x0);
-
+kernelfun = @(theta, xi, xj, training, regularization) conditional_preference_kernelfun(theta, base_kernelfun, xi, xj, training, regularization,condition.x0);
 
 theta_init = theta;
 
@@ -50,7 +49,7 @@ max_x = [ub; ub];
 
 xtrain = NaN(2*D, maxiter);
 ctrain = NaN(1, maxiter);
-
+regularization = 'nugget';
 for i =1:maxiter
     disp(i)
     x_duel1 = new_duel(1:D,:);
@@ -64,7 +63,7 @@ for i =1:maxiter
     %% Normalize data so that the bound of the search space are 0 and 1.
     xtrain_norm = (xtrain(:,1:i) - [lb; lb])./([ub; ub]- [lb; lb]);
     
-    [~,~,~,~,~,~,~,~,~,~,post] =  prediction_bin_preference(theta, xtrain_norm(:,1:i), ctrain(1:i), new_duel, kernelfun);
+    post =  prediction_bin(theta, xtrain_norm(:,1:i), ctrain(1:i), [], kernelfun, modeltype, [], regularization);
     if i>ninit
         options=[];
         %Local optimization of hyperparameters
@@ -110,7 +109,7 @@ if d == 1
     [d,n]= size(x);
     kernelname = kernelname;
     
-    [~,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x;x0*ones(1,N)], kernelfun,kernelname, 'modeltype', modeltype);
+    [~,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;x0*ones(1,N)], kernelfun,kernelname, modeltype, post, regularization);
     figure();
     errorshaded(x, g_mu_y, sqrt(g_sigma2_y));
     
@@ -128,11 +127,11 @@ if d == 1
     
     result = NaN(2*d,N^d);
     num_result = NaN(d,N^d);
-    k=@(x) to_test_prediction_bin_preference(theta, xtrain_norm, ctrain, x,x0, kernelfun,kernelname, modeltype)
+    k=@(x) to_test_prediction_bin(theta, xtrain_norm, ctrain, x,x0, kernelfun,kernelname, modeltype)
     
     for i = 1:N^d
         num_result(:,i) = test_deriv(k, x(:,i), 1e-12);
-        [~, ~,~,~,~,~, result(:,i)] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x(:,i);x0.*ones(d,1)], kernelfun,kernelname, 'modeltype', modeltype);
+        [~, ~,~,~,~,~, result(:,i)] = prediction_bin(theta, xtrain_norm, ctrain, [x(:,i);x0.*ones(d,1)], kernelfun,kernelname, modeltype, post, regularization);
     end
     result = result(1:d,:);
     figure()
@@ -151,7 +150,7 @@ elseif D==2
     xrange = linspace(0,1,N);
     [p,q] = ndgrid(xrange, xrange);
     x2d= [p(:),q(:)]';
-    [~,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x2d;x0.*ones(d,N^d)], kernelfun,kernelname, 'modeltype', modeltype);
+    [~,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x2d;x0.*ones(d,N^d)], kernelfun,kernelname, modeltype, post, regularization);
     fig=figure()
     fig.Color =  [1 1 1];
     imagesc(xrange,xrange,reshape(g_mu_y, N,N)); hold on;
@@ -205,14 +204,14 @@ elseif D==2
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    k=@(x) to_test_prediction_bin_preference(theta, xtrain_norm, ctrain, x,x0, kernelfun,kernelname, modeltype)
+    k=@(x) to_test_prediction_bin(theta, xtrain_norm, ctrain, x,x0, kernelfun,kernelname, modeltype)
     
     result = NaN(2*d,N^d);
     num_result = NaN(d,N^d);
     
     for i = 1:N^d
         num_result(:,i) = test_deriv(k, x2d(:,i), 1e-12);
-        [~, ~,~,~,~,~, result(:,i)] = prediction_bin_preference(theta, xtrain_norm, ctrain, [x2d(:,i);x0.*ones(d,1)], kernelfun,kernelname, 'modeltype', modeltype);
+        [~, ~,~,~,~,~, result(:,i)] = prediction_bin(theta, xtrain_norm, ctrain, [x2d(:,i);x0.*ones(d,1)], kernelfun,kernelname, modeltype, post, regularization);
     end
     result = result(1:d,:);
     figure()

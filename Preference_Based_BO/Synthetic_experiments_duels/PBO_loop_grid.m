@@ -9,7 +9,7 @@ base_kernelname = 'Gaussian_wnoise';
 kernelfun = @(theta, xi, xj, training) conditional_preference_kernelfun(theta, base_kernelfun, xi, xj, training);
 
 % negloglike =   str2func('negloglike_bin'); %define the negative log-likelihood function
-prediction =   str2func('prediction_bin_preference');%define the prediction (posterior distribution)
+prediction =   str2func('prediction_bin');%define the prediction (posterior distribution)
 
 link = @normcdf; %inverse link function for the classification model
 
@@ -97,8 +97,8 @@ for i =1:maxiter
     
     
     % Compute the Condorcet Winner
-%     [mu_c_acq,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq] = prediction(theta, xtrain, ctrain, xduels, kernelfun, 'modeltype', modeltype);
-    [mu_c_acq,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq] = prediction(theta, xtrain, ctrain, xduels, kernelfun, base_kernelname, 'modeltype', modeltype);
+%     [mu_c_acq,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq] = prediction(theta, xtrain, ctrain, xduels, kernelfun, modeltype, post, regularization);
+    [mu_c_acq,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq] = prediction(theta, xtrain, ctrain, xduels, kernelfun, base_kernelname, modeltype, post, regularization);
 
     CS= soft_copeland_score(reshape(mu_c_acq, ntest^d, ntest^d));
     [maxC, idxmaxC(i)]= max(CS);
@@ -140,7 +140,7 @@ for i =1:maxiter
         %             theta = run(ms,problem,100);
         %         elseif i>nfit && mod(i-ninit,5)==-1
         %             %% Update the model hyperparameters
-        %             theta= minFunc(negloglike, theta, options, xtrain, ctrain, kernelfun, 'modeltype', modeltype);
+        %             theta= minFunc(negloglike, theta, options, xtrain, ctrain, kernelfun, modeltype, post, regularization);
         %         end
         
         
