@@ -2,8 +2,6 @@ function  [new_x, new_x_norm, idx, L] = TME_sampling_binary(x, theta, xtrain_nor
 
 xnorm = (x - lb)./(ub-lb);
 
-nx = size(x,2);
-
 % gaussian_entropy = @(Sigma) 0.5+log(det(Sigma)) + 0.5*size(Sigma,1)*log(2*pi*exp(1));
 gaussian_entropy = @(sigma2) 0.5*log(2*pi*exp(1)*sigma2);
 regularization = 'false';

@@ -19,41 +19,45 @@ nrepets = 20; %20;
 seeds=1:nrepets;
 
 
-load('active_learning_benchmarks_table.mat')
+nobj = 4;
+objectives = cell(1,nobj);
+for i = 1:nobj
+    objectives{i} = 'japan';
+end
+kernelnames = {'Matern32', 'Matern32','Matern52','Matern52'};
+lengthscales = {'long', 'short','long', 'short'};
 
-objectives = benchmarks_table.fName;
-acquisition_funs = {'BALD', 'TME', 'maxvar', 'random'}; 
 
+acquisition_funs = {'TME_sampling'};
+% acquisition_funs = {'random','BALD_grid'};
 
+meanfun = @constant_mean;
+theta.mean = 0;
 nobj = numel(objectives);
 nacq = numel(acquisition_funs);
 for j = 1:nobj
-    bias = 0;
-    objective = char(objectives(j));
-    
-    [y, theta.cov, lb, ub, theta_lb, theta_ub,kernelfun, kernelname] = load_benchmarks(objective, [], benchmarks_table);
-    theta.mean = 0;
-    meanfun = @constant_mean;
+    objective = [objectives{j}, '_', kernelnames{j}, '_',lengthscales{j}];
+    [x, y, theta.cov, lb, ub, theta_lb, theta_ub, kernelfun] = load_benchmarks_active_learning_grid(objectives{j}, kernelnames{j}, lengthscales{j});
     for ji = 1:nacq
         acquisition_name = acquisition_funs{ji};
         acquisition_fun = str2func(acquisition_name);
-        clear('xtrain', 'ytrain', 'cum_regret', 'score');
+        clear('xtrain', 'ctrain', 'cum_regret', 'score');
         for k = 1:nrepets
             disp(['Repetition ', num2str(k)])
             seed = seeds(k);
-            [xtrain{k}, ytrain{k}, cum_regret{k}, score{k}]= AL_loop_grid(x, y, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, theta_lb, theta_ub, lb, ub, seed);
+            [xtrain{k}, ytrain{k}, cum_regret{k}, score{k}]= AL_loop_grid(x, ...
+                y, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, theta_lb, theta_ub, lb, ub, seed);            
         end
         clear('experiment')
         fi = ['xtrain_',acquisition_name];
         experiment.(fi) = xtrain;
         fi = ['xtrain_norm_',acquisition_name];
-        experiment.(fi) = xtrain_norm;
-        fi = ['ytrain_',acquisition_name];
-        experiment.(fi) = ytrain;
+        experiment.(fi) = ctrain;
         fi = ['score_',acquisition_name];
         experiment.(fi) = score;
-        
-        filename = [pathname,'/Active_learning/Data_active_learning_grid/',objective,'_',acquisition_name];
+        fi = ['cul_regret_',acquisition_name];
+        experiment.(fi) = score;
+        filename = [pathname,'/Active_learning/Data_active_learning_binary_grid/',objective,'_',acquisition_name];
         save(filename, 'experiment')
     end
 end
