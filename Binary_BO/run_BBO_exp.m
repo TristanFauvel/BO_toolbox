@@ -20,12 +20,13 @@ objectives = benchmarks_table.fName; %; 'Ursem_waves';'forretal08'; 'camel6';'go
 nobj =numel(objectives);
 seeds = 1:nreplicates;
 update_period = maxiter+2; % do not update the hyperparameters;
+rescaling = 1;
 for j = 1:nobj
     objective = char(objectives(j));    
     
     link = @normcdf;
     modeltype = 'exp_prop';
-    [g, theta, lb, ub, lb_norm, ub_norm, theta_lb, theta_ub, kernelfun, kernelname] = load_benchmarks(objective, [], benchmarks_table);
+    [g, theta, lb, ub, lb_norm, ub_norm, theta_lb, theta_ub, kernelfun, kernelname] = load_benchmarks(objective, [], benchmarks_table, rescaling);
     close all
     for a =1:nacq
         acquisition_name = acquisition_funs{a};
