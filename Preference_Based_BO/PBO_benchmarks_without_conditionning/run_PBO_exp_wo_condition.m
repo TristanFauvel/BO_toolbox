@@ -7,33 +7,38 @@ close all
 
 data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_PBO_wo_condition/'];
 
-acquisition_funs = {'DTS', 'random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI','bivariate_EI', 'Thompson_challenge'};
+acquisition_funs = {'maxvar_challenge'};
 
 % acquisition_funs = {'DTS'};
 
 %there is a problem with 'value_expected_improvement'
-maxiter = 10;%50; %total number of iterations : 200
+maxiter =  50;%50; %total number of iterations : 200
 
-%answer = 'max_mu_g'; %the way I report the maximum, either by maximizing the predictive mean of g, either by maximizing the soft-copeland score, EITHER BY maximizing MU_C: which makes more sense (but this depends on the acquisition function).
 
-nreplicates = 1; %20;
+nreplicates = 20; %20;
 
 nacq = numel(acquisition_funs);
 
 
 % wbar = waitbar(0,'Computing...');
-
+rescaling = 0;
+if rescaling ==0
 load('benchmarks_table.mat')
+else
+load('benchmarks_table_rescaled.mat')
+end
+
 objectives = benchmarks_table.fName; %; 'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12';'forretal08'};
 nobj =numel(objectives);
 seeds = 1:nreplicates;
 update_period = maxiter+2;
+rescaling = 1;
 for j = 1:nobj %nobj
     objective = char(objectives(j));
     
     link = @normcdf;
     modeltype = 'exp_prop';
-    [g, theta, lb, ub, lb_norm, ub_norm, theta_lb, theta_ub, kernelfun, kernelname] = load_benchmarks(objective, [], benchmarks_table);
+    [g, theta, lb, ub, lb_norm, ub_norm, theta_lb, theta_ub, kernelfun, kernelname] = load_benchmarks(objective, [], benchmarks_table, rescaling);
     close all
     for a =1:nacq
         acquisition_name = acquisition_funs{a};

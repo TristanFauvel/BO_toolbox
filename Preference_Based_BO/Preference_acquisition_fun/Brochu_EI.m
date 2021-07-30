@@ -1,5 +1,5 @@
 function [x_duel1, x_duel2, new_duel] = Brochu_EI(theta, xtrain_norm, ctrain, kernelfun, base_kernelfun, modeltype, max_x, min_x, lb_norm, ub_norm, condition, post, ~)
-% Bivariate Expected Improvement, as proposed by Brochu (2010)
+% Expected Improvement, as proposed by Brochu (2010)
 
 D = size(xtrain_norm,1)/2;
 n = size(xtrain_norm,2);

@@ -6,10 +6,11 @@ add_bo_module;
 close all
 
 data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
+data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
 
 acquisition_funs = {'random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI','bivariate_EI', 'Thompson_challenge','DTS'};
 
-
+acquisition_funs = {'Dueling_UCB','EIIG'};
 % acquisition_funs = {'DTS'};
 
 %there is a problem with 'value_expected_improvement'
@@ -23,8 +24,12 @@ nacq = numel(acquisition_funs);
 
 
 % wbar = waitbar(0,'Computing...');
-
+rescaling = 0;
+if rescaling ==0
 load('benchmarks_table.mat')
+else
+load('benchmarks_table_rescaled.mat')
+end
 objectives = benchmarks_table.fName; %; 'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12';'forretal08'};
 nobj =numel(objectives);
 seeds = 1:nreplicates;
@@ -34,7 +39,7 @@ for j = 1:nobj %nobj
     
     link = @normcdf;
     modeltype = 'exp_prop';
-    [g, theta, lb, ub, lb_norm, ub_norm, theta_lb, theta_ub, kernelfun, kernelname] = load_benchmarks(objective, [], benchmarks_table);
+    [g, theta, lb, ub, lb_norm, ub_norm, theta_lb, theta_ub, kernelfun, kernelname] = load_benchmarks(objective, [], benchmarks_table, rescaling);
     close all
     for a =1:nacq
         acquisition_name = acquisition_funs{a};

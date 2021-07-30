@@ -1,10 +1,11 @@
-function t = ranking_analysis(data_path, names, objectives, algos, nreps, maxiter)
+function t = ranking_analysis_AL_grid(data_path, names, objectives, algos, nreps, maxiter)
 
 nobj = numel(objectives);
 nacq = numel(algos);
 graphics_style_paper;
 
 rng(1);
+ninit = 5;
 benchmarks_results = cell(1,nobj);
 scores = cell(1,nacq);
 for j = 1:nobj
@@ -21,8 +22,11 @@ for j = 1:nobj
         filename = [data_path,'/',objective, '_',acquisition];
         try
             load(filename, 'experiment');
-            UNPACK_STRUCT(experiment, false)           
-            scores{a} = cell2mat(eval(['score_', acquisition])');
+            UNPACK_STRUCT(experiment, false)
+            legends{a}=[names{a}];
+            n=['a',num2str(a)];
+            
+            scores{a} = cell2mat(eval(['score_c_', acquisition])');
             
         catch
             scores{a} = NaN(nreps, maxiter);
@@ -33,13 +37,7 @@ for j = 1:nobj
     %     [ranks, average_ranks]= compute_rank(scores, ninit);
 end
 
-%% To test the ranking algo : 
 
-
-
-%%
-
-alpha = 1e-3;
 %% Partial ranking based on Mann-Withney t-test at alpha = 5e-4 significance
 R_best = NaN(nobj, nacq, nacq);
 R_AUC = NaN(nobj, nacq, nacq);
@@ -54,13 +52,15 @@ for k = 1:nobj
             try
                 best_j = S{j};
                 best_j = best_j(:,end);
-                [p,h] = ranksum(best_i, best_j, 'tail','right', 'alpha', alpha); % Test whether i beats j
+                %[p,h] = signrank(best_i, best_j, 'tail','right', 'alpha', 5e-4); % Test whether i beats j
+                [p,h] = ranksum(best_i, best_j, 'tail','right', 'alpha', 5e-4); % Test whether i beats j
                 R_best(k, i, j) = h;
                 
                 score_j = S{j};
                 AUC_j = mean(score_j, 2);
                 
-                [p,h] = ranksum(AUC_i, AUC_j, 'tail','right', 'alpha', alpha); % Test whether i beats j
+                %[p,h] = signrank(AUC_i, AUC_j, 'tail','right', 'alpha', 5e-4); % Test whether i beats j
+                [p,h] = ranksum(AUC_i, AUC_j, 'tail','right', 'alpha', 5e-4); % Test whether i beats j
                 R_AUC(k, i, j) = h;
             catch
                 disp(k)
@@ -69,14 +69,16 @@ for k = 1:nobj
         end
     end
 end
+
+squeeze(R_best(1, :, :))
+squeeze(R_AUC(1, :, :))
+squeeze(R_best(2, :, :))
+squeeze(R_AUC(2, :, :))
+
 partial_ranking = squeeze(sum(R_best,3));
 
-borda_scores = NaN(size(partial_ranking));
-for i=1:nobj
-    partial_ranking(i,:)  = get_ranking(partial_ranking(i,:));
-    borda_scores(i,:)  = get_Borda_from_ranking(partial_ranking(i,:));
-
-end
+AUC_ranking = squeeze(sum(R_AUC,3));
+total_ranking = partial_ranking;
 
 %% Ties from the previous step are broken based on the Area Under Curve
 for k = 1:nobj
@@ -89,16 +91,17 @@ for k = 1:nobj
             %auc_comparisons = AUC_ranking(k,eq); %% Use all the AUC
             %comparisons
             auc_comparisons = squeeze(sum(R_AUC(k,eq,eq),3)); % Only use the comparisons within the ties %%
-            borda_modifier = get_Borda_from_ranking(get_ranking(auc_comparisons));
-            borda_scores(k,eq) = borda_scores(k,eq)+borda_modifier;           
+            
+            total_ranking(k,eq) = total_ranking(k,eq) + rank_with_ties(auc_comparisons);
+            
         end
     end
 end
 
-Borda_score = sum(borda_scores,1);
+Borda_score = sum(total_ranking,1);
 ranking = get_ranking(Borda_score);
 
-[~,b] = sort(ranking);
+[a,b] = sort(ranking);
 ordered_names = names(b);
 t = table(ordered_names(:), ranking(b)', Borda_score(b)', 'VariableNames', {'Acquisition rule', 'Rank', 'Borda score'});
 % table2latex(t, 'PBO_benchmark_results')
@@ -120,17 +123,6 @@ s= 1;
 for i =1:numel(d)
     U(V == d(i)) = s;
     s = s + sum(V == d(i));
-end
-end
-
-function B  = get_Borda_from_ranking(ranking)
-V = ranking;
-B= NaN(size(V));
-ranks = sort(unique(V),'descend');
-s = 0;
-for r = ranks
-    B(V == r) = s;
-    s = s+sum(V==r);
 end
 end
 

@@ -28,7 +28,7 @@ kernelnames = {'Matern32', 'Matern32','Matern52','Matern52'};
 lengthscales = {'long', 'short','long', 'short'};
 
 
-acquisition_funs = {'TME_sampling'};
+acquisition_funs = {'TME_sampling_binary','random','BALD_grid'};
 % acquisition_funs = {'random','BALD_grid'};
 
 meanfun = @constant_mean;
@@ -55,9 +55,9 @@ for j = 1:nobj
         experiment.(fi) = ctrain;
         fi = ['score_',acquisition_name];
         experiment.(fi) = score;
-        fi = ['cul_regret_',acquisition_name];
-        experiment.(fi) = score;
-        filename = [pathname,'/Active_learning/Data_active_learning_binary_grid/',objective,'_',acquisition_name];
+        fi = ['cum_regret_',acquisition_name];
+        experiment.(fi) = cum_regret;
+        filename = [pathname,'/Active_learning/Data_active_learning_grid/',objective,'_',acquisition_name];
         save(filename, 'experiment')
     end
 end

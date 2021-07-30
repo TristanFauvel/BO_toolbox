@@ -59,7 +59,7 @@ classdef japan
             x = [p(:),q(:)]';
             mask = logical(domain.mask(:));
             % Decrease resolution
-            keep = 1:3:numel(y);
+            keep = 1:numel(y);
             x = x(:,keep);
             mask = mask(keep);
             y = y(keep);

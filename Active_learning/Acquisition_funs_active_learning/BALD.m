@@ -1,35 +1,36 @@
-function [I, dIdx]= BALD(theta, xtrain, ctrain, kernelfun, modeltype, post)
+function [I, dIdx]= BALD(theta, xtrain, ctrain, x, kernelfun, modeltype, post)
 
 regularization = 'nugget';
-if nargout == 1
-    [mu_c,  mu_y, sigma2_y] =  prediction_bin(theta, xtrain, ctrain, x, kernelfun, modeltype, post, regularization);
-else
-    [mu_c,  mu_y, sigma2_y, ~, ~, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain, ctrain, x, kernelfun, modeltype, post, regularization);
-end
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain, ctrain, x, kernelfun, modeltype, post, regularization);
+
 h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps);
 
-% for a gaussian cdf link function:
-C = sqrt(pi*log(2)/2);
 
-I1 = h(mu_c);
-I2 =  log(2)*C.*exp(-0.5*mu_y.^2./(sigma2_y+C^2))./sqrt(sigma2_y+C^2);
-I = I1 - I2;
-I = -I; % For minimization
+if strcmp(modeltype, 'exp_prop')
+    % for a gaussian cdf link function:
+    C = sqrt(pi*log(2)/2);
+    
+    I1 = h(mu_c);
+    I2 =  log(2)*C.*exp(-0.5*mu_y.^2./(sigma2_y+C^2))./sqrt(sigma2_y+C^2);
+   
+elseif strcmp(modeltype, 'laplace')
+    %for a sigmoid link
+    C = sqrt(2*log(2));
+    I1 = h(mu_c) ;
+    I2 = 2*C.*exp(-0.5*mu_y.^2./(sigma2_y+C^2))./sqrt(sigma2_y+C^2);
+    
+end
+    I = I1 - I2;
 
-%for a sigmoid link
-%C = sqrt(2*log(2));
-%I = h(mu_c) - 2*C.*exp(-0.5*mu_y.^2./(sigma2_y+C^2))./sqrt(sigma2_y+C^2);
-if nargout>1
+if nargout >1
 dhdp = @(p) -log(p)+log(1-p);
-arg = mu_y./sqrt(sigma2_y+C^2);
-dI1dx = (((dmuy_dx).*sqrt(sigma2_y+C^2)-mu_y.*dsigma2y_dx./(2*sqrt(sigma2_y+C^2)))./(sigma2_y+1)).*normpdf(arg).*dhdp(normcdf(arg));
+% arg = mu_y./sqrt(sigma2_y+C^2);
+% dI1dx = (((dmuy_dx).*sqrt(sigma2_y+C^2)-mu_y.*dsigma2y_dx./(2*sqrt(sigma2_y+C^2)))./(sigma2_y+1)).*normpdf(arg).*dhdp(normcdf(arg));
+dI1dx = dhdp(mu_c)*dmuc_dx;
 
 dI2dx =I2.*(0.5*mu_y.^2.*dsigma2y_dx-mu_y.*(sigma2_y+C^2).*dmuy_dx)./((sigma2_y+C^2).^2)-I2./(2*(sigma2_y+C^2)).*dsigma2y_dx;
-% dI2dx = dI2dx(1:d,:);
 
 dIdx = dI1dx - dI2dx;
-dIdx = -dIdx;
-dIdx = squeeze(dIdx);
 end
 
 return

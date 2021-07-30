@@ -9,7 +9,8 @@ figure_path = '/home/tfauvel/Documents/PhD/Figures/Thesis_figures/Chapter_1/';
 letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 legend_pos = [-0.07,1];
 
-
+regularization = 'nugget';
+post = [];
 n=100;
 rng(2)
 
@@ -25,7 +26,7 @@ theta= theta_true;
 
 meanfun= @constant_mean;
 
-% x = linspace(0,1, n);
+%x = linspace(0,1, n);
 x = [linspace(0,0.2, 20), linspace(0.4,0.6, 20), linspace(0.8,1,20)];
 n = numel(x);
 
@@ -34,7 +35,7 @@ b = -3;
 % g = @(x) normcdf(a*x+b);
 %figure(); plot(g(x))
 
-y = normcdf(mvnrnd(zeros(size(x)), kernelfun(theta_true, x,x, true))); %generate a function
+y = normcdf(mvnrnd(zeros(size(x)), kernelfun(theta_true, x,x, true, regularization))); %generate a function
 figure(); plot(x, y)
 
 
@@ -58,7 +59,8 @@ idx = randsample(n,1);
 new_x = x(idx);
 theta_lb =-15*ones(size(theta));
 theta_ub = 15*ones(size(theta));
-
+lb = min_x;
+ub = max_x;
 
 for i =1:maxiter
     xtrain = [xtrain, new_x];
@@ -70,9 +72,8 @@ for i =1:maxiter
 end
 
 [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc]= prediction_bin(theta, xtrain, ctrain, xtest, kernelfun, modeltype, post, regularization);
-[new_x, idx, L] = adaptive_sampling_binary_grid(x, theta, xtrain, ctrain, kernelfun, modeltype);
-[new_x, idx, TME] = TME_sampling(x, theta, xtrain, ctrain, kernelfun, modeltype);
-
+[new_x, ~, idx, L] = BALD_grid(x, theta, xtrain, ctrain, kernelfun, modeltype, lb, ub, post);
+[new_x, ~, idx, TME] = TME_sampling_binary(x, theta, xtrain, ctrain, kernelfun, modeltype, lb, ub, post);
 
 maxiter = 30;
 
@@ -80,13 +81,19 @@ nreps = 20; %50
 cum_regret_maxvar= NaN(nreps,maxiter+1);
 cum_regret_rand= NaN(nreps,maxiter+1);
 cum_regret_BALD= NaN(nreps,maxiter+1);
+cum_regret_TME= NaN(nreps,maxiter+1);
+score_maxvar= NaN(nreps,maxiter);
+score_rand= NaN(nreps,maxiter);
+score_BALD= NaN(nreps,maxiter);
+score_TME= NaN(nreps,maxiter);
 
+ninit = maxiter+2;
 for s = 1:nreps
-rng(s)
-[~,~, cum_regret_TME(s,:)]= active_learning_grid(n,maxiter, nopt, kernelfun, meanfun, theta, x, y, 'TME');
-[~,~, cum_regret_maxvar(s,:)]= active_learning_grid(n,maxiter, nopt, kernelfun, meanfun, theta, x, y, 'maxvar');
-[~,~, cum_regret_rand(s,:)]= active_learning_grid(n,maxiter, nopt, kernelfun, meanfun,theta,  x, y, 'random');
-[~,~, cum_regret_BALD(s,:)]= active_learning_grid(n,maxiter, nopt, kernelfun, meanfun,theta,  x, y, 'BALD');
+seed = s;
+[~,~, cum_regret_TME(s,:), score_TME(s,:)]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @TME_sampling_binary, ninit, theta_lb, theta_ub, lb, ub, seed);
+[~,~, cum_regret_maxvar(s,:),score_maxvar(s,:)]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @maxvar_binary_grid, ninit, theta_lb, theta_ub, lb, ub, seed);
+[~,~, cum_regret_rand(s,:),score_rand(s,:)]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @random, ninit, theta_lb, theta_ub, lb, ub, seed);
+[~,~, cum_regret_BALD(s,:), score_BALD(s,:)]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @BALD_grid, ninit, theta_lb, theta_ub, lb, ub, seed);
 end
 
 
@@ -159,9 +166,9 @@ h2 = plot_areaerrorbar(cum_regret_rand, options); hold on;
 options.color_area = C(3,:);
 options.color_line = C(3,:);
 h3 = plot_areaerrorbar(cum_regret_BALD, options); hold on;
-options.color_area = C(4,:);
-options.color_line = C(4,:);
-h4 = plot_areaerrorbar(cum_regret_TME, options); hold on;
+options.color_area = C(5,:);
+options.color_line = C(5,:);
+h4 = plot_areaerrorbar(cum_regret_TME, options); hold off;
 
 legend([h1 h2 h3 h4], 'Maximum variance', 'Random', 'BALD', 'TME', 'Location', 'northwest');
 %legend('EI', 'Random')
@@ -172,6 +179,35 @@ grid off
 box off
 legend boxoff
 text(legend_pos(1)-0.1, legend_pos(2),['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
+
+
+fig = figure();
+options.handle = fig;
+options.alpha = 0.2;
+options.error= 'sem'; %std
+options.line_width = linewidth;
+options.color_area = C(1,:);
+options.color_line = C(1,:);
+h1 = plot_areaerrorbar(score_maxvar, options); hold on;
+options.color_area = C(2,:);
+options.color_line = C(2,:);
+h2 = plot_areaerrorbar(score_rand, options); hold on;
+options.color_area = C(3,:);
+options.color_line = C(3,:);
+h3 = plot_areaerrorbar(score_BALD, options); hold on;
+options.color_area = C(5,:);
+options.color_line = C(5,:);
+h4 = plot_areaerrorbar(score_TME, options); hold off;
+
+legend([h1 h2 h3 h4], 'Maximum variance', 'Random', 'BALD', 'TME', 'Location', 'northwest');
+%legend('EI', 'Random')
+xlabel('Iteration','Fontsize',Fontsize)
+ylabel('Score','Fontsize',Fontsize)
+set(gca, 'Fontsize', Fontsize, 'Xlim', [0, maxiter])
+grid off
+box off
+legend boxoff
+
 
 % 
 % figname  = 'Active_learning';

@@ -53,7 +53,7 @@ for j = 1:nobj
         legends{a}=[names{a}];
         n=['a',num2str(a)];
         
-        scores{a} = cell2mat(eval(['score_', acquisition])');
+        scores{a} = cell2mat(eval(['score_c_', acquisition])');
     
         catch 
            

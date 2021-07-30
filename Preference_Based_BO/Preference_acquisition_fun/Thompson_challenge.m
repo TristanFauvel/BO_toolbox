@@ -1,5 +1,5 @@
 function [x_duel1, x_duel2,new_duel] = Thompson_challenge(theta, xtrain_norm, ctrain, kernelfun, base_kernelfun,modeltype, max_x, min_x, lb_norm, ub_norm, condition, post, kernel_approx)
-
+% This function is called Dueling Thompson in Benavoli 2020.
 options.method = 'lbfgs';
 options.verbose = 1;
 D = size(xtrain_norm,1)/2;

@@ -1,84 +1,26 @@
-clear all
-close all
-cd(' C:\Users\tfauvel\Documents\Retinal_prosthetic_optimization\Retinal_Prosthetic_Optimization_Code\Experiment_p2p_preference\Run')
-add_modules
-data_dir =  [code_directory,'\Preference_Based_BO_toolbox\Data'];
-cd([code_directory,'\Preference_Based_BO_toolbox'])
-pathname = [data_dir,'/synthetic_exp_duels_data/'];
-pathname_wo_condition = [data_dir,'/synthetic_exp_duels_data_without_conditioning/'];
+add_bo_module;
+data_dir_1 =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data'];
+data_dir_2 =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data_wo_conditioning'];
 
-figures_folder = [pathname, 'figures/'];
+figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
+figname =  'PBO_scores_benchmarks_w_wo_conditioning';
 
+acquisition_funs = {'maxvar_challenge'};
 
-objectives = {'GP1d', 'forretal08', 'grlee12', 'levy', 'goldpr', 'camel6'};
-objectives = {'forretal08', 'grlee12', 'GP1d', 'levy', 'goldpr', 'camel6'};
-nobj = numel(objectives);
+names = {'Maximum Variance Challenge'};
 
-acquisition_funs = {'random_acquisition_pref', 'new_DTS','active_sampling', 'MES', 'random', 'decorrelatedsparring', 'kernelselfsparring'};
-acquisition_funs = {'DTS','random_acquisition_pref','kernelselfsparring','maxvar_challenge', 'Thompson_challenge'};
-% Warning: to compare with Brochu_EI and Bivariate_EI, I would need to
-% rerun these benchmarks without conditioning (seed problem)
-names = {'DTS','Random', 'KSS', 'MVC', 'Thompson Challenge',};
-names = {'Duel Thompson Sampling','Random', 'Kernel Self-Sparring', 'Maximum Variance Challenge','Thompson Challenge'};
+load('benchmarks_table.mat')
+objectives = benchmarks_table.fName; %; 'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12';'forretal08'};
+objectives_names = benchmarks_table.fName; %{'GP1d','Forrester (2008)', 'Gramacy and Lee (2012)', 'Levy', 'Goldstein-Price', 'Six Hump Camel', 'Ursem-Waves'};
+nobj =numel(objectives);
 
-nacq = numel(acquisition_funs);
-graphics_style_paper;
+nreps = 20;
+maxiter = 50;
+t = ranking_analysis_w_wo_condition(data_dir1, data_dir2, names, objectives, acquisition_funs, nreps, maxiter);
 
-mc = 2;
-mr = 4;
-fig=figure('units','centimeters','outerposition',1+[0 0 width height(mr)]);
-fig.Color =  [1 1 1];
-tiledlayout(mr, mc, 'TileSpacing', 'tight', 'padding','compact');
-options.handle = fig;
-options.alpha = 0.2;
-options.error= 'sem';
-options.line_width = linewidth/2;
-options.semilogy = false;
-options.cmap = C;
-
-rng(1);
-% colors = rand(nacq,3);
-% options.colors = colors;
-for j = 1:nobj
-    nexttile
-    objective = objectives{j};
-    
-    
-        options.semilogy = false;
-    for a = 1:nacq
-        legends{a}=[names{a}];
-        n=['a',num2str(a)];
-        acquisition = acquisition_funs{a};
-
-        filename = [pathname,'\',objective, '_',acquisition];
-        load(filename, 'experiment');
-        UNPACK_STRUCT(experiment, false)
-        scores{a} = cell2mat(eval(['score_', acquisition])');
-
-        filename = [pathname_wo_condition,'\',objective, '_',acquisition];
-        load(filename, 'experiment');
-        UNPACK_STRUCT(experiment, false)
-        scores_wo_condition{a} = cell2mat(eval(['score_', acquisition])');
-        
-        diff_scores{a} = scores_wo_condition{a}-scores{a};
-    end
-    
-    plots =  plot_areaerrorbar_grouped(diff_scores, options);
-    maxiter=  size(diff_scores{1},2);
-    set(gca, 'Xlim', [1, maxiter])
-    plot([1,maxiter], [0,0], '--k', 'Linewidth', linewidth); hold off;
-    box off
-    ylabel('Value $g(x^*)$');
-    title(objective)
-end
-legend(plots, legends);
-legend boxoff
-xlabel('Iteration \#')
+table2latex(t, [figure_folder, '/PBO_benchmark_results_w_wo_conditioning'])
 
 
-figname =  'PBO_scores_benchmarks_condition_or_not';
-folder = ['C:\Users\tfauvel\Documents\PhD\Figures\Thesis_figures\Chapter_1\',figname];
-savefig(fig, [folder,'\', figname, '.fig'])
-exportgraphics(fig, [folder,'\' , figname, '.pdf']);
-exportgraphics(fig, [folder,'\' , figname, '.png'], 'Resolution', 300);
-
+objectives = categorical({'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12'}); 
+objectives_names = benchmarks_table(any(benchmarks_table.fName == objectives',2),:).Name; 
+plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname)

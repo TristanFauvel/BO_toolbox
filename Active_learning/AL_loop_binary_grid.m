@@ -1,4 +1,4 @@
-function [xtrain, ctrain, cum_regret, score]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, acquisition_fun, ninit, theta_lb, theta_ub, lb, ub, seed)
+function [xtrain, ctrain, cum_regret, score_y, score_c]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, acquisition_fun, ninit, theta_lb, theta_ub, lb, ub, seed)
 
 rng(seed)
 
@@ -10,7 +10,7 @@ new_x_norm = (new_x - lb)./(ub-lb);
 cum_regret=NaN(1, maxiter+1);
 cum_regret(1)=0;
 
-regularization = 'false';
+regularization = 'nugget';
 
 y = mvnrnd(zeros(size(y)),kernelfun(theta,x,x, true, regularization))';
 
@@ -18,9 +18,11 @@ xtrain = NaN(D,maxiter);
 xtrain_norm = NaN(D,maxiter);
 
 ctrain = NaN(1, maxiter);
-score = NaN(1,maxiter);
-modeltype = 'exp_prop';
+score_c = NaN(1,maxiter);
+score_y = NaN(1,maxiter);
 
+modeltype = 'exp_prop';
+link = @normcdf;
 if strcmp(func2str(acquisition_fun), 'random')
     nopt = maxiter +1;
 end
@@ -30,15 +32,17 @@ post = [];
 for i =1:maxiter
     disp(i)
     xtrain(:,i) = new_x;
-    ctrain(:,i) = normcdf(y(new_i))>rand;
+    ctrain(:,i) = link(y(new_i))>rand;
     xtrain_norm(:,i) = new_x_norm;
-    post = prediction_bin(theta, xtrain(:,1:i), ctrain(:,1:i), [], kernelfun, modeltype, [], regularization);
+    post = prediction_bin(theta, xtrain_norm(:,1:i), ctrain(:,1:i), [], kernelfun, modeltype, [], regularization);
 
-    mu_c = prediction_bin(theta, xtrain(:,1:i), ctrain(:,1:i), x, kernelfun, modeltype, post, regularization);
+    [mu_c, mu_y] = prediction_bin(theta, xtrain_norm(:,1:i), ctrain(:,1:i), x, kernelfun, modeltype, post, regularization);
   
-    score(i) = sqrt(mse(mu_c(:),normcdf(y(:))));
-    cum_regret(i+1) = cum_regret(i)+score(i);
-    score(i)= -score(i);
+    score_y(i) = sqrt(mse(mu_y(:),y(:))); 
+    score_c(i) = sqrt(mse(mu_c(:),link(y(:))));
+    cum_regret(i+1) = cum_regret(i)+score_c(i);
+    score_c(i)= -score_c(i);
+    score_y(i)= -score_y(i);
     if i > ninit
         init_guess = theta;
         theta = multistart_minConf(@(hyp)negloglike_bin(hyp, xtrain_norm(:,1:i), ctrain(:,1:i), kernelfun, 'modeltype', modeltype, 'post', post), theta_lb, theta_ub,10, init_guess, options_theta); 

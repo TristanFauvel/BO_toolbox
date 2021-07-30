@@ -31,6 +31,8 @@ if any(strcmp(func2str(acquisition_fun), {'DTS', 'kernelselfsparring', 'Thompson
 else
     kernel_approx = [];
 end
+options_theta.method = 'lbfgs';
+options_theta.verbose = 1;
 
 % Warning : the seed has to be re-initialized after the random kernel
 % approximation.
@@ -63,15 +65,17 @@ for i =1:maxiter
     %% Normalize data so that the bound of the search space are 0 and 1.
     xtrain_norm = (xtrain(:,1:i) - [lb; lb])./([ub; ub]- [lb; lb]);
     
-    post =  prediction_bin(theta, xtrain_norm(:,1:i), ctrain(1:i), [], kernelfun, modeltype, [], regularization);
     if i>ninit
         options=[];
         %Local optimization of hyperparameters
-        if mod(i, update_period) ==1
+        if mod(i, update_period) ==0
             theta = theta_init(:);
             theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm(:,1:i), ctrain(1:i), kernelfun, 'modeltype', modeltype), theta, theta_lb, theta_ub, options);
         end
-        
+    end
+        post =  prediction_bin(theta, xtrain_norm(:,1:i), ctrain(1:i), [], kernelfun, modeltype, [], regularization);
+
+    if i>ninit
         [x_duel1, x_duel2] = acquisition_fun(theta, xtrain_norm(:,1:i), ctrain(1:i), kernelfun, base_kernelfun, modeltype,max_x, min_x, lb_norm, ub_norm, condition, post, kernel_approx);
     else %When we have not started to train the GP classification model, the acquisition is random
         [x_duel1,x_duel2]=random_acquisition_pref([],[],[],[],[],[], max_x, min_x, lb_norm, ub_norm, [], []);

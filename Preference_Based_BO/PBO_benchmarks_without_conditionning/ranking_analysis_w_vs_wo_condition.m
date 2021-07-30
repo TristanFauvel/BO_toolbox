@@ -1,12 +1,12 @@
-function t = ranking_analysis(data_path, names, objectives, algos, nreps, maxiter)
+function t = ranking_analysis_w_vs_wo_condition(data_dir_w, data_dir_wo, names, objectives, algos, nreps, maxiter)
 
 nobj = numel(objectives);
 nacq = numel(algos);
 graphics_style_paper;
 
 rng(1);
-benchmarks_results = cell(1,nobj);
-scores = cell(1,nacq);
+benchmarks_results_wo = cell(1,nobj);
+scores_wo = cell(1,nacq);
 for j = 1:nobj
     %     objective = objectives{j};
     objective = char(objectives(j));
@@ -22,23 +22,46 @@ for j = 1:nobj
         try
             load(filename, 'experiment');
             UNPACK_STRUCT(experiment, false)           
-            scores{a} = cell2mat(eval(['score_', acquisition])');
+            scores_wo{a} = cell2mat(eval(['score_', acquisition])');
             
         catch
-            scores{a} = NaN(nreps, maxiter);
+            scores_wo{a} = NaN(nreps, maxiter);
         end
         
     end
-    benchmarks_results{j} = scores;
+    benchmarks_results_wo{j} = scores_wo;
     %     [ranks, average_ranks]= compute_rank(scores, ninit);
 end
 
-%% To test the ranking algo : 
+benchmarks_results_w = cell(1,nobj);
+scores_w = cell(1,nacq);
+for j = 1:nobj
+    %     objective = objectives{j};
+    objective = char(objectives(j));
+    
+    if strcmp(objective, 'goldpr')
+        options.semilogy = true; %true;
+    else
+        options.semilogy = false;
+    end
+    for a = 1:nacq
+        acquisition = algos{a};
+        filename = [data_path,'/',objective, '_',acquisition];
+        try
+            load(filename, 'experiment');
+            UNPACK_STRUCT(experiment, false)           
+            scores_w{a} = cell2mat(eval(['score_', acquisition])');
+            
+        catch
+            scores_w{a} = NaN(nreps, maxiter);
+        end
+        
+    end
+    benchmarks_results_w{j} = scores_w;
+    %     [ranks, average_ranks]= compute_rank(scores, ninit);
+end
 
-
-
-%%
-
+nacq = 2;
 alpha = 1e-3;
 %% Partial ranking based on Mann-Withney t-test at alpha = 5e-4 significance
 R_best = NaN(nobj, nacq, nacq);
