@@ -12,14 +12,8 @@ ncandidates= 5;
 
 [sample_g, dsample_g_dx] = sample_value_GP_precomputed_features(phi, dphi_dx, phi_pref, dphi_pref_dx, xtrain_norm, ctrain, theta,kernelfun, decoupled_bases, modeltype, base_kernelfun, post, condition);
 
-new= NaN;
 init_guess = [];
-while isnan(new)
-    new = multistart_minConf(@(x)deriv(x,sample_g, dsample_g_dx), lb_norm, ub_norm, ncandidates,init_guess, options);
-    if any(isnan(new))
-        warning('x is NaN')
-    end
-end
+new = multistart_minConf(@(x)deriv(x,sample_g, dsample_g_dx), lb_norm, ub_norm, ncandidates,init_guess, options);
 
 %Careful here: the goal is to maximize the value function (the problem
 %is a maximization problem): deriv takes the opposite of sample_g

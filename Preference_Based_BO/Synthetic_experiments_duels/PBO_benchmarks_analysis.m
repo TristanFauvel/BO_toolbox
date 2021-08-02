@@ -18,10 +18,10 @@ t = ranking_analysis(data_dir, names, objectives, acquisition_funs, nreps, maxit
 
 table2latex(t, [figure_folder, '/PBO_benchmark_results'])
 
-
+rescaling = 0;
 objectives = categorical({'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12'}); 
 objectives_names = benchmarks_table(any(benchmarks_table.fName == objectives',2),:).Name; 
-plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname)
+plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname, rescaling)
 
 
 

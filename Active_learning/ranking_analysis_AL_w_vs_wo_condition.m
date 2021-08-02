@@ -1,4 +1,4 @@
-function t = ranking_analysis_w_vs_wo_condition(data_dir_w, data_dir_wo, names, objectives, algos, nreps, maxiter)
+function t = ranking_analysis_AL_w_vs_wo_condition(data_dir, names, objectives, algos, nreps, maxiter)
 
 nobj = numel(objectives);
 nacq = numel(algos);
@@ -8,24 +8,15 @@ rng(1);
 benchmarks_results_wo = cell(1,nobj);
 scores_wo = cell(1,nacq);
 for j = 1:nobj
-    %     objective = objectives{j};
-    objective = char(objectives(j));
-    
+    objective = char(objectives(j));    
     for a = 1:nacq
         acquisition = algos{a};
-        filename = [data_dir_wo,'/',objective, '_',acquisition];
-        %         try
+        filename = [data_dir,'/',objective, '_',acquisition, '_0'];
         load(filename, 'experiment');
         UNPACK_STRUCT(experiment, false)
-        scores_wo{a} = cell2mat(eval(['score_', acquisition])');
-        
-        %         catch
-        %             scores_wo{a} = NaN(nreps, maxiter);
-        %         end
-        
+        scores_wo{a} = -cell2mat(eval(['score_', acquisition])');
     end
     benchmarks_results_wo{j} = scores_wo;
-    %     [ranks, average_ranks]= compute_rank(scores, ninit);
 end
 
 benchmarks_results_w = cell(1,nobj);
@@ -35,16 +26,16 @@ for j = 1:nobj
     
     for a = 1:nacq
         acquisition = algos{a};
-        filename = [data_dir_w,'/',objective, '_',acquisition];
+        filename = [data_dir,'/',objective, '_',acquisition, '_1'];
         load(filename, 'experiment');
         UNPACK_STRUCT(experiment, false)
-        scores_w{a} = cell2mat(eval(['score_', acquisition])');     
+        scores_w{a} =- cell2mat(eval(['score_', acquisition])');     
     end
     benchmarks_results_w{j} = scores_w;
 end
 
 nacq = 2;
-alpha = 1e-2;
+alpha = 5e-4;
 %% Partial ranking based on Mann-Withney t-test at alpha = 5e-4 significance
 R_best = NaN(nobj, nacq, nacq);
 R_AUC = NaN(nobj, nacq, nacq);

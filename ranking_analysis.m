@@ -11,11 +11,6 @@ for j = 1:nobj
     %     objective = objectives{j};
     objective = char(objectives(j));
     
-    if strcmp(objective, 'goldpr')
-        options.semilogy = true; %true;
-    else
-        options.semilogy = false;
-    end
     for a = 1:nacq
         acquisition = algos{a};
         filename = [data_path,'/',objective, '_',acquisition];
@@ -39,7 +34,7 @@ end
 
 %%
 
-alpha = 1e-3;
+alpha = 5e-4;
 %% Partial ranking based on Mann-Withney t-test at alpha = 5e-4 significance
 R_best = NaN(nobj, nacq, nacq);
 R_AUC = NaN(nobj, nacq, nacq);

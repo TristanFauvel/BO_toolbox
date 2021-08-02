@@ -36,11 +36,20 @@ for i =1:maxiter
     xtrain_norm(:,i) = new_x_norm;
     post = prediction_bin(theta, xtrain_norm(:,1:i), ctrain(:,1:i), [], kernelfun, modeltype, [], regularization);
 
-    [mu_c, mu_y] = prediction_bin(theta, xtrain_norm(:,1:i), ctrain(:,1:i), x, kernelfun, modeltype, post, regularization);
-  
-    score_y(i) = sqrt(mse(mu_y(:),y(:))); 
-    score_c(i) = sqrt(mse(mu_c(:),link(y(:))));
+    [mu_c, mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain_norm(:,1:i), ctrain(:,1:i), x, kernelfun, modeltype, post, regularization);
+
+    Err = sigma2_y(:)+(y(:)-mu_y(:)).^2;
+    score_y(i) = mean(Err);
+    
+    Err = var_muc(:)+(link(y(:))-mu_c(:)).^2;
+    score_y(i) = mean(Err);
+
+%     
+%     score_y(i) = sqrt(mse(mu_y(:),y(:))); 
+%     score_c(i) = sqrt(mse(mu_c(:),link(y(:))));
     cum_regret(i+1) = cum_regret(i)+score_c(i);
+    
+    
     score_c(i)= -score_c(i);
     score_y(i)= -score_y(i);
     if i > ninit

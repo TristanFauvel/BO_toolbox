@@ -1,6 +1,6 @@
 add_bo_module;
-data_dir_1 =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data'];
-data_dir_2 =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data_wo_conditioning'];
+data_dir_w =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
+data_dir_wo =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_PBO_wo_condition'];
 
 figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
 figname =  'PBO_scores_benchmarks_w_wo_conditioning';
@@ -16,7 +16,7 @@ nobj =numel(objectives);
 
 nreps = 20;
 maxiter = 50;
-t = ranking_analysis_w_wo_condition(data_dir1, data_dir2, names, objectives, acquisition_funs, nreps, maxiter);
+t = ranking_analysis_w_wo_condition(data_dir_w, data_dir_wo, names, objectives, acquisition_funs, nreps, maxiter);
 
 table2latex(t, [figure_folder, '/PBO_benchmark_results_w_wo_conditioning'])
 

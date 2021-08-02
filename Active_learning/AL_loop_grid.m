@@ -22,9 +22,13 @@ for i =1:maxiter
     ytrain(:,i) = y(new_i);
            xtrain_norm(:,i) = new_x_norm;
 
-    mu_y = prediction(theta, xtrain(:,1:i), ytrain(:,1:i), x, kernelfun, meanfun, [], regularization);
+    [mu_y,sigma2_y] = prediction(theta, xtrain(:,1:i), ytrain(:,1:i), x, kernelfun, meanfun, [], regularization);
   
-    score(i) = sqrt(mse(mu_y',y));
+    
+    Err = sigma2_y(:)+(y(:)-mu_y(:)).^2;
+    
+    score(i) = mean(Err);
+    
     cum_regret(i+1) = cum_regret(i)+score(i);
     
     if i > ninit

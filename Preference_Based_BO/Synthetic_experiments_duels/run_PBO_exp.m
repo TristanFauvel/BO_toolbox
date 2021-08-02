@@ -34,7 +34,7 @@ objectives = benchmarks_table.fName; %; 'Ursem_waves';'forretal08'; 'camel6';'go
 nobj =numel(objectives);
 seeds = 1:nreplicates;
 update_period = maxiter+2;
-for j = 1:nobj %nobj
+for j = 1:nobj %nobj %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     objective = char(objectives(j));
     
     link = @normcdf;
