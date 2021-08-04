@@ -47,6 +47,17 @@ for j = 1:nobj %nobj %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         clear('xtrain', 'xtrain_norm', 'ctrain', 'score');
         
         filename = [data_dir,objective,'_',acquisition_name];
+        
+        if more_repets          
+            load(filename, 'experiment')
+            
+            for k = 1:nrepets
+                n = numel(experiment.(['xtrain_',acquisition_name]));
+                disp(['Repetition : ', num2str(n+k)])
+                seed =n+k;
+                [experiment.(['xtrain_',acquisition_name]){n+k}, experiment.(['xtrain_norm_',acquisition_name]){n+k}, experiment.(['ctrain_',acquisition_name]){n+k}, experiment.(['score_',acquisition_name]){n+k}]=  PBO_loop(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, modeltype, theta_lb, theta_ub, kernelname, kernelfun, lb_norm, ub_norm, link);
+            end
+        else
             for r=1:nreplicates  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 seed  = seeds(r)
                 %             waitbar(((a-1)*nreplicates+r)/(nreplicates*nacq),wbar,'Computing...');
@@ -61,7 +72,7 @@ for j = 1:nobj %nobj %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             experiment.(fi) = ctrain;
             fi = ['score_',acquisition_name];
             experiment.(fi) = score;
-            
+        end
             filename = [data_dir,objective,'_',acquisition_name];
             close all
             save(filename, 'experiment')

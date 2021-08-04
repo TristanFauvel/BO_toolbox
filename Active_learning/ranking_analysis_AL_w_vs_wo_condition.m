@@ -91,6 +91,8 @@ for k = 1:nobj
 end
 
 Borda_score = sum(borda_scores,1);
+
+% objectives(logical(sum(borda_scores,2)))
 ranking = get_ranking(Borda_score);
 
 [~,b] = sort(ranking);

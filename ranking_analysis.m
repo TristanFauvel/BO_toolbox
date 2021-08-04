@@ -1,4 +1,4 @@
-function t = ranking_analysis(data_path, names, objectives, algos, nreps, maxiter)
+function [t, Best_ranking, AUC_ranking,b] = ranking_analysis(data_path, names, objectives, algos, nreps, maxiter, suffix)
 
 nobj = numel(objectives);
 nacq = numel(algos);
@@ -13,7 +13,7 @@ for j = 1:nobj
     
     for a = 1:nacq
         acquisition = algos{a};
-        filename = [data_path,'/',objective, '_',acquisition];
+        filename = [data_path,'/',objective, '_',acquisition,suffix];
         try
             load(filename, 'experiment');
             UNPACK_STRUCT(experiment, false)           
@@ -66,6 +66,7 @@ for k = 1:nobj
 end
 partial_ranking = squeeze(sum(R_best,3));
 
+
 borda_scores = NaN(size(partial_ranking));
 for i=1:nobj
     partial_ranking(i,:)  = get_ranking(partial_ranking(i,:));
@@ -93,9 +94,15 @@ end
 Borda_score = sum(borda_scores,1);
 ranking = get_ranking(Borda_score);
 
-[~,b] = sort(ranking);
-ordered_names = names(b);
-t = table(ordered_names(:), ranking(b)', Borda_score(b)', 'VariableNames', {'Acquisition rule', 'Rank', 'Borda score'});
+[a,b] = sort(ranking);
+ordered_names = names(b,:);
+t = table(ordered_names, ranking(b)', Borda_score(b)', 'VariableNames', {'Acquisition rule', 'Rank', 'Borda score'});
+
+Best_ranking = squeeze(sum(R_best,1))/nobj;
+Best_ranking = Best_ranking(b,b);
+AUC_ranking = squeeze(sum(R_AUC,1))/nobj;
+AUC_ranking =  AUC_ranking(b,b);
+
 % table2latex(t, 'PBO_benchmark_results')
 end
 

@@ -4,7 +4,7 @@ close all
 add_bo_module;
 
 seed=1;
-maxiter= 35;% 100;
+maxiter= 60;% 100;
 rng(seed)
 
 

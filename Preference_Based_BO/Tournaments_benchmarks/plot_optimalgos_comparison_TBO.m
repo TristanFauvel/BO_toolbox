@@ -1,4 +1,4 @@
-function fig =  plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname, nreps, maxiter, rescaling, suffix)
+function plot_optimalgos_comparison_TBO(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname, nreps, maxiter, rescaling, feedback)
 
 % data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data'];
 % figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
@@ -30,8 +30,8 @@ options.semilogy = false;
 options.cmap = C;
 
 rng(1);
-colors = colororder;
-options.colors = colors;
+% colors = rand(nacq,3);
+% options.colors = colors;
 ninit = 5;
 
 for j = 1:nobj
@@ -46,11 +46,11 @@ for j = 1:nobj
     clear('score')
     for a = 1:nacq
         acquisition = acquisition_funs{a};
-        filename = [data_dir,'/',objective, '_',acquisition, suffix];
+        filename = [data_dir,'/',objective, '_',acquisition, '_', feedback];
         try
         load(filename, 'experiment');
         UNPACK_STRUCT(experiment, false)
-        legends{a}=char(names(a));
+        legends{a}=[names{a}];
         n=['a',num2str(a)];
         
         scores{a} = cell2mat(eval(['score_', acquisition])');

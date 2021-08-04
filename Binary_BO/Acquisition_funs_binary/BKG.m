@@ -19,11 +19,14 @@ end
 
 function [U, dUdx] = knowledge_grad(theta, xtrain_norm, ctrain, xt, kernelfun, modeltype, post, c0, c1, xbest, ybest)
 init_guess = xbest;
+ncandidates = 5;
+options.verbose= 1;
+options.method = 'lbfgs';
+regularization = 'nugget';
 
-regularization = 'false';
 [mu_c,  ~, ~, ~, dmuc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, xt, kernelfun, modeltype, post, regularization);
 
-post0=  prediction_bin(theta, [xtrain_norm,xt], c0, [], kernelfun, modeltype, [], regularization);
+post0 =  prediction_bin(theta, [xtrain_norm,xt], c0, [], kernelfun, modeltype, [], regularization);
 post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], kernelfun, modeltype, [], regularization);
 
 [xbest1, ybest1] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c1, x, kernelfun,modeltype, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
