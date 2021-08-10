@@ -32,9 +32,10 @@ ub = [10,100, 5] ;
 c= othercolor('GnBu7');
 
 rng(5)
+regularization = 'nugget';
 
 %generate a function
-y = mvnrnd(meanfun(x,0), kernelfun(theta_true, x,x));
+y = mvnrnd(meanfun(x,0), kernelfun(theta_true, x,x, 'true', regularization));
 y = y - mean(y);
 
 x_test = x;
@@ -63,7 +64,7 @@ for i =1:2
     y_tr = [y_tr, new_y];
     
     
-    [mu_y, sigma2_y, ~, ~, Sigma2_y]= prediction(theta, x_tr, y_tr, x, kernelfun, meanfun);
+    [mu_y, sigma2_y, ~, ~, Sigma2_y]= prediction(theta, x_tr, y_tr, x, kernelfun, meanfun, [], regularization);
     
     
     if i> nopt
@@ -82,12 +83,6 @@ for i =1:2
     end
 end
 
-sample = mvnrnd(mu_y,Sigma2_y);
-[~, new_i_TS] = max(sample);
-new_x_TS = x(:, new_i_TS);
-max_TS = max(sample);
-
-
 
 maxiter = 30;
 
@@ -105,11 +100,16 @@ for s = 1:nreps
 end
 
 
+rng(2)
+sample = mvnrnd(mu_y,Sigma2_y);
+[~, new_i_TS] = max(sample);
+new_x_TS = x(:, new_i_TS);
+max_TS = max(sample);
 
 
 mr = 2;
 mc = 3;
-fig=figure('units','centimeters','outerposition',1+[0 0 width height(1)]);
+fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(1)]);
 fig.Color =  [1 1 1];
 layout1 = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
 i = 0;
@@ -123,7 +123,7 @@ plot(x, y, 'Color',  C(2,:),'LineWidth', linewidth); hold on;
 plot(x_tr, y_tr, 'ro', 'MarkerSize', 10, 'color', C(2,:)); hold on;
 scatter(x_tr, y_tr, markersize, C(2,:), 'filled'); hold on;
 % xlabel('$x$')
-% ylabel('$f(x)$')
+ylabel('$f(x)$')
 set(gca, 'Fontsize', Fontsize, 'Xlim', Xlim); %,  'Ylim',Ylim)
 grid off
 box off
@@ -134,33 +134,41 @@ nexttile(layout1, 4, [1,2]);
 i=i+1;
 yyaxis left
 p1 = plot(x,sample,'LineWidth',1.5,'Color', C(2,:)); hold on;
-vline(new_x_TS,'Linewidth',linewidth, 'ymax', max_TS); hold off;
+vline(new_x_TS,'Linewidth',linewidth, 'ymax', max_TS,  'LineStyle', '--', ...
+    'Linewidth', 1); hold off;
 xlabel('$x$','Fontsize',Fontsize)
-ylabel('$\tilde{f}(x)$','Fontsize',Fontsize)
-xticks([0,new_x_TS, new_x, 1])
-xticklabels({'0', '$x_{t+1}$ (TS)', '$x_{t+1}$ (EI)','1'})
-
+[xt,b] = sort([0,new_x_TS, new_x, 1]);
+xticks(xt)
+lgs = {'0', '$x_{t+1}$ (TS)', '$x_{t+1}$ (EI)','1'};
+xticklabels(lgs(b))
 set(gca, 'Fontsize', Fontsize, 'Xlim', Xlim, 'Ylim', [1.1*min(sample), 1.1*max(sample)])
 grid off
 box off
+ax = gca;
+ax.YAxis(1).Color = 'k';
+ylabel('$\tilde{f}(x)$','Fontsize',Fontsize, 'color', C(2,:))
+
 
 yyaxis right
 p2 = plot(x,EI,'LineWidth',1.5,'Color', C(1,:)); hold on;
-vline(new_x,'Linewidth',linewidth, 'ymax', max_EI); hold off;
+vline(new_x,'Linewidth',linewidth, 'ymax', max_EI, 'LineStyle', '--', ...
+    'Linewidth', 1); hold off;
 % xlabel('$x$','Fontsize',Fontsize)
-ylabel('$EI(x)$','Fontsize',Fontsize)
 set(gca, 'Fontsize', Fontsize, 'Xlim', Xlim, 'Ylim', [min(EI)-1, 1+max(EI)])
 grid off
 box off
 % xticks([0,new_x,1])
+ax = gca;
+ax.YAxis(2).Color = 'k';
+ylabel('$EI(x)$','Fontsize',Fontsize, 'color', C(1,:))
+
 % xticklabels({'0', '$x_{t+1}$','1'})
 text(legend_pos(1), legend_pos(2),['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
-ax = gca;
-ax.YAxis(1).Color = 'k';
-ax.YAxis(2).Color = 'k';
-legend([p1, p2], {'$\tilde{f}(x)$', '$EI(x)$'},'Fontsize',Fontsize)
 
-legend boxoff
+
+% legend([p1, p2], {'$\tilde{f}(x)$', '$EI(x)$'},'Fontsize',Fontsize)
+
+% legend boxoff
 
 nexttile(layout1, 3, [mr,1]);
 i=i+1;
@@ -193,7 +201,7 @@ text(legend_pos(1)-0.2, legend_pos(2),['$\bf{', letters(i), '}$'],'Units','norma
 
 figname  = 'Bayesian_optimization';
 folder = [figure_path,figname];
-savefig(fig, [folder,'\', figname, '.fig'])
-exportgraphics(fig, [folder,'\' , figname, '.pdf']);
-exportgraphics(fig, [folder,'\' , figname, '.png'], 'Resolution', 300);
+savefig(fig, [folder,'/', figname, '.fig'])
+exportgraphics(fig, [folder,'/' , figname, '.pdf']);
+exportgraphics(fig, [folder,'/' , figname, '.png'], 'Resolution', 300);
 

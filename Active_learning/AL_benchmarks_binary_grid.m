@@ -4,7 +4,7 @@ close all
 add_bo_module;
 
 seed=1;
-maxiter= 60;% 100;
+maxiter= 150;% 100;
 rng(seed)
 
 
@@ -15,7 +15,7 @@ update_period = maxiter+ 2;
 
 ninit = maxiter +2 ;
 nopt= 0;% number of time steps before starting using the acquisition functions.
-nrepets = 10; %20;
+nrepets = 20; %20;
 seeds=1:nrepets;
 
 
@@ -28,7 +28,7 @@ kernelnames = {'Matern32', 'Matern32','Matern52','Matern52'};
 lengthscales = {'long', 'short','long', 'short'};
 
 
-acquisition_funs = {'TME_sampling_binary', 'BALD_grid'}; %'maxvar_binary_grid', 'random',
+acquisition_funs = {'Variance_gradient_grid'}; %{'TME_sampling_binary', 'BALD_grid'}; %'maxvar_binary_grid', 'random',
 % acquisition_funs = {'random','BALD_grid'};
 
 

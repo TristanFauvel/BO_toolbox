@@ -30,7 +30,7 @@ theta_lb = -8*ones(ncov_hyp  + nmean_hyp ,1);
 theta_lb(end) = 0;
 theta_ub = 10*ones(ncov_hyp  + nmean_hyp ,1);
 theta_ub(end) = 0;
-
+regularization = 'nugget';
 for i =1:maxiter
     x_tr = [x_tr, new_x];
     y_tr = [y_tr, new_y];
@@ -38,7 +38,7 @@ for i =1:maxiter
     cum_regret(i+1) = cum_regret_i;
 
    
-    [mu_y, sigma2_y, ~, ~, Sigma2_y]= prediction(theta, x_tr, y_tr, x, kernelfun, meanfun);
+    [mu_y, sigma2_y, ~, ~, Sigma2_y]= prediction(theta, x_tr, y_tr, x, kernelfun, meanfun, [], regularization);
     
     if i > ninit
         update = 'cov';       

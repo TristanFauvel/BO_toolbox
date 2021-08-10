@@ -1,7 +1,8 @@
 function [new_x, new_x_norm] = EI(theta, xtrain_norm, ytrain, meanfun, kernelfun, kernelname, max_x, min_x, lb_norm, ub_norm, kernel_approx)
 
 options.method = 'lbfgs';
-mu_y =  prediction(theta, xtrain_norm, ytrain, xtrain_norm, kernelfun, meanfun);
+regularization = 'nugget';
+mu_y =  prediction(theta, xtrain_norm, ytrain, xtrain_norm, kernelfun, meanfun, [], regularization);
 y_best = max(mu_y);
 
 x_init = [];
@@ -13,7 +14,9 @@ end
 
 function [EI, dEI_dx] = expected_improvement(theta, xtrain_norm, x, ytrain, kernelfun, meanfun, y_best)
 
-[mu_y, sigma2_y,dmu_dx, dsigma2_dx] =  prediction(theta, xtrain_norm, ytrain, x, kernelfun, meanfun);
+regularization = 'nugget';
+
+[mu_y, sigma2_y,dmu_dx, dsigma2_dx] =  prediction(theta, xtrain_norm, ytrain, x, kernelfun, meanfun, [], regularization);
 
 sigma_y = sqrt(sigma2_y);
 d = (mu_y - y_best)./sigma_y;

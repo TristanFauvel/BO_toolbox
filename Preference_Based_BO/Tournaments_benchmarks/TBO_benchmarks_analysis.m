@@ -3,12 +3,14 @@ data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_tournaments_data'
 figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
 figname =  'TBO_scores_benchmarks';
 
-acquisition_funs = {'random_acquisition_tour','kernelselfsparring_tour','MVT'};
+ 
+acq_funs = {'random_acquisition_tour','kernelselfsparring_tour','MVT'};
 
 load('/home/tfauvel/Documents/BO_toolbox/Acquisition_funs_table','T')
-acquisition_names = T(any(T.acq_funs == acquisition_funs,2),:).names; 
-acquisition_names_citation = T(any(T.acq_funs == acquisition_funs,2),:).names_citations; 
-short_acq_names= T(any(T.acq_funs == acquisition_funs,2),:).short_names; 
+acquisition_funs = cellstr(char(T(any(T.acq_funs == acq_funs,2),:).acq_funs)); 
+acquisition_names = char(T(any(T.acq_funs == acq_funs,2),:).names); 
+acquisition_names_citation = char(T(any(T.acq_funs == acq_funs,2),:).names_citations); 
+short_acq_names= char(T(any(T.acq_funs == acq_funs,2),:).short_names); 
 
 
 load('benchmarks_table.mat')

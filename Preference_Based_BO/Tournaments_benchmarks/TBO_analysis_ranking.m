@@ -12,11 +12,14 @@ objectives_names = {'GP1d','Forrester (2008)', 'Gramacy and Lee (2012)', 'Levy',
 
 nobj = numel(objectives);
 
-acquisition_funs = {'random_acquisition_pref', 'new_DTS','active_sampling', 'MES', 'brochu_EI', 'bivariate_EI', 'random', 'decorrelatedsparring', 'kernelselfsparring'};
-acquisition_funs = {'DTS','random_acquisition_pref','kernelselfsparring','maxvar_challenge', 'bivariate_EI', 'Brochu_EI', 'Thompson_challenge'};
+ 
+acq_funs = 'DTS','random_acquisition_pref','kernelselfsparring','maxvar_challenge', 'bivariate_EI', 'Brochu_EI', 'Thompson_challenge'};
 
-names = {'DTS','Random', 'KSS', 'MVC', 'Bivariate EI (Nielsen 2015)', 'EI (Brochu 2010)', 'Thompson Challenge',};
-names = {'Duel Thompson Sampling','Random', 'Kernel Self-Sparring', 'Maximum Variance Challenge', 'Bivariate Expected Improvement (Nielsen 2015)', 'Expected Improvement (Brochu 2010)', 'Thompson Challenge'};
+load('/home/tfauvel/Documents/BO_toolbox/Acquisition_funs_table','T')
+acquisition_funs = cellstr(char(T(any(T.acq_funs == acq_funs,2),:).acq_funs)); 
+acquisition_names = char(T(any(T.acq_funs == acq_funs,2),:).names); 
+acquisition_names_citation = char(T(any(T.acq_funs == acq_funs,2),:).names_citations); 
+short_acq_names= char(T(any(T.acq_funs == acq_funs,2),:).short_names); 
 
 nacq = numel(acquisition_funs);
 graphics_style_paper;

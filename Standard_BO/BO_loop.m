@@ -1,4 +1,4 @@
-function [xtrain, xtrain_norm, ytrain, score, cum_regret]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, max_x, min_x, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm, seed)
+function [xtrain, xtrain_norm, ytrain, score, cum_regret, theta_evo]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, max_x, min_x, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm, seed)
 
 % Run a Bayesian optimization loop
 % g : objective function
@@ -43,7 +43,9 @@ nfeatures = 4096;
 % kernel_approx.dphi_dx : nfeatures x D
 % kernel_approx.dphi_dx : nfeatures x 2D
 [kernel_approx.phi, kernel_approx.dphi_dx]= sample_features_GP(theta.cov, D, kernelname, approximation_method, nfeatures);
-
+post = [];
+regularization = 'nugget';
+theta_evo = zeros(numel(theta.cov), maxiter);
 rng(seed)
 for i =1:maxiter
     i
@@ -52,7 +54,7 @@ for i =1:maxiter
     xtrain_norm = [xtrain_norm, new_x_norm];
     ytrain = [ytrain, new_y];
     
-    mu_ytrain =  prediction(theta, xtrain_norm, ytrain, xtrain_norm, kernelfun, meanfun);
+    mu_ytrain =  prediction(theta, xtrain_norm, ytrain, xtrain_norm, kernelfun, meanfun, post, regularization);
     [max_ytrain,b]= max(mu_ytrain);
     
     cum_regret_i  =cum_regret_i + max_g-max_ytrain;
@@ -72,8 +74,9 @@ for i =1:maxiter
         new_x_norm = rand_interval(lb_norm,ub_norm);
         new_x = new_x_norm.*(max_x - min_x)+min_x;
     end
+    theta_evo(:, i) = theta.cov;
 end
-mu_ytrain =  prediction(theta, xtrain_norm, ytrain, xtrain, kernelfun, meanfun);
+mu_ytrain =  prediction(theta, xtrain_norm, ytrain, xtrain, kernelfun, meanfun, post, regularization);
 % [max_ytrain,b]= max(mu_ytrain);
 % max_xtrain = xtrain(:,b);
 

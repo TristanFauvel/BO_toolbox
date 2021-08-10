@@ -1,4 +1,4 @@
-function plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname, nreps, maxiter, rescaling)
+function fig = plot_optimalgos_comparison_AL_grid(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname, nreps, maxiter, rescaling)
 
 % data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data'];
 % figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
@@ -50,10 +50,12 @@ for j = 1:nobj
         try
         load(filename, 'experiment');
         UNPACK_STRUCT(experiment, false)
-        legends{a}=[names{a}];
+        legends{a}=char(names(a,:));
         n=['a',num2str(a)];
         
-        scores{a} = cell2mat(eval(['score_c_', acquisition])');
+        data = cell2mat(eval(['score_c_', acquisition])');
+        data = data(1:nreps, 1:maxiter);
+        scores{a} = data;
     
         catch 
            
@@ -61,7 +63,7 @@ for j = 1:nobj
         end
     end
     benchmarks_results{j} = scores;
-    [ranks, average_ranks]= compute_rank(scores, ninit);
+%     [ranks, average_ranks]= compute_rank(scores, ninit);
     plots =  plot_areaerrorbar_grouped(scores, options);
     box off
     ylabel('Value $g(x^*)$');

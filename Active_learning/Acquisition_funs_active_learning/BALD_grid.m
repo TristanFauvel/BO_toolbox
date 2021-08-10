@@ -7,7 +7,7 @@ if size(x,2)>ngrid
 end
 
 xnorm = (x - lb)./(ub-lb);
-regularization = 'false';
+regularization = ' nugget';
 [mu_c, mu_y, sigma2_y] =   prediction_bin(theta, xtrain_norm, ctrain, xnorm, kernelfun, modeltype, post, regularization);
 h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps);
 

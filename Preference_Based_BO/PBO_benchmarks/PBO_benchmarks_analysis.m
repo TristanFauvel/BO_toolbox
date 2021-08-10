@@ -3,9 +3,10 @@ data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data'];
 figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
 figname =  'PBO_scores_benchmarks';
 
-acquisition_funs = {'EIIG', 'Dueling_UCB', 'MaxEntChallenge','DTS','random_acquisition_pref','kernelselfsparring','maxvar_challenge', 'bivariate_EI', 'Brochu_EI', 'Thompson_challenge'};
+acq_funs = {'EIIG', 'Dueling_UCB', 'MaxEntChallenge','DTS','random_acquisition_pref','kernelselfsparring','maxvar_challenge', 'bivariate_EI', 'Brochu_EI', 'Thompson_challenge'};
 
 load('/home/tfauvel/Documents/BO_toolbox/Acquisition_funs_table','T')
+acquisition_funs = cellstr(char(T(any(T.acq_funs == acq_funs,2),:).acq_funs)); 
 acquisition_names = char(T(any(T.acq_funs == acquisition_funs,2),:).names); 
 acquisition_names_citation = char(T(any(T.acq_funs == acquisition_funs,2),:).names_citations); 
 short_acq_names= T(any(T.acq_funs == acquisition_funs,2),:).short_names; 

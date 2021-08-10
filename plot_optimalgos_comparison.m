@@ -50,7 +50,9 @@ for j = 1:nobj
         try
         load(filename, 'experiment');
         UNPACK_STRUCT(experiment, false)
-        legends{a}=char(names(a));
+        
+        
+        legends{a}=char(names(a,:));
         n=['a',num2str(a)];
         
         scores{a} = cell2mat(eval(['score_', acquisition])');
@@ -79,6 +81,11 @@ set(legend1,...
 
 set(gca, 'Fontsize', Fontsize)
 
+
+if strcmp(objectives_names(1), 'refractive')
+    ylabel('VA (in logMAR)')
+    title('')
+end
 savefig(fig, [figure_folder,'/', figname, '.fig'])
 exportgraphics(fig, [figure_folder,'/' , figname, '.pdf']);
 exportgraphics(fig, [figure_folder,'/' , figname, '.png'], 'Resolution', 300);

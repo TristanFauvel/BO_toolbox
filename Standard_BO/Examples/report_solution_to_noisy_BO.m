@@ -61,12 +61,13 @@ new_y = y(:,i_tr);
 
 x_tr = [];
 y_tr = [];
+regularization = 'nugget';
 for i =1:3
     x_tr = [x_tr, new_x];
     y_tr = [y_tr, new_y];
     
    
-    [mu_y, sigma2_y, ~, ~, Sigma2_y]= prediction(theta, x_tr, y_tr, x, kernelfun, meanfun);
+    [mu_y, sigma2_y, ~, ~, Sigma2_y]= prediction(theta, x_tr, y_tr, x, kernelfun, meanfun, [], regularization);
     i_tr= idx(i); %random sampling
     new_x = x(:,i_tr);
     new_y = y(:,i_tr); % no noise %%%%%%%%%%%%%%%%%%%
@@ -104,7 +105,7 @@ plot(edges, N);
 
 mr = 1;
 mc = 1;
-fig=figure('units','centimeters','outerposition',1+[0 0 width height(mr)]);
+fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
 fig.Color =  [1 1 1];
 % layout1 = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
 i = 0;
@@ -115,7 +116,7 @@ yyaxis left
 plot_gp(x,mu_y, sigma2_y, C(1,:), linewidth); hold on
 plot(x, g, '-', 'Color',  C(2,:),'LineWidth', linewidth); hold on;
 % errorshaded(x,mu_y, sqrt(sigma2_y), 'Color',  C(1,:),'LineWidth', linewidth, 'Fontsize', Fontsize); hold on
-vline(xmax_mu,'Linewidth',linewidth, 'ymax', max_mu); hold on;
+vline(xmax_mu,'Linewidth',linewidth, 'ymax', max_mu, 'Color', C(1,:)); hold on;
 
 plot(x_tr, y_tr, 'ro', 'MarkerSize', 10, 'color', C(2,:)); hold on;
 scatter(x_tr, y_tr, markersize, C(2,:), 'filled'); hold on;

@@ -26,8 +26,6 @@ for i = 1:nobj
 end
 kernelnames = {'Matern32', 'Matern32','Matern52','Matern52'};
 lengthscales = {'long', 'short','long', 'short'};
-
-
 acquisition_funs = {'TME_sampling_binary','random','BALD_grid'};
 % acquisition_funs = {'random','BALD_grid'};
 

@@ -35,8 +35,7 @@ post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], kernelfun, modeltype, p
 ybest1 = - ybest1; ybest0 = -ybest0;
 
 K = post0.K;
-k = post0.k;
-dkdx = post0.dk_dx;
+[k, ~, dkdx] = kernelfun(theta, [xtrain_norm,xt], xt, false, 'false');
 dkdx = squeeze(dkdx);
 n = size(K,1);
 D = size(xt,1);

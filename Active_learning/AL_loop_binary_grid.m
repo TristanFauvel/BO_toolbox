@@ -12,7 +12,7 @@ cum_regret(1)=0;
 
 regularization = 'nugget';
 
-y = mvnrnd(zeros(size(y)),kernelfun(theta,x,x, true, regularization))';
+y = mvnrnd(zeros(size(y)),kernelfun(theta,x,x, true, regularization))'; %%%%%%%%%%%%%
 
 xtrain = NaN(D,maxiter);
 xtrain_norm = NaN(D,maxiter);

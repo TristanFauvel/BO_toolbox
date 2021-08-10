@@ -4,8 +4,13 @@ figname =  'PBO_scores_benchmarks';
 
 objectives = {'GP1d', 'forretal08', 'grlee12', 'levy', 'goldpr', 'camel6', 'Ursem_waves'};
 objectives_names = {'GP1d','Forrester (2008)', 'Gramacy and Lee (2012)', 'Levy', 'Goldstein-Price', 'Six Hump Camel', 'Ursem-Waves'};
-acquisition_funs = {'TS_binary', 'KG_binary', 'random_acquisition_binary'};
-names = {'Binary Thompson Sampling','Binary Knowledge Gradient', 'Random'};
+ acq_funs = {'TS_binary', 'KG_binary', 'random_acquisition_binary'};
+load('/home/tfauvel/Documents/BO_toolbox/Acquisition_funs_table','T')
+acquisition_funs = cellstr(char(T(any(T.acq_funs == acq_funs,2),:).acq_funs)); 
+acquisition_names = char(T(any(T.acq_funs == acq_funs,2),:).names); 
+acquisition_names_citation = char(T(any(T.acq_funs == acq_funs,2),:).names_citations); 
+short_acq_names= char(T(any(T.acq_funs == acq_funs,2),:).short_names); 
+
 
 nreps = 40;
 maxiter= 60;

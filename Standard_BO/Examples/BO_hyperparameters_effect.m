@@ -56,19 +56,33 @@ for k = 1:nreps
     ninit = maxiter + 1;
     theta= true_theta;
     seed = k;
-    [~, ~, ~, true_theta_score{k}]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, ub, lb, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm, seed)
+    [~, ~, ~, true_theta_score{k}]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, ub, lb, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm, seed);
     theta= wrong_theta;
-    [~, ~, ~, wrong_theta_score{k}]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, ub, lb, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm,seed)
+    [~, ~, ~, wrong_theta_score{k}]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, ub, lb, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm,seed);
     ninit = nopt;
-    [~, ~, ~, learned_theta_score{k}]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, ub, lb, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm,seed)
+    [~, ~, ~, learned_theta_score{k}, theta_evo]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, ub, lb, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm,seed);
 end
+%[xtrain, xtrain_norm, ytrain, score, cum_regret]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, max_x, min_x, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm, seed)
 
 
 mr = 1;
-mc = 1;
+mc = 3;
+x0 = [x; zeros(D-1,n)];
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
 fig.Color =  [1 1 1];
 layout1 = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
+nexttile()
+plot(x, g(x0), 'color', C(1,:), 'linewidth', linewidth); hold on;
+plot(x, mvnrnd(zeros(1,n), kernelfun(wrong_theta.cov, x0,x0, true, 'none')), 'color', C(2,:), 'linewidth', linewidth); hold on;
+plot(x, mvnrnd(zeros(1,n), kernelfun(theta_evo(:,end), x0,x0, true, 'none')), 'color', C(3,:), 'linewidth', linewidth); hold off;
+box off
+xlabel('$x$')
+ylabel('$f(x)$')
+%legend('True function', 'Sample from the GP with wrong hyperparameters', 'Sample from the GP with learned hyperparameters')
+set(gca, 'Fontsize',Fontsize)
+
+
+nexttile([1 2])
 options.handle = fig;
 options.alpha = 0.2;
 options.error= 'sem'; %std
@@ -91,7 +105,7 @@ set(gca, 'Fontsize', Fontsize, 'Xlim', [0, maxiter])
 grid off
 box off
 legend boxoff
-set(gca, 'Xlim', [1, maxiter])
+set(gca, 'Xlim', [1, maxiter],'Fontsize',Fontsize)
 
 
 figname  = 'Bayesian_optimization_hyperparameters';
