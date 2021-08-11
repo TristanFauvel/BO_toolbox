@@ -1,4 +1,4 @@
-function new_x = Brochu_EI(theta, xtrain_norm, ctrain, kernelfun, modeltype, max_x, min_x, lb_norm, ub_norms, post, ~)
+function new_x = Brochu_EI(theta, xtrain_norm, ctrain,model, max_x, min_x, lb_norm, ub_norms, post, ~)
 % Binary Expected Improvement, as proposed by Brochu (2010)
 %% Find the maximum of the value function
 options.method = 'sd';
@@ -27,7 +27,7 @@ dsigma2_y_dx = dsigma2_y_dx(1:nd,:);
 g_sigma_y = sqrt(g_sigma2_y);
 %% Find the maximum of the value function
 regularization = 'false';
-[~,  max_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x_best;x0], kernelfun, modeltype, post, regularization);
+[~,  max_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x_best;x0], model, post);
 
 
 sigma_y = sqrt(g_sigma2_y);

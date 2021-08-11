@@ -2,7 +2,7 @@ function [xtrain, ytrain, cum_regret, score]= AL_loop_grid(x, y, maxiter, nopt, 
 
 new_i = randsample(size(x,2),1);
 new_x = x(:,new_i);
-new_x_norm = (new_x - lb)./(ub - lb);
+new_x_norm = (new_x - model.lb)./(model.ub - model.lb);
 
 D = size(x,1);
 
@@ -22,7 +22,7 @@ for i =1:maxiter
     ytrain(:,i) = y(new_i);
            xtrain_norm(:,i) = new_x_norm;
 
-    [mu_y,sigma2_y] = prediction(theta, xtrain(:,1:i), ytrain(:,1:i), x, kernelfun, meanfun, [], regularization);
+    [mu_y,sigma2_y] = prediction(theta, xtrain(:,1:i), ytrain(:,1:i), x, model, []);
   
     
     Err = sigma2_y(:)+(y(:)-mu_y(:)).^2;
@@ -42,7 +42,7 @@ for i =1:maxiter
         [new_x, new_x_norm, new_i] = acquisition_fun(x, theta,  xtrain_norm(:,1:i), ytrain(:,1:i), meanfun, kernelfun, lb, ub, []);        
     else
         new_x = rand_interval(lb,ub);
-        new_x_norm = (new_x - lb)./(ub - lb);
+        new_x_norm = (new_x - model.lb)./(model.ub - model.lb);
     end
 end
 return

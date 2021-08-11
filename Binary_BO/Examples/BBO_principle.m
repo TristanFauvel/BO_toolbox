@@ -24,7 +24,7 @@ x0 = x(:,1);
 modeltype = 'exp_prop'; % Approximation method
 base_kernelfun =  @Matern52_kernelfun;%kernel used within the preference learning kernel, for subject = computer
 base_kernelname = 'Matern52';
-approximation_method = 'RRGP';
+approximation.method = 'RRGP';
 kernelfun = @(theta, xi, xj, training) conditional_preference_kernelfun(theta, base_kernelfun, xi, xj, training);
 link = @normcdf; %inverse link function for the classification model
 
@@ -46,9 +46,9 @@ ytrain= f(rd_idx);
 ctrain = link(ytrain)>rand(nsamp,1);
 
 
-[mu_c,  mu_f, sigma2_f] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), x2d, kernelfun, modeltype, post, regularization);
+[mu_c,  mu_f, sigma2_f] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), x2d, model, post);
 
-[~,  mu_g, sigma2_g, Sigma2_g] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x; x0*ones(1,n^d)], kernelfun, modeltype, post, regularization);
+[~,  mu_g, sigma2_g, Sigma2_g] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x; x0*ones(1,n^d)], model, post);
 mu_g = -mu_g; %(because prediction_bin considers P(x1 > x2);
     
 
@@ -132,8 +132,8 @@ box off
 %% Plot a sample
 decoupled_bases = 1;
 post = [];
-nfeatures = 256;
-[sample_f, sample_g]= sample_binary_GP(theta, xtrain(:,1:ntr), ctrain(1:ntr), base_kernelname, approximation_method, nfeatures, decoupled_bases, kernelfun, modeltype, post);
+approximation.nfeatures = 256;
+[sample_f, sample_g]= sample_binary_GP(theta, xtrain(:,1:ntr), ctrain(1:ntr), base_model, approximation, post);
 
 % nexttile([1,2])
 nexttile
@@ -153,7 +153,7 @@ box off
 % nexttile([1,2])
 nexttile
 i=i+1;
-[~,~,~,~,~,~,~,~, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x;xmax*ones(size(x))], kernelfun, modeltype, post, regularization);
+[~,~,~,~,~,~,~,~, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x;xmax*ones(size(x))], model, post);
 d = size(x,1);
 plot(x, var_muc,'k','linewidth',linewidth);
 xlabel('$x$')

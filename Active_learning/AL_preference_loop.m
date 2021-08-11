@@ -22,12 +22,12 @@ ninit = 5; % number of time steps before starting using the acquisition function
 
 rng(seed)
 if strcmp(kernelname, 'Matern52') || strcmp(kernelname, 'Matern32') %|| strcmp(kernelname, 'ARD')
-    approximation_method = 'RRGP';
+    approximation.method = 'RRGP';
 else
-    approximation_method = 'SSGP';
+    approximation.method = 'SSGP';
 end
 nfeatures = 4096;
-[kernel_approx.phi_pref, kernel_approx.dphi_pref_dx, kernel_approx.phi, kernel_approx.dphi_dx]= sample_features_preference_GP(theta, D, kernelname, approximation_method, nfeatures);
+[approximation.phi_pref, approximation.dphi_pref_dx, approximation.phi, approximation.dphi_dx]= sample_features_preference_GP(theta, D, model, approximation);
 
 options_theta.method = 'lbfgs';
 options_theta.verbose = 1;
@@ -73,10 +73,10 @@ for i =1:maxiter
         %Local optimization of hyperparameters
         if mod(i, update_period) ==0
             theta = theta_init(:);
-            theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm(:,1:i), ctrain(1:i), kernelfun, 'modeltype', modeltype), theta, theta_lb, theta_ub, options);
+            theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm(:,1:i), ctrain(1:i), model), theta, theta_lb, theta_ub, options);
         end
     end
-    post =  prediction_bin(theta, xtrain_norm(:,1:i), ctrain(1:i), [], kernelfun, modeltype, [], regularization);
+    post =  prediction_bin(theta, xtrain_norm(:,1:i), ctrain(1:i), [], model, post);
     
     if i>ninit
         new_duel = acquisition_fun(theta, xtrain_norm(:,1:i), ctrain(1:i), kernelfun,modeltype, max_x, min_x, [lb_norm; lb_norm], [ub_norm;ub_norm], post);
@@ -93,7 +93,7 @@ for i =1:maxiter
         init_guess = x_best(:, end);
     end
     
-    [mu_c, mu_y, sigma2_y] = prediction_bin(theta, xtrain_norm(:,1:i), ctrain(1:i), xtest_norm, kernelfun, modeltype, [], regularization);
+    [mu_c, mu_y, sigma2_y] = prediction_bin(theta, xtrain_norm(:,1:i), ctrain(1:i), xtest_norm, model, post);
     
     gvals = g(xtest(1:D,:))';
     Err = sigma2_y+(gvals-mu_y).^2;

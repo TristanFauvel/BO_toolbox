@@ -48,7 +48,7 @@ for j = 1:nobj %nobj
             for r=1:nreplicates  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 seed  = seeds(r)
                 %             waitbar(((a-1)*nreplicates+r)/(nreplicates*nacq),wbar,'Computing...');
-                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  PBO_loop_wo_condition(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, modeltype, theta_lb, theta_ub, kernelname, kernelfun, lb_norm, ub_norm, link);
+                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  PBO_loop_wo_condition(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, model, link);
             end
             clear('experiment')
             fi = ['xtrain_',acquisition_name];

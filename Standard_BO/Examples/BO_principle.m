@@ -64,7 +64,7 @@ for i =1:2
     y_tr = [y_tr, new_y];
     
     
-    [mu_y, sigma2_y, ~, ~, Sigma2_y]= prediction(theta, x_tr, y_tr, x, kernelfun, meanfun, [], regularization);
+    [mu_y, sigma2_y, ~, ~, Sigma2_y]= prediction(theta, x_tr, y_tr, x, model, []);
     
     
     if i> nopt

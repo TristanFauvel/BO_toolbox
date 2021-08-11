@@ -71,9 +71,9 @@ for i =1:maxiter
     
 end
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc]= prediction_bin(theta, xtrain, ctrain, xtest, kernelfun, modeltype, post, regularization);
-[new_x, ~, idx, L] = BALD_grid(x, theta, xtrain, ctrain, kernelfun, modeltype, lb, ub, post);
-[new_x, ~, idx, TME] = TME_sampling_binary(x, theta, xtrain, ctrain, kernelfun, modeltype, lb, ub, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc]= prediction_bin(theta, xtrain, ctrain, xtest, model, post);
+[new_x, ~, idx, L] = BALD_grid(x, theta, xtrain, ctrain,model, post);
+[new_x, ~, idx, TME] = TME_sampling_binary(x, theta, xtrain, ctrain,model, post);
 
 maxiter = 30;
 

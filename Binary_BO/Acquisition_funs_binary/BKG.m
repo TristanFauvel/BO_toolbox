@@ -1,4 +1,4 @@
-function [new_x, new_x_norm] = BKG(theta, xtrain_norm, ctrain, kernelfun, modeltype, max_x, min_x, lb_norm, ub_norm, post, kernel_approx)
+function [new_x, new_x_norm] = BKG(theta, xtrain_norm, ctrain,model, max_x, min_x, lb_norm, ub_norm, post, approximation)
 if ~strcmp(modeltype, 'laplace')
     error('This acquisition function is only implemented with Laplace approximation')
 end
@@ -12,22 +12,22 @@ ybest = -ybest;
 c0 = [ctrain, 0];
 c1 = [ctrain,1];
 
-new_x_norm  = multistart_minConf(@(x)knowledge_grad(theta, xtrain_norm, ctrain, x, kernelfun, modeltype, post, c0, c1, xbest, ybest), lb_norm, ub_norm, ncandidates, init_guess, options);
+new_x_norm  = multistart_minConf(@(x)knowledge_grad(theta, xtrain_norm, ctrain, x,model, post, c0, c1, xbest, ybest), lb_norm, ub_norm, ncandidates, init_guess, options);
 
 new_x = new_x_norm.*(max_x-min_x) + min_x;
 end
 
-function [U, dUdx] = knowledge_grad(theta, xtrain_norm, ctrain, xt, kernelfun, modeltype, post, c0, c1, xbest, ybest)
+function [U, dUdx] = knowledge_grad(theta, xtrain_norm, ctrain, xt,model, post, c0, c1, xbest, ybest)
 init_guess = xbest;
 ncandidates = 5;
 options.verbose= 1;
 options.method = 'lbfgs';
 regularization = 'nugget';
 
-[mu_c,  ~, ~, ~, dmuc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, xt, kernelfun, modeltype, post, regularization);
+[mu_c,  ~, ~, ~, dmuc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, xt, model, post);
 
-post0 =  prediction_bin(theta, [xtrain_norm,xt], c0, [], kernelfun, modeltype, [], regularization);
-post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], kernelfun, modeltype, [], regularization);
+post0 =  prediction_bin(theta, [xtrain_norm,xt], c0, [], model, post);
+post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], model, post);
 
 [xbest1, ybest1] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c1, x, kernelfun,modeltype, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
 [xbest0, ybest0] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c0, x, kernelfun,modeltype, post0), lb_norm, ub_norm, ncandidates, init_guess, options);

@@ -45,7 +45,7 @@ for j = 2:nobj
             disp(['Repetition ', num2str(k)])
             seed = seeds(k);
             [xtrain{k}, ctrain{k}, cum_regret{k}, score_y{k}, score_c{k}]= AL_loop_binary_grid(x, ...
-                y, maxiter, nopt, kernelfun, theta, acquisition_fun, ninit, theta_lb, theta_ub, lb, ub, seed);            
+                y, maxiter, nopt, model, acquisition_fun, ninit, seed);            
         end
         clear('experiment')
         fi = ['xtrain_',acquisition_name];

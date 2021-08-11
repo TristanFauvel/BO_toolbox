@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2] = PF_acq(theta, xtrain_norm, ctrain, kernelfun, base_kernelfun, base_name, modeltype, max_x, min_x, lb_norm, ub_norm, condition, post)
+function [x_duel1, x_duel2] = PF_acq(theta, xtrain_norm, ctrain, model base_name, modeltype, max_x, min_x, lb_norm, ub_norm, condition, post)
 d = size(xtrain_norm,1)/2;
 
 MultiObjFnc = 'Kursawe';

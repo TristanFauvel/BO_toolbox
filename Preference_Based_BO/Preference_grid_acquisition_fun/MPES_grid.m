@@ -2,7 +2,7 @@ function new_duel = MPES_grid(x, theta, xtrain, ctrain, kernelfun,modeltype, m, 
 
 %(x, theta, xtrain, ctrain, kernelfun, link, xduels,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq, modeltype, C, mu_c_acq)
 %Max-preference entropy search
-[mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin(theta, xtrain, ctrain, xtrain, kernelfun, modeltype, post, regularization);
+[mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin(theta, xtrain, ctrain, xtrain, model, post);
 h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps); %entropy of a binary variable
 
 nsamples=100;
@@ -14,7 +14,7 @@ py = zeros(size(xduels,2), nsamples);
 
 for k = 1:nsamples
     fsamples = mvnrnd(mu_y,  nearestSPD(Sigma2_y))'; %sample from the posterior at training points
-    %sample_g= sample_value_GP(x, theta, xtrain, fsamples, Sigma2_y);
+    %sample_g= sample_value_GP(theta, xtrain, ctrain, model, approximation, post)
     %samples_g(k,:)=sample_g;
     sample_f = sample_preference_GP(x, theta, xtrain, fsamples, Sigma2_y);
 

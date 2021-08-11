@@ -33,16 +33,16 @@ new_x_norm = rand_interval(lb_norm,ub_norm);
 new_x = new_x_norm.*(max_x - min_x)+min_x;
 
 if strcmp(kernelname, 'Matern52') || strcmp(kernelname, 'Matern32') %|| strcmp(kernelname, 'ARD')
-    approximation_method = 'RRGP';
+    approximation.method = 'RRGP';
 else
-    approximation_method = 'SSGP';
+    approximation.method = 'SSGP';
 end
 nfeatures = 4096;
-%kernel_approx.phi : ntest x nfeatures
-%kernel_approx.phi_pref : ntest x nfeatures
-% kernel_approx.dphi_dx : nfeatures x D
-% kernel_approx.dphi_dx : nfeatures x 2D
-[kernel_approx.phi, kernel_approx.dphi_dx]= sample_features_GP(theta.cov, D, kernelname, approximation_method, nfeatures);
+%approximation.phi : ntest x nfeatures
+%approximation.phi_pref : ntest x nfeatures
+% approximation.dphi_dx : nfeatures x D
+% approximation.dphi_dx : nfeatures x 2D
+[approximation.phi, approximation.dphi_dx]= sample_features_GP(theta.cov, D, model, approximation);
 post = [];
 regularization = 'nugget';
 theta_evo = zeros(numel(theta.cov), maxiter);
@@ -54,7 +54,7 @@ for i =1:maxiter
     xtrain_norm = [xtrain_norm, new_x_norm];
     ytrain = [ytrain, new_y];
     
-    mu_ytrain =  prediction(theta, xtrain_norm, ytrain, xtrain_norm, kernelfun, meanfun, post, regularization);
+    mu_ytrain =  prediction(theta, xtrain_norm, ytrain, xtrain_norm, model, post);
     [max_ytrain,b]= max(mu_ytrain);
     
     cum_regret_i  =cum_regret_i + max_g-max_ytrain;
@@ -69,14 +69,14 @@ for i =1:maxiter
         theta.mean = hyp(ncov_hyp+1:ncov_hyp+nmean_hyp);
     end
     if i> nopt              
-        [new_x, new_x_norm] = acquisition_fun(theta, xtrain_norm, ytrain, meanfun, kernelfun, kernelname, max_x, min_x, lb_norm, ub_norm, kernel_approx);        
+        [new_x, new_x_norm] = acquisition_fun(theta, xtrain_norm, ytrain, meanfun, kernelfun, kernelname, max_x, min_x, lb_norm, ub_norm, approximation);        
     else
         new_x_norm = rand_interval(lb_norm,ub_norm);
         new_x = new_x_norm.*(max_x - min_x)+min_x;
     end
     theta_evo(:, i) = theta.cov;
 end
-mu_ytrain =  prediction(theta, xtrain_norm, ytrain, xtrain, kernelfun, meanfun, post, regularization);
+mu_ytrain =  prediction(theta, xtrain_norm, ytrain, xtrain, model, post);
 % [max_ytrain,b]= max(mu_ytrain);
 % max_xtrain = xtrain(:,b);
 

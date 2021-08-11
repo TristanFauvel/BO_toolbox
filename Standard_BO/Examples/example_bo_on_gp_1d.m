@@ -71,7 +71,7 @@ end
 c= othercolor('GnBu7');
 
 x = linspace(0,5,n);
-y = mvnrnd(constant_mean(x,0), kernelfun(theta_true, x,x)); %generate a function
+y = mvnrnd(constant_mean(x,0), kernelfun(theta_truex,x, true, 'nugget')); %generate a function
 
 x_test = x;
 y_test = y;

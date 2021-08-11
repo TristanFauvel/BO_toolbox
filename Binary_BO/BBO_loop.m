@@ -1,4 +1,4 @@
-function [xtrain, xtrain_norm, ctrain, score]= BBO_loop(acquisition_fun, nopt, seed, lb, ub, maxiter, theta, g, update_period, modeltype, theta_lb, theta_ub, kernelname, kernelfun, lb_norm, ub_norm, link);
+function [xtrain, xtrain_norm, ctrain, score]= BBO_loop(acquisition_fun, nopt, seed, lb, ub, maxiter, theta, g, update_period, model, link);
 
 % g : objective function
 
@@ -29,12 +29,12 @@ options.method = 'lbfgs';
 ncandidates= 10;
 %% Compute the kernel approximation if needed
 if strcmp(kernelname, 'Matern52') || strcmp(kernelname, 'Matern32') || strcmp(kernelname, 'ARD')
-    approximation_method = 'RRGP';
+    approximation.method = 'RRGP';
 else
-    approximation_method = 'SSGP';
+    approximation.method = 'SSGP';
 end
-nfeatures = 256;
-[kernel_approx.phi, kernel_approx.dphi_dx] = sample_features_GP(theta(:), D, kernelname, approximation_method, nfeatures);
+approximation.nfeatures = 256;
+[approximation.phi, approximation.dphi_dx] = sample_features_GP(theta(:), D, model, approximation);
 regularization = 'nugget';
 for i =1:maxiter
     disp(i)
@@ -51,10 +51,10 @@ for i =1:maxiter
             theta = multistart_minConf(@(hyp)minimize_negloglike_bin(hyp, xtrain_norm, ctrain, kernelfun, meanfun, update, post), theta_lb, theta_ub,10, init_guess, options_theta);
         end
     end
-    post =  prediction_bin(theta, xtrain_norm, ctrain, [], kernelfun, modeltype, [], regularization);
+    post =  prediction_bin(theta, xtrain_norm, ctrain, [], model, post);
 
     if i> nopt
-        [new_x, new_x_norm] = acquisition_fun(theta, xtrain_norm, ctrain, kernelfun, modeltype, ub, lb, lb_norm, ub_norm,post, kernel_approx);
+        [new_x, new_x_norm] = acquisition_fun(theta, xtrain_norm, ctrain,model, ub, lb, lb_norm, ub_norm,post, approximation);
     else
         new_x_norm = rand_interval(lb_norm,ub_norm);
         new_x = new_x_norm.*(ub - lb)+lb;

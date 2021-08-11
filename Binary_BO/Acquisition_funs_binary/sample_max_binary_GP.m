@@ -1,14 +1,14 @@
-function [sample_normalized, sample] = sample_max_binary_GP(kernel_approx, xtrain_norm, ctrain, theta,kernelfun, decoupled_bases, modeltype,post, max_x, min_x, lb_norm, ub_norm)
+function [sample_normalized, sample] = sample_max_binary_GP(approximation, xtrain_norm, ctrain, theta,kernelfun, decoupled_bases, modeltype,post, max_x, min_x, lb_norm, ub_norm)
 
 D = size(xtrain_norm,1);
-phi = kernel_approx.phi;
-dphi_dx = kernel_approx.dphi_dx;
+phi = approximation.phi;
+dphi_dx = approximation.dphi_dx;
 
 options.method = 'lbfgs';
 options.verbose = 1;
 ncandidates= 5;
 
-[sample_g, dsample_g_dx] = sample_binary_GP_precomputed_features(phi, dphi_dx, xtrain_norm, ctrain, theta,kernelfun, decoupled_bases, modeltype, post);
+[sample_g, dsample_g_dx] = sample_binary_GP_precomputed_features(phi, dphi_dx, xtrain_norm, ctrain, theta,model, decoupled_bases, post);
 
 new= NaN;
 init_guess = [];

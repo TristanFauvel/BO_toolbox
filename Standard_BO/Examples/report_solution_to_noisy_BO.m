@@ -24,6 +24,11 @@ theta_true = [5,7,5];%[3,2];
 theta.cov = theta_true; %%%%%%%%%%%%%%%%%%%% Known hyperparameters of the covariance
 
 meanfun= @constant_mean;
+
+model.regularization = 'nugget';
+model.kernelfun = kernelfun;
+model.meanfun = meanfun;
+
 nmean_hyp = 1;
 theta.mean = zeros(nmean_hyp,1);
 lb = [-10,0, -5] ; % lengthscale, k0, mu
@@ -67,7 +72,7 @@ for i =1:3
     y_tr = [y_tr, new_y];
     
    
-    [mu_y, sigma2_y, ~, ~, Sigma2_y]= prediction(theta, x_tr, y_tr, x, kernelfun, meanfun, [], regularization);
+    [mu_y, sigma2_y, ~, ~, Sigma2_y]= prediction(theta, x_tr, y_tr, x, model, []);
     i_tr= idx(i); %random sampling
     new_x = x(:,i_tr);
     new_y = y(:,i_tr); % no noise %%%%%%%%%%%%%%%%%%%

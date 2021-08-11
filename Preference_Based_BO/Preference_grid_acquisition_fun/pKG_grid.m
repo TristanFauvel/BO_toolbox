@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2,new_duel] = pKG(theta, xtrain_norm, ctrain, kernelfun, base_kernelfun, modeltype, max_x, min_x, lb_norm, ub_norm, condition, post, ~)
+function [x_duel1, x_duel2,new_duel] = pKG(theta, xtrain_norm, ctrain, model, approximation)
 
 % Preference Knowledge Gradient
 

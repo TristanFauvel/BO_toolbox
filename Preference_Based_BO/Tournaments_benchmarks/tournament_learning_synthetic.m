@@ -152,7 +152,7 @@ for i =1:maxiter
     if i>ninit
         %         if i==ninit+1 %&& mod(i-ninit,3)==-1 %Global optimization every 10 steps
         %             % Try global optimization to find theta
-        %             myobjfun = @(theta)(negloglike(theta(:), xtrain, ctrain, kernelfun, 'modeltype', modeltype));
+        %             myobjfun = @(theta)(negloglike(theta(:), xtrain, ctrain, model));
         %             gs = GlobalSearch;
         %             gs.Display='iter';
         %             opts = optimoptions(@fmincon,'Algorithm','sqp');
@@ -162,7 +162,7 @@ for i =1:maxiter
         %         else % eif i>nfit && mod(i-ninit,5)==-1
         %             %% Update the model hyperparameters
         %             options=[];
-        %             theta= minFunc(negloglike, theta(:), options, xtrain, ctrain, kernelfun, modeltype, post, regularization);
+        %             theta= minFunc(negloglike, theta(:), options, xtrain, ctrain, model, post);
         %             if theta(2)>10
         %                 disp('stop')
         %             end
@@ -171,7 +171,7 @@ for i =1:maxiter
         %% Update the model hyperparameters
 %         options=[];
 %         if mod(i-ninit,5)==0
-%             theta= minFunc(negloglike, theta(:), options, xtrain, ctrain, kernelfun, modeltype, post, regularization);
+%             theta= minFunc(negloglike, theta(:), options, xtrain, ctrain, model, post);
 %             
 %             if theta(2)>50
 %                 disp('stop')

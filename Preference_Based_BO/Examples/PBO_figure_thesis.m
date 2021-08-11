@@ -24,19 +24,28 @@ x0 = x(:,1);
 modeltype = 'exp_prop'; % Approximation method
 base_kernelfun =  @Matern52_kernelfun;%kernel used within the preference learning kernel, for subject = computer
 base_kernelname = 'Matern52';
-kernel_approximation = 'RRGP';
+approximationimation = 'RRGP';
 condition.x0 = x0;
 condition.y0 = 0;
 
-kernelfun = @(theta, xi, xj, training) conditional_preference_kernelfun(theta, base_kernelfun, xi, xj, training);
+kernelfun = @(theta, xi, xj, training, regularization) conditional_preference_kernelfun(theta, base_kernelfun, xi, xj, training,regularization, condition.x0);
 link = @normcdf; %inverse link function for the classification model
+model.regularization = 'nugget';
+model.kernelfun = kernelfun;
+model.base_kernelfun = base_kernelfun;
 
+model.link = link;
+model.modeltype = modeltype;
+model.kernelname = base_kernelname;
+model.condition = condition;
+post = [];
 % gfunc = @(x) forretal08(x)/10;
 % gfunc = @(x) normpdf(x, 0.5, 0.2);
 % g = gfunc(x)-gfunc(x0);
 
+regularization = 'nugget';
 theta= [-1;1];
-g = mvnrnd(zeros(1,n),base_kernelfun(theta, x, x, 'false'));
+g = mvnrnd(zeros(1,n),base_kernelfun(theta, x, x, 'false', regularization));
 g = g-g(1);
 
 f = g'-g;
@@ -49,9 +58,8 @@ ytrain= f(rd_idx);
 ctrain = link(ytrain)>rand(nsamp,1);
 
 
-[mu_c,  mu_f, sigma2_f] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), x2d, kernelfun, modeltype, post, regularization);
-
-[~,  mu_g, sigma2_g, Sigma2_g, ~,~,~,~,~,~,post] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x; x0*ones(1,n^d)], kernelfun, modeltype, post, regularization);
+[mu_c,  mu_f, sigma2_f] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), x2d, model, post);
+[~,  mu_g, sigma2_g, Sigma2_g, ~,~,~,~,~,~,post] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x; x0*ones(1,n^d)], model, post);
 mu_g = -mu_g; %(because prediction_bin considers P(x1 > x2);
     
 
@@ -62,7 +70,7 @@ xmax = x(id_xmax);
 mr = 2;
 mc = 3;
 
-fig=figure('units','centimeters','outerposition',1+[0 0 16 height(mr)]);
+fig=figure('units','centimeters','outerposition',1+[0 0 16 fheight(mr)]);
 fig.Color =  [1 1 1];
 
 i = 0;
@@ -133,9 +141,10 @@ text(-0.25,1.15,['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', let
 box off
 
 %% Plot a sample
-decoupled_bases = 1;
-nfeatures = 256;
-[sample_f, sample_g]= sample_preference_GP(x, theta, xtrain(:,1:ntr), ctrain(1:ntr), base_kernelname, kernelfun, modeltype, kernel_approximation, decoupled_bases, base_kernelfun, nfeatures, condition, post);
+approximation.decoupled_bases = 1;
+approximation.approximation.nfeatures = 256;
+approximation.method = 'RRGP';
+[sample_f, sample_g]= sample_preference_GP(x, theta, xtrain(:,1:ntr), ctrain(1:ntr), model, approximation, post);
 
 
 
@@ -157,7 +166,7 @@ box off
 % nexttile([1,2])
 nexttile
 i=i+1;
-[~,~,~,~,~,~,~,~, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x;xmax*ones(size(x))], kernelfun, modeltype, post, regularization);
+[~,~,~,~,~,~,~,~, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x;xmax*ones(size(x))], model, post);
 d = size(x,1);
 plot(x, var_muc,'k','linewidth',linewidth);
 xlabel('$x$')

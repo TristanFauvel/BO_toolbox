@@ -1,4 +1,4 @@
-function new_duel = PF_acq_grid(x, theta, xtrain, ctrain, kernelfun, modeltype, m, base_name)
+function new_duel = PF_acq_grid(x, theta, xtrain, ctrain,model, m, base_name)
 
 d = size(x,1);
 

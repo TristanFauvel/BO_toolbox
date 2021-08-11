@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2,new_duel] = MaxEntChallenge(theta, xtrain_norm, ctrain, kernelfun, base_kernelfun, modeltype, max_x, min_x, lb_norm, ub_norm, condition, post, ~)
+function [x_duel1, x_duel2,new_duel] = MaxEntChallenge(theta, xtrain_norm, ctrain, model, approximation)
 options.method = 'lbfgs';
 options.verbose = 1;
 D = size(xtrain_norm,1)/2;
@@ -14,7 +14,7 @@ x_duel2 = active_sampling_binary(theta, xtrain_norm, ctrain, kernelfun,modeltype
 x_duel2 = x_duel2(1:D);
 % regularization = 'nugget';
 % 
-% new = multistart_minConf(@(x)adaptive_sampling(theta, xtrain_norm, ctrain, x, x_best_norm, kernelfun, modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
+% new = multistart_minConf(@(x)adaptive_sampling(theta, xtrain_norm, ctrain, x, x_best_norm,model, post), lb_norm, ub_norm, ncandidates,init_guess, options);
 % x_duel2 = new.*(max_x(1:d)-min_x(1:d)) + min_x(1:d);
 
 new_duel= [x_duel1; x_duel2];

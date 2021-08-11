@@ -17,12 +17,12 @@ ninit = 5; % number of time steps before starting using the acquisition function
 
 rng(seed)
 if strcmp(kernelname, 'Matern52') || strcmp(kernelname, 'Matern32') %|| strcmp(kernelname, 'ARD')
-    approximation_method = 'RRGP';
+    approximation.method = 'RRGP';
 else
-    approximation_method = 'SSGP';
+    approximation.method = 'SSGP';
 end
 nfeatures = 4096;
-[kernel_approx.phi_pref, kernel_approx.dphi_pref_dx, kernel_approx.phi, kernel_approx.dphi_dx]= sample_features_preference_GP(theta, D, kernelname, approximation_method, nfeatures);
+[approximation.phi_pref, approximation.dphi_pref_dx, approximation.phi, approximation.dphi_dx]= sample_features_preference_GP(theta, D, model, approximation);
 options_theta.method = 'lbfgs';
 options_theta.verbose = 1;
 
@@ -85,13 +85,13 @@ for i =1:maxiter
         %Local optimization of hyperparameters
         if mod(i, update_period) ==0
             theta = theta_init(:);
-            theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm, ctrain, kernelfun, 'modeltype', modeltype), theta, theta_lb, theta_ub, options);
+            theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm, ctrain, model), theta, theta_lb, theta_ub, options);
         end
     end
-        post =  prediction_bin(theta, xtrain_norm, ctrain, [], kernelfun, modeltype, [], regularization);
+        post =  prediction_bin(theta, xtrain_norm, ctrain, [], model, post);
 
     if i>ninit
-        new_x = acquisition_fun(theta, xtrain_norm, ctrain, kernelfun, base_kernelfun, modeltype,max_x, min_x, lb_norm, ub_norm, condition, post, kernel_approx, tsize);
+        new_x = acquisition_fun(theta, xtrain_norm, ctrain, model modeltype,max_x, min_x, lb_norm, ub_norm, condition, post, approximation, tsize);
     else %When we have not started to train the GP classification model, the acquisition is random
         new_x =random_acquisition_tour([],[],[],[],[],[], max_x, min_x, lb_norm, ub_norm, [], [],[], tsize);
     end

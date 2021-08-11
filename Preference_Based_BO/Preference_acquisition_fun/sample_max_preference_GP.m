@@ -1,10 +1,10 @@
-function [sample_normalized, sample] = sample_max_preference_GP(kernel_approx, xtrain_norm, ctrain, theta,kernelfun, decoupled_bases, modeltype, base_kernelfun, post, condition, max_x, min_x, lb_norm, ub_norm)
+function [sample_normalized, sample] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta,kernelfun, decoupled_bases, modeltype, base_kernelfun, post, condition, max_x, min_x, lb_norm, ub_norm)
 
 D = size(xtrain_norm,1)/2;
-phi_pref = kernel_approx.phi_pref;
-dphi_pref_dx = kernel_approx.phi_pref;
-phi = kernel_approx.phi;
-dphi_dx = kernel_approx.dphi_dx;
+phi_pref = approximation.phi_pref;
+dphi_pref_dx = approximation.phi_pref;
+phi = approximation.phi;
+dphi_dx = approximation.dphi_dx;
 
 options.method = 'lbfgs';
 options.verbose = 1;

@@ -1,16 +1,21 @@
-function [U, dUdx] = knowledge_grad(theta, xtrain_norm, ctrain, xt, kernelfun, modeltype, post, c0, c1, xbest, ybest, lb_norm,ub_norm, link, x0)
+function [U, dUdx] = knowledge_grad(theta, xtrain_norm, ctrain, xt,model, post, c0, c1, xbest, ybest, lb_norm,ub_norm)
+
+kernelfun = model.kernelfun;
+modeltype = model.modeltype;
+regularization = model.regularization;
+link = model.link;
+
 ncandidates = 5;
 init_guess = xbest;
 options.verbose= 1;
 options.method = 'lbfgs';
-regularization = 'nugget';
-[mu_c,  ~, ~, ~, dmuc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, xt, kernelfun, modeltype, post, regularization, link);
+[mu_c,  ~, ~, ~, dmuc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, xt, model, post, link);
 
-post0 =  prediction_bin(theta, [xtrain_norm,xt], c0, [], kernelfun, modeltype, post, regularization);
-post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], kernelfun, modeltype, post, regularization);
+post0 =  prediction_bin(theta, [xtrain_norm,xt], c0, [], model, post);
+post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], model, post);
 if nargin == 14
-    [xbest1, ybest1] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xt], c1, x, kernelfun, x0, modeltype, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
-    [xbest0, ybest0] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xt], c0, x, kernelfun, x0, modeltype, post0), lb_norm, ub_norm, ncandidates, init_guess, options);
+    [xbest1, ybest1] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xt], c1, x, kernelfun, model.x0, modeltype, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
+    [xbest0, ybest0] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xt], c0, x, kernelfun, model.x0, modeltype, post0), lb_norm, ub_norm, ncandidates, init_guess, options);
     
 else
     [xbest1, ybest1] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c1, x, kernelfun,modeltype, post1), lb_norm, ub_norm, ncandidates, init_guess, options);

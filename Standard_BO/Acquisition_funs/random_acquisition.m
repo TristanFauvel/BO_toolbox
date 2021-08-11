@@ -1,4 +1,4 @@
-function [new_x, new_x_norm] = random_acquisition(theta, xtrain_norm, ytrain, meanfun, kernelfun, kernelname, max_x, min_x, lb_norm, ub_norm, kernel_approx)       
+function [new_x, new_x_norm] = random_acquisition(theta, xtrain_norm, ytrain, meanfun, kernelfun, kernelname, max_x, min_x, lb_norm, ub_norm, approximation)       
 
 D = numel(max_x);
 new_x_norm = rand_interval(lb_norm,ub_norm);

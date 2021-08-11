@@ -33,7 +33,8 @@ b = -3;
 %figure(); plot(g(x))
 regularization = 'nugget';
 y = mvnrnd(zeros(size(x)), kernelfun(theta_true, x,x, 'true', regularization)); %generate a function
-c = normcdf(y);
+link = @normcdf;
+c = link(y);
 figure(); plot(x, c)
 
 
@@ -47,12 +48,20 @@ ctrain = [];
 options_theta.method = 'lbfgs';
 options_theta.verbose = 1;
 
-max_x = 1;
-min_x = 0;
+ub = 1;
+lb = 0;
 lb_norm = 0;
 ub_norm = 1;
 modeltype = 'exp_prop';
-% new_x = random_acquisition_binary(theta, xtrain, ctrain, kernelfun, kernelname, modeltype,max_x, min_x, lb_norm, ub_norm);
+
+model.regularization = 'nugget';
+model.kernelfun = kernelfun;
+model.link = link;
+model.modeltype = modeltype;
+model.lb = lb;
+model.ub = ub;
+
+% new_x = random_acquisition_binary(theta, xtrain, ctrain, kernelfun, kernelname, modeltype,ub, lb, lb_norm, ub_norm);
 idx = randsample(n,1);
 new_x = x(idx);
 theta_lb =-15*ones(size(theta));
@@ -71,13 +80,14 @@ for i =1:maxiter
     
 end
 post = [];
-regularization = 'nugget';
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc]= prediction_bin(theta, xtrain, ctrain, xtest, kernelfun, modeltype, post, regularization);
+ 
+
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc]= prediction_bin(theta, xtrain, ctrain, xtest, model, post);
 D = 1;
 lb = zeros(D,1);
 ub = ones(D,1);
 
-[new_x, new_x_norm ,idx, L] = BALD_grid(x, theta, xtrain, ctrain, kernelfun, modeltype,lb, ub, post);
+[new_x, new_x_norm ,idx, L] = BALD_grid(x, theta, xtrain, ctrain,model, post);
 
 
 maxiter = 30;
@@ -88,24 +98,16 @@ cum_regret_rand= NaN(nreps,maxiter+1);
 cum_regret_BALD= NaN(nreps,maxiter+1);
 cum_regret_VG= NaN(nreps,maxiter+1);
 
-% 
-% for s = 1:nreps
-% rng(s)
-% [~,~, cum_regret_maxvar(s,:)]= active_learning_grid(n,maxiter, nopt, kernelfun, meanfun, theta, x, y, 'maxvar');
-% [~,~, cum_regret_rand(s,:)]= active_learning_grid(n,maxiter, nopt, kernelfun, meanfun,theta,  x, y, 'random');
-% [~,~, cum_regret_BALD(s,:)]= active_learning_grid(n,maxiter, nopt, kernelfun, meanfun,theta,  x, y, 'BALD');
-% 
-% end
-
+ 
 
 ninit = 15000;
 
 for s = 1:nreps
 seed = s;
-% [~,~, cum_regret_maxvar(s,:)] = AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @maxvar_binary_grid, ninit, theta_lb, theta_ub, lb, ub, seed);
-%  [~,~, cum_regret_rand(s,:)] = AL_loop_binary_grid(x, y, maxiter, maxiter+1, kernelfun, theta, @random, ninit, theta_lb, theta_ub, lb, ub, seed);
-% [~,~, cum_regret_BALD(s,:)] = AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @BALD_grid, ninit, theta_lb, theta_ub, lb, ub, seed);
-[~,~, cum_regret_VG(s,:)]=  AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @Variance_gradient_grid, ninit, theta_lb, theta_ub, lb, ub, seed);
+% [~,~, cum_regret_maxvar(s,:)] = AL_loop_binary_grid(x, y, maxiter, nopt, model, theta, @maxvar_binary_grid, ninit, seed);
+%  [~,~, cum_regret_rand(s,:)] = AL_loop_binary_grid(x, y, maxiter, maxiter+1, model, theta, @random, ninit, seed);
+% [~,~, cum_regret_BALD(s,:)] = AL_loop_binary_grid(x, y, maxiter, nopt, model, theta, @BALD_grid, ninit, seed);
+[~,~, cum_regret_VG(s,:)]=  AL_loop_binary_grid(x, y, maxiter, nopt, model, theta, @Variance_gradient_grid, ninit, seed);
 
 end
 

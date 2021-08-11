@@ -1,4 +1,5 @@
-function [x_duel1, x_duel2,new_duel] = kernelselfsparring(theta, xtrain_norm, ctrain, kernelfun, base_kernelfun,modeltype, max_x, min_x, lb_norm, ub_norm, condition, post, kernel_approx)
+function [x_duel1, x_duel2,new_duel] = kernelselfsparring(theta, xtrain_norm, ctrain, model, approximation)
+
 
 nsamples=2;
 decoupled_bases = 1;
@@ -7,7 +8,7 @@ for k =1:nsamples %sample g* from p(g*|D)
     loop = 1;
     while loop
         loop = 0;
-        [x_duel1_norm, new] = sample_max_preference_GP(kernel_approx, xtrain_norm, ctrain, theta,kernelfun, decoupled_bases, modeltype, base_kernelfun, post, condition, max_x, min_x, lb_norm, ub_norm);
+        [x_duel1_norm, new] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, decoupled_bases, post);
         
         if k == 2  && all(x_duel1 == new)
             loop =1;
@@ -36,13 +37,13 @@ end
 % new = NaN(d,nsamples);
 % for k =1:nsamples %sample g* from p(g*|D)
 %     y = mvnrnd(mu_y, Sigma2_y)';
-%     [sample_g, dsample_g_dx] = sample_features_value_GP(theta, xtrain_norm, y, sig2, kernelname, x0, 'method', approximation_methoD);
+%     [sample_g, dsample_g_dx] = sample_features_value_GP(theta, xtrain_norm, y, sig2, kernelname, x0, 'method', approximation.method);
 %     test(k,:) = sample_g(xtest_norm);
 %     x_init =  rand_interval(lb_norm,ub_norm);
 %     new(:,k) = minFuncBC(@(x)deriv(x,sample_g, dsample_g_dx), x_init, lb_norm, ub_norm, options); %bounds constraints.
 % end
 % 
-% [~,  test_value, test_variance, ~] = prediction_bin(theta, xtrain_norm, ctrain, [xtest_norm; x0.*ones(d,size(xtest_norm,2))], kernelfun, modeltype, post, regularization);
+% [~,  test_value, test_variance, ~] = prediction_bin(theta, xtrain_norm, ctrain, [xtest_norm; x0.*ones(d,size(xtest_norm,2))], model, post);
 % 
 % if d==1
 %     figure()
@@ -90,7 +91,7 @@ end
 % new = NaN(2,nsamples);
 % for k =1:nsamples %sample g* from p(g*|D)
 %     y = mvnrnd(mu_y, Sigma2_y)';
-%     [sample_g, dsample_g_dx] = sample_value_GP(theta, xtrain_norm, y, sig2, kernelname, x0);
+%     [sample_g, dsample_g_dx] = sample_value_GP(theta, xtrain, ctrain, model, approximation, post);
 %     test(k,:) = sample_g(x_array);
 %     x_init =  rand_interval(lb_norm,ub_norm);
 %     new(:,k) = minFuncBC(@(x)deriv(x,sample_g, dsample_g_dx), x_init, lb_norm, ub_norm, options); %bounds constraints.
@@ -152,7 +153,7 @@ end
 %         val(i,:) = sample_g(x);
 % end
 % 
-% [~,  mu_y, sigma2y, Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [x; x0*ones(1,n)], kernelfun, modeltype, post, regularization);
+% [~,  mu_y, sigma2y, Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [x; x0*ones(1,n)], model, post);
 % 
 % figure()
 % errorshaded(x, mu_y, sqrt(sigma2y));

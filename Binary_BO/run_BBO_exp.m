@@ -34,7 +34,7 @@ for j = 1:nobj
         clear('xtrain', 'xtrain_norm', 'ctrain', 'score');
         for r=1:nreplicates
             seed  = seeds(r)
-            [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  BBO_loop(acquisition_fun, nbo, seed, lb, ub, maxiter, theta, g, update_period, modeltype, theta_lb, theta_ub, kernelname, kernelfun, lb_norm, ub_norm, link);
+            [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  BBO_loop(acquisition_fun, nbo, seed, lb, ub, maxiter, theta, g, update_period, model, link);
         end
         clear('experiment')
         fi = ['xtrain_',acquisition_name];

@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2, new_duel] = Brochu_EI(theta, xtrain_norm, ctrain, kernelfun, base_kernelfun, modeltype, max_x, min_x, lb_norm, ub_norm, condition, post, ~)
+function [x_duel1, x_duel2, new_duel] = Brochu_EI(theta, xtrain_norm, ctrain, model, approximation)
 % Expected Improvement, as proposed by Brochu (2010)
 
 D = size(xtrain_norm,1)/2;
@@ -13,7 +13,7 @@ ncandidates= 5;
 % x_duel1 = x_best;
 x = [xtrain_norm(1:D,:), xtrain_norm((D+1):end,:)];
 regularization = 'nugget';
-[g_mu_c,  g_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,2*n)], kernelfun, modeltype, post, regularization);
+[g_mu_c,  g_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,2*n)], model, post);
 [max_mu_y,b]= max(g_mu_y);
 x_duel1 = x(:,b);
 

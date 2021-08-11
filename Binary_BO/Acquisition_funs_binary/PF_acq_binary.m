@@ -1,4 +1,4 @@
-function new_x = PF_acq_binary(theta, xtrain_norm, ctrain, kernelfun, modeltype, max_x, min_x, lb_norm, ub_norm, post, ~)
+function new_x = PF_acq_binary(theta, xtrain_norm, ctrain,model, max_x, min_x, lb_norm, ub_norm, post, ~)
 d = size(xtrain_norm,1)/2;
 
 MultiObjFnc = 'Kursawe';
@@ -14,7 +14,7 @@ params.pm = 0.5;        % Probability of mutation
 params.maxgen = 50;    % Maximum number of generations
 params.ms = 0.05;       % Mutation strength
 
-MultiObj.fun = @(arg)  multiobjective(theta, xtrain_norm, ctrain, arg', kernelfun, modeltype, 'post', post);
+MultiObj.fun = @(arg)  multiobjective(theta, xtrain_norm, ctrain, arg',model, 'post', post);
 [PFy, PFx] =NSGAII(params,MultiObj); %Minimisation Genetic Algorithm
 PFy = -PFy';
 
@@ -24,9 +24,9 @@ new_x =new_duel.*(max_x-min_x) + min_x;
 
 end
 
-function output =  multiobjective(theta, xtrain, ctrain, x, kernelfun, modeltype, post)
+function output =  multiobjective(theta, xtrain, ctrain, x,model, post)
 regularization = 'nugget';
-[mu_c, mu_y, sigma2_y] =  prediction_bin(theta,xtrain, ctrain, x, kernelfun, modeltype, post, regularization);
+[mu_c, mu_y, sigma2_y] =  prediction_bin(theta,xtrain, ctrain, x, model, post);
 
 output = [-mu_y, -sigma2_y];
 end

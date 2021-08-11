@@ -1,4 +1,4 @@
-function [new_x, new_x_norm] = BKG_grid(theta, xtrain_norm, ctrain, kernelfun, modeltype, max_x, min_x, lb_norm, ub_norm, post, kernel_approx)
+function [new_x, new_x_norm] = BKG_grid(theta, xtrain_norm, ctrain,model, max_x, min_x, lb_norm, ub_norm, post, approximation)
 
 nx = 30;
 d = size(xtrain_norm,1);
@@ -18,14 +18,14 @@ c0 = [ctrain, 0];
 c1 = [ctrain,1];
 
 regularization = 'nugget';
-[mu_c,  mu_y] =  prediction_bin(theta, xtrain_norm, ctrain, xtest, kernelfun, modeltype, post, regularization);
+[mu_c,  mu_y] =  prediction_bin(theta, xtrain_norm, ctrain, xtest, model, post);
 gmax = max(mu_y);
 
 N= size(mu_c,1);
 U = zeros(1,N);
 for i = 1:N
-    [mu_c0,  mu_y0] =  prediction_bin(theta, [xtrain_norm, xtest(:,i)], c0, xtest, kernelfun, modeltype, [], regularization);
-    [mu_c1,  mu_y1] =  prediction_bin(theta, [xtrain_norm, xtest(:,i)], c1, xtest, kernelfun, modeltype, [], regularization);
+    [mu_c0,  mu_y0] =  prediction_bin(theta, [xtrain_norm, xtest(:,i)], c0, xtest, model, post);
+    [mu_c1,  mu_y1] =  prediction_bin(theta, [xtrain_norm, xtest(:,i)], c1, xtest, model, post);
     u = (max(mu_y0)-gmax).*(1-mu_c(i)) + (max(mu_y1)-gmax).*mu_c(i);
     U(i) = u;
 end

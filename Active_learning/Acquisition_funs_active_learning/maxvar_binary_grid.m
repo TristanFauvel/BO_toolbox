@@ -1,4 +1,4 @@
-function  [new_x, new_x_norm, idx, L] = maxvar_binary_grid(x, theta, xtrain_norm, ctrain, kernelfun, modeltype, lb, ub, post)
+function  [new_x, new_x_norm, idx, L] = maxvar_binary_grid(x, theta, xtrain_norm, ctrain,model, post)
 xog = x;
 ngrid = 300;
 if size(x,2)>ngrid
@@ -7,10 +7,10 @@ if size(x,2)>ngrid
 end
 
 
-xnorm = (x - lb)./(ub-lb);
+xnorm = (x - model.lb)./(model.ub - model.lb);
 
 regularization = 'false';
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] =  prediction_bin(theta, xtrain_norm, ctrain, xnorm, kernelfun, modeltype, post, regularization);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] =  prediction_bin(theta, xtrain_norm, ctrain, xnorm, model, post);
 L = var_muc;
 idx= find(L==max(L));
 if numel(idx)~=1

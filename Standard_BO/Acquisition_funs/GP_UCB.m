@@ -1,4 +1,4 @@
-function [new_x, new_x_norm] = GP_UCB(theta, xtrain_norm, ytrain, meanfun, kernelfun, kernelname, max_x, min_x, lb_norm, ub_norm, kernel_approx);        
+function [new_x, new_x_norm] = GP_UCB(theta, xtrain_norm, ytrain, meanfun, kernelfun, kernelname, max_x, min_x, lb_norm, ub_norm, approximation);        
 options.verbose = 1;
 ncandidates = 10;
 

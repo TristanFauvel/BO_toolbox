@@ -6,17 +6,17 @@ ncandidates = 10;
 init_guess = [];
 options.method = 'lbfgs';
 options.verbose = 1;
-new_x_norm = multistart_minConf(@(x)adaptive_sampling_binary(x, theta, xtrain_norm, ctrain, kernelfun, modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
+new_x_norm = multistart_minConf(@(x)adaptive_sampling_binary(x, theta, xtrain_norm, ctrain,model, post), lb_norm, ub_norm, ncandidates,init_guess, options);
 new_x = new_x_norm.*(max_x-min_x) + min_x;
 end
 
-function [vargrad_x, dvargrad_x_dx] = vargrad(theta, xtrain_norm, ctrain, x_duel1, x, kernelfun, modeltype, post, regularization)
+function [vargrad_x, dvargrad_x_dx] = vargrad(theta, xtrain_norm, ctrain, x_duel1, x, model, post)
 ncandidates = 5;
 init_guess = xbest;
 options.verbose= 1;
 options.method = 'lbfgs';
 
-[mu_c,  ~, ~, ~, dmuc_dx,~,~,~, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, x, kernelfun, modeltype, post, regularization);
+[mu_c,  ~, ~, ~, dmuc_dx,~,~,~, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
 
 var_muc = -var_muc;
 dvar_muc_dx = -dvar_muc_dx;
@@ -25,8 +25,8 @@ c0 = [ctrain, 0];
 c1 = [ctrain,1];
 
 
-post0 =  prediction_bin(theta, [xtrain_norm,xt], c0, [], kernelfun, modeltype, post, regularization);
-post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], kernelfun, modeltype, post, regularization);
+post0 =  prediction_bin(theta, [xtrain_norm,xt], c0, [], model, post);
+post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], model, post);
 
 [xmaxvar1, maxvar1] = multistart_minConf(@(x)to_maximize_var_bin_GP(theta, [xtrain_norm, xt], c1, x, kernelfun,modeltype, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
 [xmaxvar0, maxvar0] = multistart_minConf(@(x)to_maximize_var_bin_GP(theta, [xtrain_norm, xt], c0, x, kernelfun,modeltype, post0), lb_norm, ub_norm, ncandidates, init_guess, options);

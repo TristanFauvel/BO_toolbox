@@ -43,7 +43,7 @@ for j = 1:nobj
             for r=1:nreplicates  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 seed  = seeds(r);
                 %             waitbar(((a-1)*nreplicates+r)/(nreplicates*nacq),wbar,'Computing...');
-                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  AL_preference_loop(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, modeltype, theta_lb, theta_ub, kernelname, kernelfun, lb_norm, ub_norm, link,condition);       
+                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  AL_preference_loop(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, model, link,condition);       
             end
             clear('experiment')
             fi = ['xtrain_',acquisition_name];

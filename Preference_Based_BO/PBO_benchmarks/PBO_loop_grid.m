@@ -97,7 +97,7 @@ for i =1:maxiter
     
     
     % Compute the Condorcet Winner
-%     [mu_c_acq,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq] = prediction(theta, xtrain, ctrain, xduels, kernelfun, modeltype, post, regularization);
+%     [mu_c_acq,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq] = prediction(theta, xtrain, ctrain, xduels, model, post);
     [mu_c_acq,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq] = prediction(theta, xtrain, ctrain, xduels, kernelfun, base_kernelname, modeltype, post, regularization);
 
     CS= soft_copeland_score(reshape(mu_c_acq, ntest^d, ntest^d));
@@ -131,7 +131,7 @@ for i =1:maxiter
     if i>ninit
         %         if i>=nfit && mod(i-ninit,3)==-1 %Global optimization every 10 steps
         %             % Try global optimization to find theta
-        %             myobjfun = @(theta)(negloglike(theta, xtrain, ctrain, kernelfun, 'modeltype', modeltype));
+        %             myobjfun = @(theta)(negloglike(theta, xtrain, ctrain, model));
         %             gs = GlobalSearch;
         %             gs.Display='iter';
         %             opts = optimoptions(@fmincon,'Algorithm','sqp');
@@ -140,12 +140,12 @@ for i =1:maxiter
         %             theta = run(ms,problem,100);
         %         elseif i>nfit && mod(i-ninit,5)==-1
         %             %% Update the model hyperparameters
-        %             theta= minFunc(negloglike, theta, options, xtrain, ctrain, kernelfun, modeltype, post, regularization);
+        %             theta= minFunc(negloglike, theta, options, xtrain, ctrain, model, post);
         %         end
         
         
         %new_duel = acquisition_fun(x, theta, xtrain, ctrain, kernelfun, link, xduels,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq, modeltype, maxC, mu_c_acq, base_kernelname);
-        new_duel = acquisition_fun(x, theta, xtrain, ctrain, kernelfun, modeltype, m, base_kernelname);
+        new_duel = acquisition_fun(x, theta, xtrain, ctrain,model, m, base_kernelname);
     else %When we have not started to train the GP classification model, the acquisition is random
         
         new_id = randsample(ind,1);

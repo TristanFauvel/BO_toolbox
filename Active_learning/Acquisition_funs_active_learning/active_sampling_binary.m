@@ -3,13 +3,13 @@ ncandidates = 10;
 init_guess = [];
 options.method = 'lbfgs';
 options.verbose = 1;
-new_x_norm = multistart_minConf(@(x)adaptive_sampling_binary(x, theta, xtrain_norm, ctrain, kernelfun, modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
+new_x_norm = multistart_minConf(@(x)adaptive_sampling_binary(x, theta, xtrain_norm, ctrain,model, post), lb_norm, ub_norm, ncandidates,init_guess, options);
 new_x = new_x_norm.*(max_x-min_x) + min_x;
 end
 
-function [I, dIdx]= adaptive_sampling_binary(x, theta, xtrain, ctrain, kernelfun, modeltype, post)
+function [I, dIdx]= adaptive_sampling_binary(x, theta, xtrain, ctrain,model, post)
 regularization = 'nugget';
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain, ctrain, x, kernelfun, modeltype, post, regularization);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain, ctrain, x, model, post);
 
 h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps);
 

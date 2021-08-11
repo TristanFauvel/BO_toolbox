@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2, new_duel] = EIIG(theta, xtrain_norm, ctrain, kernelfun, base_kernelfun, modeltype, max_x, min_x, lb_norm, ub_norm, condition, post, ~)
+function [x_duel1, x_duel2, new_duel] = EIIG(theta, xtrain_norm, ctrain, model, approximation)
 % EIIG, (Benavoli 2020)
 
 D = size(xtrain_norm,1)/2;
@@ -23,8 +23,8 @@ new_duel = [x_duel1;x_duel2];
 end
 
 function [eiig_val, deiig_val_dx]= eiig(theta, xtrain_norm, x, ctrain, kernelfun,xduel1_norm, modeltype, post,regularization)
-[I, dIdx]= BALD(theta, xtrain_norm, ctrain, [x;xduel1_norm], kernelfun, modeltype, post);
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;xduel1_norm], kernelfun, modeltype, post, regularization);
+[I, dIdx]= BALD(theta, xtrain_norm, ctrain, [x;xduel1_norm],model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;xduel1_norm], model, post);
 k= 0.5;
 D = numel(x);
 eiig_val = k*log(mu_c) - I;

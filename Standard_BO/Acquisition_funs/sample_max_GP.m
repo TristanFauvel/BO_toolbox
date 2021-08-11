@@ -1,14 +1,14 @@
-function [sample,sample_normalized] = sample_max_GP(kernel_approx, xtrain_norm, ytrain, theta,kernelfun, kernelname, decoupled_bases, max_x, min_x, lb_norm, ub_norm)
+function [sample,sample_normalized] = sample_max_GP(approximation, xtrain_norm, ytrain, theta,kernelfun, kernelname, decoupled_bases, max_x, min_x, lb_norm, ub_norm)
 
 D = size(xtrain_norm,1);
-phi = kernel_approx.phi;
-dphi_dx = kernel_approx.dphi_dx;
+phi = approximation.phi;
+dphi_dx = approximation.dphi_dx;
 
 options.method = 'lbfgs';
 options.verbose = 1;
 ncandidates= 5;
 
-[sample_g, dsample_g_dx] = sample_GP_precomputed_features(theta.cov, phi, dphi_dx, xtrain_norm, ytrain, kernelname, decoupled_bases, kernelfun);
+[sample_g, dsample_g_dx] = sample_GP_precomputed_features(theta.cov, phi, dphi_dx, xtrain_norm, ytrain, model,approximation);
 
 init_guess = [];
 new = multistart_minConf(@(x)deriv(x,sample_g, dsample_g_dx), lb_norm, ub_norm, ncandidates,init_guess, options);

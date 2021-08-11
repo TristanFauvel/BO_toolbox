@@ -1,4 +1,4 @@
-function new_duel = kernelselfsparring_grid(x, theta, xtrain, ctrain, kernelfun, modeltype,m,  kernelname, post)
+function new_duel = kernelselfsparring_grid(x, theta, xtrain, ctrain,model,m,  kernelname, post)
 
 [mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin(theta, xtrain, ctrain, xtrain, kernelfun, kernelname, modeltype, post, regularization);
 

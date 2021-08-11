@@ -1,12 +1,11 @@
-function [I, dIdx]= BALD(theta, xtrain, ctrain, x, kernelfun, modeltype, post)
+function [I, dIdx]= BALD(theta, xtrain, ctrain, x, model, post)
 
-regularization = 'nugget';
-
+modeltype = model.modeltype;
 
 if nargout>1
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain, ctrain, x, kernelfun, modeltype, post, regularization);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain, ctrain, x, model, post);
 else
-    [mu_c,  mu_y, sigma2_y] =  prediction_bin(theta, xtrain, ctrain, x, kernelfun, modeltype, post, regularization);
+    [mu_c,  mu_y, sigma2_y] =  prediction_bin(theta, xtrain, ctrain, x, model, post);
 
 end
 
