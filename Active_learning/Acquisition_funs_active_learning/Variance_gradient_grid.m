@@ -13,7 +13,7 @@ regularization = 'nugget';
 n = size(x,2);
 L = zeros(1, n);
 for i = 1:n
-    L(i) = vargrad(x, theta, xtrain_norm, ctrain, xnorm(:,i), kernelfun, modeltype, mu_c(i), regularization,var_muc);
+    L(i) = vargrad(x, theta, xtrain_norm, ctrain, xnorm(:,i), kernelfun, modeltype, mu_c(i), regularization,var_muc(i));
 end
 
 idx= find(L==max(L));
@@ -27,43 +27,40 @@ new_x_norm = (new_x - lb)./(ub - lb);
 idx = find(ismember(xog',new_x', 'rows'));
 
 end
-% function vargrad_x = vargrad(x,theta, xtrain_norm, ctrain, xnorm, kernelfun, modeltype, mu_c, regularization, var_muc)
-% c0 = [ctrain, 0];
-% c1 = [ctrain, 1];
-% [~,  ~, ~, ~, ~,~,~,~, var_muc0] =  prediction_bin(theta, [xtrain_norm, xnorm], c0, xnorm, kernelfun, modeltype, [], regularization);
-% [~,  ~, ~, ~, ~,~,~,~, var_muc1] =  prediction_bin(theta, [xtrain_norm, xnorm], c1, xnorm, kernelfun, modeltype, [], regularization);
-% 
-% 
-% vargrad_x = var_muc-(mu_c.*var_muc1 + (1-mu_c).*var_muc0);
-% end
-% 
-% figure()
-% plot(x, L./max(abs(L))); hold on;
-% plot(x,mu_c)
-
-
 function vargrad_x = vargrad(x,theta, xtrain_norm, ctrain, xnorm, kernelfun, modeltype, mu_c, regularization, var_muc)
 c0 = [ctrain, 0];
 c1 = [ctrain, 1];
-[~,  ~, ~, ~, ~,~,~,~, var_muc0] =  prediction_bin(theta, [xtrain_norm, xnorm], c0, x, kernelfun, modeltype, [], regularization);
-[~,  ~, ~, ~, ~,~,~,~, var_muc1] =  prediction_bin(theta, [xtrain_norm, xnorm], c1, x, kernelfun, modeltype, [], regularization);
+[~,  ~, ~, ~, ~,~,~,~, var_muc0] =  prediction_bin(theta, [xtrain_norm, xnorm], c0, xnorm, kernelfun, modeltype, [], regularization);
+[~,  ~, ~, ~, ~,~,~,~, var_muc1] =  prediction_bin(theta, [xtrain_norm, xnorm], c1, xnorm, kernelfun, modeltype, [], regularization);
 
 
-
-% p = mu_c;
-% figure()
-% plot(var_muc); hold on;
-% plot(var_muc0); hold on;
-% plot(var_muc1); hold on;
-% plot(p.*var_muc1 + (1-p).*var_muc0); hold off;
-% 
-% legend('$V(\Phi(f))$', '$V(\Phi(f)|0)$', '$V(\Phi(f)|1)$', '$E[V(\Phi(f)|c)]$')
-
-var_muc0 = max(var_muc0);
-var_muc1 = max(var_muc1);
-
-vargrad_x = max(var_muc)-(mu_c.*var_muc1 + (1-mu_c).*var_muc0);
+vargrad_x = var_muc-(mu_c.*var_muc1 + (1-mu_c).*var_muc0);
 end
+
+ 
+
+% function vargrad_x = vargrad(x,theta, xtrain_norm, ctrain, xnorm, kernelfun, modeltype, mu_c, regularization, var_muc)
+% c0 = [ctrain, 0];
+% c1 = [ctrain, 1];
+% [~,  ~, ~, ~, ~,~,~,~, var_muc0] =  prediction_bin(theta, [xtrain_norm, xnorm], c0, x, kernelfun, modeltype, [], regularization);
+% [~,  ~, ~, ~, ~,~,~,~, var_muc1] =  prediction_bin(theta, [xtrain_norm, xnorm], c1, x, kernelfun, modeltype, [], regularization);
+% 
+% 
+% 
+% % p = mu_c;
+% % figure()
+% % plot(var_muc); hold on;
+% % plot(var_muc0); hold on;
+% % plot(var_muc1); hold on;
+% % plot(p.*var_muc1 + (1-p).*var_muc0); hold off;
+% % 
+% % legend('$V(\Phi(f))$', '$V(\Phi(f)|0)$', '$V(\Phi(f)|1)$', '$E[V(\Phi(f)|c)]$')
+% 
+% var_muc0 = max(var_muc0);
+% var_muc1 = max(var_muc1);
+% 
+% vargrad_x = max(var_muc)-(mu_c.*var_muc1 + (1-mu_c).*var_muc0);
+% end
 
 
 % 

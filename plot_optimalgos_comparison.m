@@ -62,8 +62,8 @@ for j = 1:nobj
             scores{a} = NaN(nreps, maxiter);
         end
     end
-    benchmarks_results{j} = scores;
-    [ranks, average_ranks]= compute_rank(scores, ninit);
+%     benchmarks_results{j} = scores;
+%     [ranks, average_ranks]= compute_rank(scores, ninit);
     plots =  plot_areaerrorbar_grouped(scores, options);
     box off
     ylabel('Value $g(x^*)$');
