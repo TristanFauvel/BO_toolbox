@@ -1,11 +1,9 @@
-function [x_duel1, x_duel2, new_duel] = random_acquisition_pref(~,~,~,~,~, ~, max_x, min_x, lb_norm, ub_norm, ~, ~, ~)
-d = numel(max_x)/2;
-x_duel1 = rand_interval(lb_norm,ub_norm);
-x_duel2 = rand_interval(lb_norm,ub_norm);
-x_duel1 = x_duel1.*(max_x(1:d)-min_x(1:d)) + min_x(1:d);
-x_duel2 = x_duel2.*(max_x(1:d)-min_x(1:d)) + min_x(1:d);
+function [x_duel1, x_duel2, new_duel] = random_acquisition_pref(theta, xtrain_norm, ctrain, model, post, approximation)
+
+samples = rand_interval(model.lb, model.ub, 'nsamples', 2);
+
+x_duel1 = samples(:,1);
+x_duel2 = samples(:,2);
 new_duel= [x_duel1; x_duel2];
 
-% x_duel1 = rand_acq();
-% x_duel2 = rand_acq();
-% new_duel= [x_duel1; x_duel2];
+ 

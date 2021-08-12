@@ -20,7 +20,7 @@ nsamples=60;
 nint= 30;
 
 int=0;
-for k = 1:nsamples
+for k = 1:model.nsamples
     
     %sample the maximum
     fsamples = mvnrnd(mu_y,  nearestSPD(Sigma2_y))'; %sample from the posterior at training points

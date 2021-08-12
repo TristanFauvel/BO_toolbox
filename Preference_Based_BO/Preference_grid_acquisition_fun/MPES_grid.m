@@ -12,7 +12,7 @@ samples_g=zeros(nsamples,numel(x));
 ent= zeros(size(xduels,2), 1);
 py = zeros(size(xduels,2), nsamples);
 
-for k = 1:nsamples
+for k = 1:model.nsamples
     fsamples = mvnrnd(mu_y,  nearestSPD(Sigma2_y))'; %sample from the posterior at training points
     %sample_g= sample_value_GP(theta, xtrain, ctrain, model, approximation, post)
     %samples_g(k,:)=sample_g;

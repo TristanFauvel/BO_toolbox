@@ -1,5 +1,4 @@
-function [xtrain, xtrain_norm, ytrain, score, cum_regret, theta_evo]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, max_x, min_x, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm, seed)
-
+function [xtrain, xtrain_norm, ytrain, score, cum_regret, theta_evo]= BO_loop(g, maxiter, nopt, model, theta, acquisition_fun, ninit, max_g, seed)
 % Run a Bayesian optimization loop
 % g : objective function
 % max_g : maximum of the objective function
@@ -8,7 +7,7 @@ function [xtrain, xtrain_norm, ytrain, score, cum_regret, theta_evo]= BO_loop(g,
 % ninit : number of time steps before starting updating the hyperparameters
 % function
 
-D = numel(max_x);
+D = numel(model.ub);
 
 xtrain = [];
 xtrain_norm = [];
@@ -29,22 +28,23 @@ nmean_hyp = numel(theta.mean);
 % theta_ub(end) = 0;
 rng(seed)
 
-new_x_norm = rand_interval(lb_norm,ub_norm);
-new_x = new_x_norm.*(max_x - min_x)+min_x;
 
-if strcmp(kernelname, 'Matern52') || strcmp(kernelname, 'Matern32') %|| strcmp(kernelname, 'ARD')
+new_x_norm = rand_interval(model.lb_norm,model.ub_norm);
+new_x = new_x_norm.*(model.ub - model.lb)+model.lb;
+
+if strcmp(model.kernelname, 'Matern52') || strcmp(model.kernelname, 'Matern32') %|| strcmp(kernelname, 'ARD')
     approximation.method = 'RRGP';
 else
     approximation.method = 'SSGP';
 end
-nfeatures = 4096;
+approximation.nfeatures = 4096;
+approximation.decoupled_bases = 1;
 %approximation.phi : ntest x nfeatures
 %approximation.phi_pref : ntest x nfeatures
 % approximation.dphi_dx : nfeatures x D
 % approximation.dphi_dx : nfeatures x 2D
 [approximation.phi, approximation.dphi_dx]= sample_features_GP(theta.cov, D, model, approximation);
 post = [];
-regularization = 'nugget';
 theta_evo = zeros(numel(theta.cov), maxiter);
 rng(seed)
 for i =1:maxiter
@@ -64,19 +64,15 @@ for i =1:maxiter
     if i > ninit
         update = 'cov';       
         init_guess = [theta.cov; theta.mean];
-        hyp = multistart_minConf(@(hyp)minimize_negloglike(hyp, xtrain_norm, ytrain, kernelfun, meanfun, ncov_hyp, nmean_hyp, update), theta_lb, theta_ub,10, init_guess, options_theta); 
+        hyp = multistart_minConf(@(hyp)minimize_negloglike(hyp, xtrain_norm, ytrain, model.kernelfun, model.meanfun, ncov_hyp, nmean_hyp, update), theta_lb, theta_ub,10, init_guess, options_theta); 
         theta.cov = hyp(1:ncov_hyp);
         theta.mean = hyp(ncov_hyp+1:ncov_hyp+nmean_hyp);
     end
     if i> nopt              
-        [new_x, new_x_norm] = acquisition_fun(theta, xtrain_norm, ytrain, meanfun, kernelfun, kernelname, max_x, min_x, lb_norm, ub_norm, approximation);        
+        [new_x, new_x_norm] = acquisition_fun(theta, xtrain_norm, ytrain, model, post, approximation);        
     else
-        new_x_norm = rand_interval(lb_norm,ub_norm);
-        new_x = new_x_norm.*(max_x - min_x)+min_x;
+        new_x_norm = rand_interval(model.lb_norm,model.ub_norm);
+        new_x = new_x_norm.*(model.ub - model.lb)+model.lb;
     end
     theta_evo(:, i) = theta.cov;
 end
-mu_ytrain =  prediction(theta, xtrain_norm, ytrain, xtrain, model, post);
-% [max_ytrain,b]= max(mu_ytrain);
-% max_xtrain = xtrain(:,b);
-

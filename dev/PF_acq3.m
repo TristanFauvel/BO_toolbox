@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2] = PF_acq(theta, xtrain_norm, ctrain, model base_name, modeltype, max_x, min_x, lb_norm, ub_norm, condition, post)
+function [x_duel1, x_duel2] = PF_acq3(theta, xtrain_norm, ctrain, kernelfun, base_name, modeltype, max_x, min_x, lb_norm, ub_norm, x0, post)
 d = size(xtrain_norm,1)/2;
 
 MultiObjFnc = 'Kursawe';
@@ -14,7 +14,7 @@ params.pm = 0.5;        % Probability of mutation
 params.maxgen = 50;    % Maximum number of generations
 params.ms = 0.05;       % Mutation strength
 
-MultiObj.fun = @(arg)  multiobjective(theta, xtrain_norm, ctrain, arg', kernelfun, base_name, modeltype, post);
+MultiObj.fun = @(arg)  multiobjective(theta, xtrain_norm, ctrain, arg', kernelfun, base_name, model, post);
 [PFy, PFx] =NSGAII(params,MultiObj); %Minimisation Genetic Algorithm
 PFy = -PFy';
 
@@ -26,7 +26,7 @@ x_duel2 = new_duel(d+1:end);
 
 end
 
-function output =  multiobjective(theta, xtrain, ctrain, xduel, kernelfun, base_name, modeltype, post)
+function output =  multiobjective(theta, xtrain, ctrain, xduel, kernelfun, base_name, modeltype)
 [mu_c,  mu_y, sigma2_y ] =  prediction_bin(theta,xtrain, ctrain, xduel, kernelfun, base_name, 'modeltype',modeltype, 'post', post);
 
 sigma2_y(sigma2_y<0) = 0;
@@ -34,16 +34,17 @@ sigma2_y(sigma2_y<0) = 0;
 d= size(xtrain,1)/2;
 x0 = 0.5*ones(d,size(xduel,2));
 [mu_c1, mu_y1] =  prediction_bin(theta,xtrain, ctrain, [xduel(1:d,:); x0], kernelfun, base_name, 'modeltype',modeltype, 'post', post);
-% [mu_c2, mu_y2] =  prediction_bin(theta,xtrain, ctrain,  [xduel(d+1:end,:); x0], kernelfun, base_name, 'modeltype',modeltype);
+[mu_c2, mu_y2] =  prediction_bin(theta,xtrain, ctrain,  [xduel(d+1:end,:); x0], kernelfun, base_name, 'modeltype',modeltype, 'post', post);
 
-tfn_output = NaN(numel(mu_c),1);
-for i= 1:numel(mu_c)
-    tfn_output(i) = tfn(mu_y(i)./sqrt(1+sigma2_y(i)), 1./sqrt(1+2*sigma2_y(i)));
-
-end
-I = (mu_c - 2*tfn_output) - mu_c.^2;
-
-I(sigma2_y==0) = 0;
+% tfn_output = NaN(numel(mu_c),1);
+% for i= 1:numel(mu_c)
+%     tfn_output(i) = tfn(mu_y(i)./sqrt(1+sigma2_y(i)), 1./sqrt(1+2*sigma2_y(i)));
+% 
+% end
+% % I = sqrt(sigma2_y).*(mu_c - 2*tfn_output) - mu_c.^2;
+% I = (mu_c - 2*tfn_output) - mu_c.^2;
+% 
+% I(sigma2_y==0) = 0;
 
 
 % ns = 10000;
@@ -55,7 +56,7 @@ I(sigma2_y==0) = 0;
 % 
 
 
-output = [-I, -mu_y1]; %maximize V(mu_c) mu_y1, mu_y2
+output = [-sigma2_y, -mu_y1, -mu_y2]; %maximize V(mu_c) mu_y1, mu_y2
 % 
 % output = [(mu_c-0.5).^2,-sigma2_y, -mu_y1, -mu_y2]; %minimize (mu_c-0.5)^2, maximize, sigma2_y, mu_y1, mu_y2
 

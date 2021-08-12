@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2, new_duel] = Brochu_EI(theta, xtrain_norm, ctrain, model, approximation)
+function [x_duel1, x_duel2, new_duel] = Brochu_EI(theta, xtrain_norm, ctrain, model, post, approximation)
 % Expected Improvement, as proposed by Brochu (2010)
 
 D = size(xtrain_norm,1)/2;
@@ -8,11 +8,9 @@ options.method = 'lbfgs';
 
 ncandidates= 5;
 
-% init_guess = [];
-% x_best = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, kernelfun, condition.x0,modeltype, post), lb_norm, ub_norm, ncandidates, init_guess, options);
-% x_duel1 = x_best;
+condition = model.condition;
+
 x = [xtrain_norm(1:D,:), xtrain_norm((D+1):end,:)];
-regularization = 'nugget';
 [g_mu_c,  g_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,2*n)], model, post);
 [max_mu_y,b]= max(g_mu_y);
 x_duel1 = x(:,b);
@@ -22,23 +20,23 @@ x_duel1 = x(:,b);
 % x_duel2 = multistart_minfuncBC(@(x)expected_improvement_for_classification(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun,kernelname, x0, x_best, modeltype), lb_norm, ub_norm, ncandidates, options);
 
 init_guess = x_duel1;
-x_duel2 = multistart_minConf(@(x)expected_improvement_preference(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun, condition.x0, max_mu_y, modeltype, post,regularization), lb_norm, ub_norm, ncandidates, init_guess, options);
+x_duel2 = multistart_minConf(@(x)expected_improvement_preference(theta, xtrain_norm, x, ctrain, max_mu_y, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
 
-x_duel1 = x_duel1.*(max_x(1:D)-min_x(1:D)) + min_x(1:D);
-x_duel2 = x_duel2.*(max_x(D+1:end)-min_x(D+1:end)) + min_x(D+1:end);
+x_duel1 = x_duel1.*(model.max_x(1:D)-model.min_x(1:D)) + model.min_x(1:D);
+x_duel2 = x_duel2.*(model.max_x(D+1:2*D)-model.min_x(D+1:2*D)) + model.min_x(D+1:2*D);
 
 new_duel = [x_duel1;x_duel2];
 
 end
 
-function [EI, dEI_dx] = expected_improvement_preference(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun, x0, max_mu_y, modeltype, post, regularization)
+function [EI, dEI_dx] = expected_improvement_preference(theta, xtrain_norm, x, ctrain, max_mu_y, model, post)
 
 [D,n]= size(x);
-[g_mu_c,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], kernelfun,modeltype, post, regularization);
+[g_mu_c,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;model.condition.x0*ones(1,n)], model, post);
 
-dmuc_dx = dmuc_dx(1:D,:); 
+dmuc_dx = dmuc_dx(1:D,:);
 dmuy_dx = dmuy_dx(1:D,:);
-dsigma2_y_dx = dsigma2_y_dx(1:D,:); 
+dsigma2_y_dx = dsigma2_y_dx(1:D,:);
 
 g_sigma_y = sqrt(g_sigma2_y);
 %% Find the maximum of the value function
@@ -54,7 +52,7 @@ EI = (g_mu_y - max_mu_y).*normcdf_d+ sigma_y.*normpdf_d;%Brochu
 
 EI(sigma_y==0)= 0;
 
-if nargout>1   
+if nargout>1
     gaussder_d = -d.*normpdf_d; %derivative of the gaussian
     dsigma_y_dx = dsigma2_y_dx./(2*g_sigma_y);
     dsigma_y_dx(g_sigma2_y==0,:) = 0;

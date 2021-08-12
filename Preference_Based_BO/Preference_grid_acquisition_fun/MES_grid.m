@@ -18,7 +18,7 @@ gmax=zeros(1, nsamples);
 g_sigma_y= sqrt(g_sigma2_y);
 
 ent = zeros(n, np);
-for k = 1:nsamples
+for k = 1:model.nsamples
     %sample the maximum
     fsamples = mvnrnd(mu_y,  nearestSPD(Sigma2_y))'; %sample from the posterior at training points
     sample_g = sample_value_GP(xrange, theta, xtrain, fsamples, Sigma2_y);

@@ -1,4 +1,4 @@
-function [xtrain, xtrain_norm, ctrain, score]= BBO_loop(acquisition_fun, nopt, seed, lb, ub, maxiter, theta, g, update_period, model, link);
+function [xtrain, xtrain_norm, ctrain, score]= BBO_loop(acquisition_fun, nopt, seed, maxiter, theta, g, update_period, model);
 
 % g : objective function
 
@@ -28,7 +28,7 @@ ninit= maxiter + 2;
 options.method = 'lbfgs';
 ncandidates= 10;
 %% Compute the kernel approximation if needed
-if strcmp(kernelname, 'Matern52') || strcmp(kernelname, 'Matern32') || strcmp(kernelname, 'ARD')
+if strcmp(model.kernelname, 'Matern52') || strcmp(model.kernelname, 'Matern32') || strcmp(kernelname, 'ARD')
     approximation.method = 'RRGP';
 else
     approximation.method = 'SSGP';
@@ -60,7 +60,7 @@ for i =1:maxiter
         new_x = new_x_norm.*(ub - lb)+lb;
     end
     init_guess = [];
-    x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, xtrain_norm, ctrain, x, kernelfun,modeltype, post), lb_norm, ub_norm, ncandidates, init_guess, options);
+    x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
     x_best(:,i) = x_best_norm(:,i) .*(ub-lb) + lb;
     score(i) = g(x_best(:,i));
 end

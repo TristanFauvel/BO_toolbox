@@ -31,7 +31,7 @@ init_guess = [];
 
 mu_c = prediction_bin(theta, xtrain_norm, ctrain, xduels, kernelfun,kernelname, modeltype, post, regularization);
 
-x_best_norm = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, kernelfun, x0,modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
+x_best_norm = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
 
 n= size(x,2);
 [~,  gm] = prediction_bin(theta, xtrain_norm, ctrain, [x_best_norm;x0*ones(1,n)], kernelfun,kernelname, modeltype, post, regularization);

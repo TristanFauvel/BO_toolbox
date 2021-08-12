@@ -130,7 +130,7 @@ text(-0.25,1.15,['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', let
 box off
 
 %% Plot a sample
-decoupled_bases = 1;
+approximation.decoupled_bases = 1;
 post = [];
 approximation.nfeatures = 256;
 [sample_f, sample_g]= sample_binary_GP(theta, xtrain(:,1:ntr), ctrain(1:ntr), base_model, approximation, post);

@@ -1,4 +1,4 @@
-function new_x = MVT(theta, xtrain_norm, ctrainmodel, post, ~, tsize)
+function new_x = MVT(theta, xtrain_norm, ctrain, model, post, ~, tsize)
 regularization = 'nugget';
 options.method = 'lbfgs';
 options.verbose = 1;
@@ -6,7 +6,7 @@ D = size(xtrain_norm,1)/2;
 ncandidates =5;
 init_guess = [];
 
-x_best_norm = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, kernelfun, condition.x0,modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
+x_best_norm = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
 
 
 new = multistart_minConf(@(x)pref_var(theta, xtrain_norm, ctrain, x_best_norm , x, model, post, tsize), repmat(lb_norm,tsize-1,1), repmat(ub_norm,tsize-1,1), ncandidates,init_guess, options);

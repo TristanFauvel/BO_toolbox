@@ -1,22 +1,19 @@
-function [new_x, new_x_norm] = EI(theta, xtrain_norm, ytrain, meanfun, kernelfun, kernelname, max_x, min_x, lb_norm, ub_norm, approximation)
+function [new_x, new_x_norm] = EI(theta, xtrain_norm, ytrain, model, post, approximation)
 
 options.method = 'lbfgs';
-regularization = 'nugget';
-mu_y =  prediction(theta, xtrain_norm, ytrain, xtrain_norm, model, []);
+mu_y =  prediction(theta, xtrain_norm, ytrain, xtrain_norm, model, post);
 y_best = max(mu_y);
 
 x_init = [];
 ncandidates = 10;
-new_x_norm = multistart_minConf(@(x)expected_improvement(theta, xtrain_norm, x, ytrain, kernelfun,meanfun, y_best), lb_norm, ub_norm, ncandidates, x_init, options);
-new_x = new_x_norm.*(max_x-min_x) + min_x;
+new_x_norm = multistart_minConf(@(x)expected_improvement(theta, xtrain_norm, x, ytrain, model, post, y_best), model.lb_norm, model.ub_norm, ncandidates, x_init, options);
+new_x = new_x_norm.*(model.ub-model.lb) + model.lb;
 
 end
 
-function [EI, dEI_dx] = expected_improvement(theta, xtrain_norm, x, ytrain, kernelfun, meanfun, y_best)
-
-regularization = 'nugget';
-
-[mu_y, sigma2_y,dmu_dx, dsigma2_dx] =  prediction(theta, xtrain_norm, ytrain, x, model, []);
+function [EI, dEI_dx] = expected_improvement(theta, xtrain_norm, x, ytrain, model, post, y_best)
+ 
+[mu_y, sigma2_y,dmu_dx, dsigma2_dx] =  prediction(theta, xtrain_norm, ytrain, x, model, post);
 
 sigma_y = sqrt(sigma2_y);
 d = (mu_y - y_best)./sigma_y;

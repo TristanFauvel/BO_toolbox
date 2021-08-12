@@ -2,24 +2,22 @@ function [U, dUdx] = knowledge_grad(theta, xtrain_norm, ctrain, xt,model, post, 
 
 kernelfun = model.kernelfun;
 modeltype = model.modeltype;
-regularization = model.regularization;
-link = model.link;
 
-ncandidates = 5;
-init_guess = xbest;
+ncandidates = 2;
+init_guess = [];
 options.verbose= 1;
 options.method = 'lbfgs';
-[mu_c,  ~, ~, ~, dmuc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, xt, model, post, link);
+[mu_c,  ~, ~, ~, dmuc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, xt, model, post);
 
 post0 =  prediction_bin(theta, [xtrain_norm,xt], c0, [], model, post);
 post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], model, post);
-if nargin == 14
-    [xbest1, ybest1] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xt], c1, x, kernelfun, model.x0, modeltype, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
-    [xbest0, ybest0] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xt], c0, x, kernelfun, model.x0, modeltype, post0), lb_norm, ub_norm, ncandidates, init_guess, options);
+if strcmp(model.type, 'preference')
+    [xbest1, ybest1] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xt], c1, x, model, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
+    [xbest0, ybest0] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xt], c0, x, model, post0), lb_norm, ub_norm, ncandidates, init_guess, options);
     
 else
-    [xbest1, ybest1] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c1, x, kernelfun,modeltype, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
-    [xbest0, ybest0] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c0, x, kernelfun,modeltype, post0), lb_norm, ub_norm, ncandidates, init_guess, options);
+    [xbest1, ybest1] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c1, x, model, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
+    [xbest0, ybest0] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c0, x, model, post0), lb_norm, ub_norm, ncandidates, init_guess, options);
     
 end
 
@@ -41,10 +39,10 @@ dybest1dx = zeros(D,1);
 for i = 1:D
     % Derivative case c = 0
     dystar0dx = (eye(n)+K*post0.D)\(dKdx(:,:,i)*post0.dloglike);
-    dybest0dx(i) = dkdx(:,i)'*post0.dloglike - k'*post0.D.*dystar0dx;
+    dybest0dx(i) = dkdx(:,i)'*post0.dloglike - k'*post0.D*dystar0dx;
     % Derivative case c = 1
     dystar1dx = (eye(n)+K*post1.D)\(dKdx(:,:,i)*post1.dloglike);
-    dybest1dx(i)  = dkdx(:,i)'*post1.dloglike - k'*post1.D.*dystar1dx;
+    dybest1dx(i)  = dkdx(:,i)'*post1.dloglike - k'*post1.D*dystar1dx;
 end
  
 U = mu_c.*ybest1 + (1-mu_c).*ybest0 -ybest;

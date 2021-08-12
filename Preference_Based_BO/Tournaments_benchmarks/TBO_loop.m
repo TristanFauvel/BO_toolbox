@@ -1,4 +1,4 @@
-function [xtrain, xtrain_norm, ctrain, score] = TBO_loop(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, modeltype, theta_lb, theta_ub, kernelname, base_kernelfun, lb_norm, ub_norm, link, tsize,feedback)
+function [xtrain, xtrain_norm, ctrain, score] = TBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model, tsize,feedback)
 
 
 xbounds = [lb(:),ub(:)];
@@ -16,7 +16,7 @@ theta_init = theta;
 ninit = 5; % number of time steps before starting using the acquisition function
 
 rng(seed)
-if strcmp(kernelname, 'Matern52') || strcmp(kernelname, 'Matern32') %|| strcmp(kernelname, 'ARD')
+if strcmp(model.kernelname, 'Matern52') || strcmp(model.kernelname, 'Matern32') %|| strcmp(kernelname, 'ARD')
     approximation.method = 'RRGP';
 else
     approximation.method = 'SSGP';
@@ -85,13 +85,13 @@ for i =1:maxiter
         %Local optimization of hyperparameters
         if mod(i, update_period) ==0
             theta = theta_init(:);
-            theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm, ctrain, model), theta, theta_lb, theta_ub, options);
+            theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm, ctrain, model), theta, model.theta_lb, model.theta_ub, options);
         end
     end
         post =  prediction_bin(theta, xtrain_norm, ctrain, [], model, post);
 
     if i>ninit
-        new_x = acquisition_fun(theta, xtrain_norm, ctrain, model modeltype,max_x, min_x, lb_norm, ub_norm, condition, post, approximation, tsize);
+        new_x = acquisition_fun(theta, xtrain_norm, ctrain, model, post, approximation, tsize);
     else %When we have not started to train the GP classification model, the acquisition is random
         new_x =random_acquisition_tour([],[],[],[],[],[], max_x, min_x, lb_norm, ub_norm, [], [],[], tsize);
     end
@@ -103,8 +103,8 @@ for i =1:maxiter
         init_guess = x_best(:, end);
     end
     
-    x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, kernelfun, x0,modeltype, post), lb_norm, ub_norm, ncandidates, init_guess, options);
-    x_best(:,i) = x_best_norm(:,i) .*(max_x(1:D)-min_x(1:D)) + min_x(1:D);
+    x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+    x_best(:,i) = x_best_norm(:,i) .*(model.ub(1:D)-model.lb(1:D)) + model.lb(1:D);
     
     score(i) = g(x_best(:,i));
     if isnan(score(i))

@@ -1,21 +1,21 @@
-function new_x = Brochu_EI(theta, xtrain_norm, ctrain,model, max_x, min_x, lb_norm, ub_norms, post, ~)
+function new_x = Brochu_EI(theta, xtrain_norm, ctrain,models, post, ~)
 % Binary Expected Improvement, as proposed by Brochu (2010)
 %% Find the maximum of the value function
 options.method = 'sd';
 
 ncandidates= 5;
 x_init = [];
-x_best = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, kernelfun, x0,modeltype, post), lb_norm, ub_norm, ncandidates, x_init, options);
+x_best = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, x_init, options);
 
 x_init = [];
 new_x = multistart_minConf(@(x)expected_improvement_preference(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun,x0, x_best, modeltype), lb_norm, ub_norm, ncandidates, x_init, options, post);
 
 d= size(new_x,1);
-new_x = new_x.*(max_x(1:d)-min_x(1:d)) + min_x(1:d);
+new_x = new_x.*(model.ub(1:D)-model.lb(1:D)) + model.lb(1:D);
 
 end
 
-function [EI, dEI_dx] = expected_improvement_preference(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun, x0, x_best, modeltype, post)
+function [EI, dEI_dx] = expected_improvement_preference(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun, x0, x_best, model, post)
 
 [nd,n]= size(x);
 [g_mu_c,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], kernelfun,kernelname, modeltype, post, regularization);

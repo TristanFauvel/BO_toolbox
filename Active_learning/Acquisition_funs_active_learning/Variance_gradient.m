@@ -6,8 +6,8 @@ ncandidates = 10;
 init_guess = [];
 options.method = 'lbfgs';
 options.verbose = 1;
-new_x_norm = multistart_minConf(@(x)adaptive_sampling_binary(x, theta, xtrain_norm, ctrain,model, post), lb_norm, ub_norm, ncandidates,init_guess, options);
-new_x = new_x_norm.*(max_x-min_x) + min_x;
+new_x_norm = multistart_minConf(@(x)adaptive_sampling_binary(x, theta, xtrain_norm, ctrain,model, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
+new_x = new_x_norm.*(model.max_x-model.min_x) + model.min_x;
 end
 
 function [vargrad_x, dvargrad_x_dx] = vargrad(theta, xtrain_norm, ctrain, x_duel1, x, model, post)
@@ -28,8 +28,8 @@ c1 = [ctrain,1];
 post0 =  prediction_bin(theta, [xtrain_norm,xt], c0, [], model, post);
 post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], model, post);
 
-[xmaxvar1, maxvar1] = multistart_minConf(@(x)to_maximize_var_bin_GP(theta, [xtrain_norm, xt], c1, x, kernelfun,modeltype, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
-[xmaxvar0, maxvar0] = multistart_minConf(@(x)to_maximize_var_bin_GP(theta, [xtrain_norm, xt], c0, x, kernelfun,modeltype, post0), lb_norm, ub_norm, ncandidates, init_guess, options);
+[xmaxvar1, maxvar1] = multistart_minConf(@(x)to_maximize_var_bin_GP(theta, [xtrain_norm, xt], c1, x, model, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
+[xmaxvar0, maxvar0] = multistart_minConf(@(x)to_maximize_var_bin_GP(theta, [xtrain_norm, xt], c0, x, model, post0), lb_norm, ub_norm, ncandidates, init_guess, options);
 maxvar0 = - maxvar0; maxvar1 = -maxvar1;
 
 K = kernelfun(theta, [xtrain_norm, xt],[xtrain_norm, xt]);

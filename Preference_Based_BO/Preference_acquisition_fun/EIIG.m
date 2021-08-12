@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2, new_duel] = EIIG(theta, xtrain_norm, ctrain, model, approximation)
+function [x_duel1, x_duel2, new_duel] = EIIG(theta, xtrain_norm, ctrain, model, post, approximation)
 % EIIG, (Benavoli 2020)
 
 D = size(xtrain_norm,1)/2;
@@ -7,22 +7,21 @@ n = size(xtrain_norm,2);
 options.method = 'lbfgs';
 
 ncandidates= 5;
-regularization = 'nugget';
-
+ 
 init_guess = [];
-xduel1_norm = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, kernelfun, condition.x0,modeltype, post), lb_norm, ub_norm, ncandidates, init_guess, options);
+xduel1_norm = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
 
 
-xduel2_norm = multistart_minConf(@(x)eiig(theta, xtrain_norm, x, ctrain, kernelfun, xduel1_norm, modeltype, post,regularization), lb_norm, ub_norm, ncandidates, init_guess, options);
+xduel2_norm = multistart_minConf(@(x)eiig(theta, xtrain_norm, x, ctrain, model, xduel1_norm, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
 
-x_duel1 = xduel1_norm.*(max_x(1:D)-min_x(1:D)) + min_x(1:D);
-x_duel2 = xduel2_norm.*(max_x(D+1:end)-min_x(D+1:end)) + min_x(D+1:end);
+x_duel1 = xduel1_norm.*(model.max_x(1:D)-model.min_x(1:D)) + model.min_x(1:D);
+x_duel2 = xduel2_norm.*(model.max_x(D+1:2*D)-model.min_x(D+1:2*D)) + model.min_x(D+1:2*D);
 
 new_duel = [x_duel1;x_duel2];
 
 end
 
-function [eiig_val, deiig_val_dx]= eiig(theta, xtrain_norm, x, ctrain, kernelfun,xduel1_norm, modeltype, post,regularization)
+function [eiig_val, deiig_val_dx]= eiig(theta, xtrain_norm, x, ctrain, model, xduel1_norm, post)
 [I, dIdx]= BALD(theta, xtrain_norm, ctrain, [x;xduel1_norm],model, post);
 [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;xduel1_norm], model, post);
 k= 0.5;

@@ -56,11 +56,11 @@ for k = 1:nreps
     ninit = maxiter + 1;
     theta= true_theta;
     seed = k;
-    [~, ~, ~, true_theta_score{k}]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, ub, lb, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm, seed);
+    [~, ~, ~, true_theta_score{k}]= BO_loop(g, maxiter, nopt, model, theta, acquisition_fun, ninit, max_g, seed);
     theta= wrong_theta;
-    [~, ~, ~, wrong_theta_score{k}]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, ub, lb, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm,seed);
+    [~, ~, ~, wrong_theta_score{k}]= BO_loop(g, maxiter, nopt, model, theta, acquisition_fun, ninit, max_g, seed);
     ninit = nopt;
-    [~, ~, ~, learned_theta_score{k}, theta_evo]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, ub, lb, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm,seed);
+    [~, ~, ~, learned_theta_score{k}, theta_evo]= BO_loop(g, maxiter, nopt, model, theta, acquisition_fun, ninit, max_g, seed);
 end
 %[xtrain, xtrain_norm, ytrain, score, cum_regret]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, max_x, min_x, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm, seed)
 

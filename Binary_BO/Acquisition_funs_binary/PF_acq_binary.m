@@ -1,4 +1,4 @@
-function new_x = PF_acq_binary(theta, xtrain_norm, ctrain,model, max_x, min_x, lb_norm, ub_norm, post, ~)
+function new_x = PF_acq_binary(theta, xtrain_norm, ctrain,model, post, ~)
 d = size(xtrain_norm,1)/2;
 
 MultiObjFnc = 'Kursawe';

@@ -25,7 +25,7 @@ seeds=1:nrepets;
 load('benchmarks_table.mat')
 
 objectives = benchmarks_table.fName;
-acquisition_funs = {'Thompson_sampling', 'EI','GP_UCB','random_acquisition'}; %, 'EI_bin_mu', 'KG'
+acquisition_funs = {'random_acquisition','Thompson_sampling','EI','GP_UCB'}; %, 'EI_bin_mu', 'KG'
 
 
 nobj = numel(objectives);
@@ -34,7 +34,9 @@ for j = 1:nobj
     bias = 0;
     objective = char(objectives(j));
     
-    [g, theta.cov, lb, ub, lb_norm, ub_norm, theta_lb, theta_ub,kernelfun, kernelname] = load_benchmarks(objective, [], benchmarks_table);
+    [g, theta.cov, model] = load_benchmarks(objective, [], benchmarks_table, 0);
+    
+    
     theta.mean = 0;
     max_g = 0;
     meanfun = @constant_mean;
@@ -45,7 +47,7 @@ for j = 1:nobj
         for k = 1:nrepets
             disp(['Repetition ', num2str(k)])
             seed = seeds(k);
-            [xtrain{k}, xtrain_norm{k}, ytrain{k}, score{k}]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, ub, lb, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm, seed)
+            [xtrain{k}, xtrain_norm{k}, ytrain{k}, score{k}]= BO_loop(g, maxiter, nopt, model, theta, acquisition_fun, ninit, max_g, seed);
         end
         clear('experiment')
         fi = ['xtrain_',acquisition_name];

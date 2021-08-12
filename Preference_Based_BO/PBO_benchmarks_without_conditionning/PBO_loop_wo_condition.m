@@ -1,4 +1,4 @@
-function [xtrain, xtrain_norm, ctrain, score] = PBO_loop_wo_condition(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, modeltype, theta_lb, theta_ub, kernelname, base_kernelfun, lb_norm, ub_norm, link)
+function [xtrain, xtrain_norm, ctrain, score] = PBO_loop_wo_condition(acquisition_fun, seed, maxiter, theta, g, update_period, model)
 
 
 xbounds = [lb(:),ub(:)];
@@ -18,7 +18,7 @@ options_theta.method = 'lbfgs';
 options_theta.verbose = 1;
 
 rng(seed)
-if strcmp(kernelname, 'Matern52') || strcmp(kernelname, 'Matern32') %|| strcmp(kernelname, 'ARD')
+if strcmp(model.kernelname, 'Matern52') || strcmp(model.kernelname, 'Matern32') %|| strcmp(kernelname, 'ARD')
     approximation.method = 'RRGP';
 else
     approximation.method = 'SSGP';
@@ -76,7 +76,7 @@ for i =1:maxiter
     
     if i>ninit
         
-        [x_duel1, x_duel2] = acquisition_fun(theta, xtrain_norm(:,1:i), ctrain(1:i), model modeltype,max_x, min_x, lb_norm, ub_norm, condition, post, approximation);
+        [x_duel1, x_duel2] = acquisition_fun(theta, xtrain_norm(:,1:i), ctrain(1:i), model, post, approximation);
     else %When we have not started to train the GP classification model, the acquisition is random
         [x_duel1,x_duel2]=random_acquisition_pref([],[],[],[],[],[], max_x, min_x, lb_norm, ub_norm, [], []);
     end
@@ -88,8 +88,8 @@ for i =1:maxiter
         init_guess = x_best(:, end);
     end
     
-    x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm(:,1:i), ctrain(1:i), x, kernelfun, x0,modeltype, post), lb_norm, ub_norm, ncandidates, init_guess, options);
-    x_best(:,i) = x_best_norm(:,i) .*(max_x(1:D)-min_x(1:D)) + min_x(1:D);
+    x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm(:,1:i), ctrain(1:i), x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+    x_best(:,i) = x_best_norm(:,i) .*(model.ub(1:D)-model.lb(1:D)) + model.lb(1:D);
     
     score(i) = g(x_best(:,i));
     if isnan(score(i))

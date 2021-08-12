@@ -37,7 +37,7 @@ for j = 1:nobj %nobj
     
     link = @normcdf;
     modeltype = 'exp_prop';
-    [g, theta, lb, ub, lb_norm, ub_norm, theta_lb, theta_ub, kernelfun, kernelname] = load_benchmarks(objective, [], benchmarks_table, rescaling);
+    [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling);
     close all
     for a =1:nacq
         acquisition_name = acquisition_funs{a};
@@ -48,7 +48,7 @@ for j = 1:nobj %nobj
             for r=1:nreplicates  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 seed  = seeds(r)
                 %             waitbar(((a-1)*nreplicates+r)/(nreplicates*nacq),wbar,'Computing...');
-                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  PBO_loop_wo_condition(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, model, link);
+                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  PBO_loop_wo_condition(acquisition_fun, seed, maxiter, theta, g, update_period, model);
             end
             clear('experiment')
             fi = ['xtrain_',acquisition_name];

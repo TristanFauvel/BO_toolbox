@@ -1,4 +1,4 @@
-function [new_x, new_x_norm] = BKG_grid(theta, xtrain_norm, ctrain,model, max_x, min_x, lb_norm, ub_norm, post, approximation)
+function [new_x, new_x_norm] = BKG_grid(theta, xtrain_norm, ctrain,model, post, approximation)
 
 nx = 30;
 d = size(xtrain_norm,1);
@@ -34,6 +34,6 @@ if numel(idx)~=1
     idx = randsample(idx,1);
 end
 new_x_norm = xtest(:,idx);
-new_x = new_x_norm.*(max_x-min_x) + min_x;
+new_x = new_x_norm.*(model.max_x-model.min_x) + model.min_x;
 
 return

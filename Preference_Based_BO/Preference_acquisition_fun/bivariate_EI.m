@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2, new_duel] = bivariate_EI(theta, xtrain_norm, ctrain, kernelfun, ~, modeltype, max_x, min_x, lb_norm, ub_norm, condition, post, ~)
+function [x_duel1, x_duel2, new_duel] = bivariate_EI(theta, xtrain_norm, ctrain, model, post, approximation)
 %'Bivariate EI only possible with duels, not tournaments'
 % Bivariate Expected Improvement, as proposed by Nielsen (2015)
 %% Find the maximum of the value function
@@ -10,30 +10,28 @@ n = size(xtrain_norm,2);
 ncandidates =5;
 init_guess = [];
 
-% x_duel1 = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, kernelfun, condition.x0,modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
+% x_duel1 = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
 x = [xtrain_norm(1:D,:), xtrain_norm((D+1):end,:)];
 
-regularization = 'nugget';
-[g_mu_c,  g_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,2*n)], model, post);
+[g_mu_c,  g_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x;model.condition.x0*ones(1,2*n)], model, post);
 [a,b]= max(g_mu_y);
 x_duel1 = x(:,b);
 
-x_duel2 = multistart_minConf(@(x)compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun, condition.x0, x_duel1, modeltype, post,regularization), lb_norm, ub_norm, ncandidates,init_guess, options);
-x_duel1 = x_duel1.*(max_x(1:D)-min_x(1:D)) + min_x(1:D);
-x_duel2 = x_duel2.*(max_x(D+1:end)-min_x(D+1:end)) + min_x(D+1:end);
+x_duel2 = multistart_minConf(@(x)compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, model, x_duel1, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
+x_duel1 = x_duel1.*(model.max_x(1:D)-model.max_x(1:D)) + model.max_x(1:D);
+x_duel2 = x_duel2.*(model.max_x(D+1:2*D)-model.min_x(D+1:2*D)) + model.min_x(D+1:2*D);
 
 new_duel = [x_duel1;x_duel2];
 
 end
 
-function [BEI, dBEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, ~, ~, kernelfun, x0, x_duel1, modeltype, post, regularization)
+function [BEI, dBEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, model, x_duel1, post)
 
 [D,n]= size(x);
-[g_mu_c,  g_mu_y, g_sigma2_y,  ~, dmuc_dx, dmuy_dx, dsigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], model, post);
+x0 = model.condition.x0;
+[g_mu_c,  g_mu_y, g_sigma2_y,  ~, dmuc_dx, dmuy_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], model, post);
 
-dmuc_dx = dmuc_dx(1:D,:); % A checker
 dmuy_dx = dmuy_dx(1:D,:);% A checker
-dsigma2_y_dx = dsigma2_y_dx(1:D,:); % A checker
 
 g_sigma_y = sqrt(g_sigma2_y);
 %% Find the maximum of the value function

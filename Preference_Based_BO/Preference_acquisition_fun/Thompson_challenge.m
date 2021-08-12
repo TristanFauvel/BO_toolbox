@@ -1,19 +1,18 @@
-function [x_duel1, x_duel2,new_duel] = Thompson_challenge(theta, xtrain_norm, ctrain, modelmodeltype, max_x, min_x, lb_norm, ub_norm, condition, post, approximation)
+function [x_duel1, x_duel2,new_duel] = Thompson_challenge(theta, xtrain_norm, ctrain, model, post, approximation)
 % This function is called Dueling Thompson in Benavoli 2020.
 options.method = 'lbfgs';
 options.verbose = 1;
 D = size(xtrain_norm,1)/2;
 ncandidates =5;
 init_guess = [];
-decoupled_bases = 1;
-x_best_norm = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, kernelfun, condition.x0,modeltype, post), lb_norm, ub_norm, ncandidates,init_guess, options);
+x_best_norm = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
 
-x_duel1 =  x_best_norm.*(max_x(1:D)-min_x(1:D)) + min_x(1:D);
+x_duel1 =  x_best_norm.*(model.ub(1:D)-model.lb(1:D)) + model.lb(1:D);
 
 loop = 1;
 while loop
     loop = 0;
-    [~, new] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, decoupled_bases, post);
+    [~, new] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, post);
 
     if all(x_duel1 == new)
         loop =1;
@@ -35,7 +34,7 @@ end
 % % xtest = [xtest; x0.*ones(1,size(xtest,2))];
 % test= zeros(nsamples,size(xtest_norm,2));
 % new = NaN(d,nsamples);
-% for k =1:nsamples %sample g* from p(g*|D)
+% for k =1:model.nsamples %sample g* from p(g*|D)
 %     y = mvnrnd(mu_y, Sigma2_y)';
 %     [sample_g, dsample_g_dx] = sample_features_value_GP(theta, xtrain_norm, y, sig2, kernelname, x0, 'method', approximation.method);
 %     test(k,:) = sample_g(xtest_norm);
@@ -89,7 +88,7 @@ end
 %
 % test= zeros(nsamples,size(x_array,2));
 % new = NaN(2,nsamples);
-% for k =1:nsamples %sample g* from p(g*|D)
+% for k =1:model.nsamples %sample g* from p(g*|D)
 %     y = mvnrnd(mu_y, Sigma2_y)';
 %     [sample_g, dsample_g_dx] = sample_value_GP(theta, xtrain, ctrain, model, approximation, post);
 %     test(k,:) = sample_g(x_array);

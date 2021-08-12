@@ -1,23 +1,18 @@
-function [sample_normalized, sample] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta,kernelfun, decoupled_bases, modeltype, base_kernelfun, post, condition, max_x, min_x, lb_norm, ub_norm)
+function [sample_normalized, sample] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, post)
 
-D = size(xtrain_norm,1)/2;
-phi_pref = approximation.phi_pref;
-dphi_pref_dx = approximation.phi_pref;
-phi = approximation.phi;
-dphi_dx = approximation.dphi_dx;
-
+ 
 options.method = 'lbfgs';
 options.verbose = 1;
 ncandidates= 5;
 
-[sample_g, dsample_g_dx] = sample_value_GP_precomputed_features(phi, dphi_dx, phi_pref, dphi_pref_dx, xtrain_norm, ctrain, theta,kernelfun, decoupled_bases, modeltype, base_kernelfun, post, condition);
+[sample_g, dsample_g_dx] = sample_value_GP_precomputed_features(approximation, theta, xtrain_norm, ctrain, model, post);
 
 init_guess = [];
-new = multistart_minConf(@(x)deriv(x,sample_g, dsample_g_dx), lb_norm, ub_norm, ncandidates,init_guess, options);
+new = multistart_minConf(@(x)deriv(x,sample_g, dsample_g_dx), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
 
 %Careful here: the goal is to maximize the value function (the problem
 %is a maximization problem): deriv takes the opposite of sample_g
-sample = new.*(max_x(1:D)-min_x(1:D)) + min_x(1:D);
+sample = new.*(model.ub -model.lb) + model.lb;
 sample_normalized= new;
 end
 

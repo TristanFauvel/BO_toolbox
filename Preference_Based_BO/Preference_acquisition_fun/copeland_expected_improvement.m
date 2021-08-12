@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2, new_duel]= copeland_expected_improvement(theta, xtrain_norm, ctrain, model modeltype,max_x, min_x, lb_norm, ub_norm, condition, post, ~)
+function [x_duel1, x_duel2, new_duel]= copeland_expected_improvement(theta, xtrain_norm, ctrain, model, post, ~)
 
 d = size(xtrain_norm, 1)/2;
 
@@ -30,7 +30,7 @@ C= max(C);
 CEI = zeros(1, size(xduels, 2));
 for i = 1:size(xduels,2)
     [mu_c_1, ~, ~] = prediction_bin(theta, [xtrain_norm, xduels(:,i)], [ctrain, 1], xduels, model, post);
-    [mu_c_0, ~, ~] = prediction_bin(theta, [xtrain_norm, xduels(:,i)], [ctrain, 0], xduels, kernelfun,modeltype, post, regularization);
+    [mu_c_0, ~, ~] = prediction_bin(theta, [xtrain_norm, xduels(:,i)], [ctrain, 0], xduels, model, post);
 
     C1= soft_copeland_score(reshape(mu_c_1, n, n));
     [maxC1, ~]= max(C1); %value of the condorcet winner in case 1 is returned with the new duel

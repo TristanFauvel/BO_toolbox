@@ -8,15 +8,12 @@ close all
 data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
 data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
 
-acquisition_funs = {'random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI','bivariate_EI', 'Thompson_challenge','DTS'};
+acquisition_funs = {'Dueling_UCB','EIIG','random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI','bivariate_EI', 'Thompson_challenge','DTS'};
 
-acquisition_funs = {'Dueling_UCB','EIIG'};
 % acquisition_funs = {'DTS'};
 
-%there is a problem with 'value_expected_improvement'
 maxiter = 50;%100; %total number of iterations : 200
 
-%answer = 'max_mu_g'; %the way I report the maximum, either by maximizing the predictive mean of g, either by maximizing the soft-copeland score, EITHER BY maximizing MU_C: which makes more sense (but this depends on the acquisition function).
 
 nreplicates = 20; %20;
 
@@ -26,20 +23,24 @@ nacq = numel(acquisition_funs);
 % wbar = waitbar(0,'Computing...');
 rescaling = 0;
 if rescaling ==0
-load('benchmarks_table.mat')
+    load('benchmarks_table.mat')
 else
-load('benchmarks_table_rescaled.mat')
+    load('benchmarks_table_rescaled.mat')
 end
-objectives = benchmarks_table.fName; %; 'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12';'forretal08'};
+objectives = benchmarks_table.fName;
 nobj =numel(objectives);
 seeds = 1:nreplicates;
 update_period = maxiter+2;
+more_repets = 0;
 for j = 1:nobj %nobj %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     objective = char(objectives(j));
     
-    link = @normcdf;
-    modeltype = 'exp_prop';
-    [g, theta, lb, ub, lb_norm, ub_norm, theta_lb, theta_ub, kernelfun, kernelname] = load_benchmarks(objective, [], benchmarks_table, rescaling);
+    [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling);
+    model.link = @normcdf;
+    model.modeltype = 'exp_prop';
+    model.max_x = [model.ub;model.ub];
+    model.min_x = [model.lb;model.lb];
+    
     close all
     for a =1:nacq
         acquisition_name = acquisition_funs{a};
@@ -48,20 +49,20 @@ for j = 1:nobj %nobj %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         filename = [data_dir,objective,'_',acquisition_name];
         
-        if more_repets          
+        if more_repets
             load(filename, 'experiment')
             
             for k = 1:nrepets
                 n = numel(experiment.(['xtrain_',acquisition_name]));
                 disp(['Repetition : ', num2str(n+k)])
                 seed =n+k;
-                [experiment.(['xtrain_',acquisition_name]){n+k}, experiment.(['xtrain_norm_',acquisition_name]){n+k}, experiment.(['ctrain_',acquisition_name]){n+k}, experiment.(['score_',acquisition_name]){n+k}]=  PBO_loop(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, model, link);
+                [experiment.(['xtrain_',acquisition_name]){n+k}, experiment.(['xtrain_norm_',acquisition_name]){n+k}, experiment.(['ctrain_',acquisition_name]){n+k}, experiment.(['score_',acquisition_name]){n+k}]=  PBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model);
             end
         else
             for r=1:nreplicates  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 seed  = seeds(r)
                 %             waitbar(((a-1)*nreplicates+r)/(nreplicates*nacq),wbar,'Computing...');
-                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  PBO_loop(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, model, link);
+                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  PBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model);
             end
             clear('experiment')
             fi = ['xtrain_',acquisition_name];
@@ -73,9 +74,9 @@ for j = 1:nobj %nobj %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             fi = ['score_',acquisition_name];
             experiment.(fi) = score;
         end
-            filename = [data_dir,objective,'_',acquisition_name];
-            close all
-            save(filename, 'experiment')
+        filename = [data_dir,objective,'_',acquisition_name];
+        close all
+        save(filename, 'experiment')
         %         save([data_dir,'/synthetic_experiments_data/', objective, '_', acquisition_funs{a}], 'experiment')
     end
 end

@@ -1,19 +1,16 @@
-function [x_duel1, x_duel2, new_duel] = DTS(theta, xtrain_norm, ctrainmodel, post, approximation)
+function [x_duel1, x_duel2, new_duel] = DTS(theta, xtrain_norm, ctrain, model, post, approximation)
 
-D = size(xtrain_norm,1)/2;
-decoupled_bases = 1;
-
+D= model.D;
 init_guess = [];
 
-[x_duel1_norm, x_duel1] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, decoupled_bases, post);
+[x_duel1_norm, x_duel1] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, post);
 
 options.method = 'lbfgs';
 options.verbose = 1;
 ncandidates= 5;
-regularization= 'nugget';
-new = multistart_minConf(@(x)pref_var(theta, xtrain_norm, ctrain, x_duel1_norm , x, model, post), lb_norm, ub_norm, ncandidates,init_guess, options);
+ new = multistart_minConf(@(x)pref_var(theta, xtrain_norm, ctrain, x_duel1_norm , x, model, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
 
-x_duel2 = new.*(max_x(1:D)-min_x(1:D)) + min_x(1:D);
+x_duel2 =  new.*(model.ub(1:D)-model.lb(1:D)) + model.lb(1:D);
 new_duel = [x_duel1;x_duel2];
 end
 

@@ -1,4 +1,4 @@
-function [xtrain, xtrain_norm, ctrain, score] = AL_preference_loop(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, modeltype, theta_lb, theta_ub, kernelname, base_kernelfun, lb_norm, ub_norm, link, c)
+function [xtrain, xtrain_norm, ctrain, score] = AL_preference_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model, c)
 
 
 xbounds = [lb(:),ub(:)];
@@ -21,7 +21,7 @@ theta_init = theta;
 ninit = 5; % number of time steps before starting using the acquisition function
 
 rng(seed)
-if strcmp(kernelname, 'Matern52') || strcmp(kernelname, 'Matern32') %|| strcmp(kernelname, 'ARD')
+if strcmp(model.kernelname, 'Matern52') || strcmp(model.kernelname, 'Matern32') %|| strcmp(kernelname, 'ARD')
     approximation.method = 'RRGP';
 else
     approximation.method = 'SSGP';
@@ -73,7 +73,7 @@ for i =1:maxiter
         %Local optimization of hyperparameters
         if mod(i, update_period) ==0
             theta = theta_init(:);
-            theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm(:,1:i), ctrain(1:i), model), theta, theta_lb, theta_ub, options);
+            theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm(:,1:i), ctrain(1:i), model), theta, model.theta_lb, model.theta_ub, options);
         end
     end
     post =  prediction_bin(theta, xtrain_norm(:,1:i), ctrain(1:i), [], model, post);

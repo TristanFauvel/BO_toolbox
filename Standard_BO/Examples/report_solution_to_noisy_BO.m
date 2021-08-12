@@ -92,7 +92,7 @@ nsamps = 100000;
 samps = mvnrnd(mu_y, Sigma2_y, nsamps);
 [a,b]= max(samps,[],2);
 
-for i = 1:nsamps
+for i = 1:model.nsamps
     index=find(samps(i,:)==a(i));
     if numel(index)>1
         b(i) = randsample(index);

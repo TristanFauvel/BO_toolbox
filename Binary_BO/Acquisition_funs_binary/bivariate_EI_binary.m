@@ -1,4 +1,4 @@
-function new_x = bivariate_EI_binary(theta, xtrain_norm, ctrain,model, max_x, min_x, lb_norm, ub_norm, post, ~)
+function new_x = bivariate_EI_binary(theta, xtrain_norm, ctrain,model, post, ~)
 
 %'Bivariate EI only possible with duels, not tournaments'
 % Bivariate Expected Improvement, as proposed by Nielsen (2015)
@@ -11,16 +11,15 @@ x_init = [];
 % x_best = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, kernelfun,kernelname, x0,modeltype), lb_norm, ub_norm, ncandidates, x_init, options);
 
 
-x_best = multistart_minConf(@(x)to_maximize_activation(theta, xtrain_norm, ctrain, x, kernelfun,kernelname,modeltype, post), lb_norm, ub_norm, ncandidates, x_init, options);
+x_best = multistart_minConf(@(x)to_maximize_activation(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, x_init, options);
 
 
-new_x = multistart_minConf(@(x)compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun,kernelname, x0, x_best, modeltype), lb_norm, ub_norm, ncandidates, x_init, options);
+new_x = multistart_minConf(@(x)compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, model, x_best, post), model.lb_norm, model.ub_norm, ncandidates, x_init, options);
 d= size(new_x,1);
-new_x = new_x.*(max_x(1:d)-min_x(1:d)) + min_x(1:d);
-
+new_x = new_x.*(model.ub(1:D)-model.lb(1:D)) + model.lb(1:D);
 end
 
-function  [g_mu_y,  dmuy_dx] =  to_maximize_activation(theta, xtrain_norm, ctrain, x, kernelfun,kernelname,modeltype, post)
+function  [g_mu_y,  dmuy_dx] =  to_maximize_activation(theta, xtrain_norm, ctrain, x, model, post)
 regularization = 'nugget';
     [~,  g_mu_y, ~, ~, ~, dmuy_dx] = prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
     g_mu_y = -g_mu_y;
@@ -30,22 +29,17 @@ regularization = 'nugget';
 end
 
 
-function [BEI, dBEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun,kernelname, x0, x_best, modeltype, post)
+function [BEI, dBEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, model, x_best, post)
 
-regularization = 'nugget';
 [nd,n]= size(x);
-[g_mu_c,  g_mu_y, g_sigma2_y,  ~, dmuc_dx, dmuy_dx, dsigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, x_norm, model, post);
 
-dmuc_dx = dmuc_dx(1:nd,:); % A checker
-dmuy_dx = dmuy_dx(1:nd,:);% A checker
-dsigma2_y_dx = dsigma2_y_dx(1:nd,:); % A checker
-
-g_sigma_y = sqrt(g_sigma2_y);
 %% Find the maximum of the value function
-% [~,  max_mu_y,  g_sigma2_y1] = prediction_bin(theta, xtrain_norm, ctrain, [x_best;x0], kernelfun,kernelname, modeltype, post, regularization);
-[~, g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, x_norm, model, post);
+
+[~, g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [x_norm; model.condition.x0], model, post);
 
 g_sigma2_y = g_sigma2_y(1);
+g_sigma_y = sqrt(g_sigma2_y);
+
 max_mu_y = g_mu_y(1);
 g_mu_y = g_mu_y(2);
 
@@ -60,11 +54,11 @@ d(sigma_y==0)=0;
 normpdf_d =  normpdf(d);
 normcdf_d = normcdf(d);
 
-BEI = (g_mu_y - max_mu_y).*normcdf_d+ sigma_I.*normpdf_d;%Brochu
+BEI = (g_mu_y - max_mu_y).*normcdf_d+ sigma_I.*normpdf_d;
 BEI(sigma_y==0) = 0;
 
 if nargout>1   
-    [~, ~, ~, g_Sigma2_y, ~, ~, ~, dSigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, x_best, model, post);
+    [~, ~, ~, g_Sigma2_y, ~, ~, dmuy_dx, dSigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, x_best, model, post);
     gaussder_d = -d.*normpdf_d; %derivative of the gaussian
     
     dsigma2_I_dx = squeeze(dSigma2_y_dx(2,2,2,1:nd) - 2*dSigma2_y_dx(1,2,2,1:nd));

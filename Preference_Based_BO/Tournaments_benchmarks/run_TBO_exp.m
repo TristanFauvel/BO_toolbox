@@ -38,7 +38,7 @@ for j = 1:nobj
     
     link = @normcdf;
     modeltype = 'exp_prop';
-    [g, theta, lb, ub, lb_norm, ub_norm, theta_lb, theta_ub, kernelfun, kernelname] = load_benchmarks(objective, [], benchmarks_table, rescaling);
+    [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling);
     close all
     for a =1:nacq
         acquisition_name = acquisition_funs{a};
@@ -54,12 +54,12 @@ for j = 1:nobj
                 n = numel(experiment.(['xtrain_',acquisition_name]));
                 disp(['Repetition : ', num2str(n+k)])
                 seed =n+k;
-                [experiment.(['xtrain_',acquisition_name]){n+k}, experiment.(['xtrain_norm_',acquisition_name]){n+k}, experiment.(['ctrain_',acquisition_name]){n+k}, experiment.(['score_',acquisition_name]){n+k}]=  TBO_loop(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, model, link, tsize,feedback);
+                [experiment.(['xtrain_',acquisition_name]){n+k}, experiment.(['xtrain_norm_',acquisition_name]){n+k}, experiment.(['ctrain_',acquisition_name]){n+k}, experiment.(['score_',acquisition_name]){n+k}]=  TBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model, tsize,feedback);
             end
         else
             for r=1:nreplicates
                 seed  = seeds(r)
-                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  TBO_loop(acquisition_fun, seed, lb, ub, maxiter, theta, g, update_period, model, link, tsize,feedback);
+                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  TBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model, tsize,feedback);
             end
             clear('experiment')
             fi = ['xtrain_',acquisition_name];
