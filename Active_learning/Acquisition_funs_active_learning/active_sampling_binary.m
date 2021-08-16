@@ -8,20 +8,20 @@ new_x = new_x_norm.*(model.max_x-model.min_x) + model.min_x;
 end
 
 function [I, dIdx]= adaptive_sampling_binary(x, theta, xtrain, ctrain,model, post)
-regularization = 'nugget';
+
 [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain, ctrain, x, model, post);
 
 h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps);
 
 
-if strcmp(model.modeltype, 'exp_prop')
+if strcmp(func2str(model.link), 'normcdf')
     % for a gaussian cdf link function:
     C = sqrt(pi*log(2)/2);
     
     I1 = h(mu_c);
     I2 =  log(2)*C.*exp(-0.5*mu_y.^2./(sigma2_y+C^2))./sqrt(sigma2_y+C^2);
    
-elseif strcmp(model.modeltype, 'laplace')
+elseif strcmp(func2str(model.link), 'logistic')
     %for a sigmoid link
     C = sqrt(2*log(2));
     I1 = h(mu_c) ;

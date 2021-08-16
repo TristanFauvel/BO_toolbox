@@ -6,10 +6,9 @@ add_bo_module;
 close all
 
 data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
-data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
 
 acquisition_funs = {'Dueling_UCB','EIIG','random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI','bivariate_EI', 'Thompson_challenge','DTS'};
-
+acquisition_funs = {'MaxEntChallenge'};
 % acquisition_funs = {'DTS'};
 
 maxiter = 50;%100; %total number of iterations : 200
@@ -32,7 +31,7 @@ nobj =numel(objectives);
 seeds = 1:nreplicates;
 update_period = maxiter+2;
 more_repets = 0;
-for j = 1:nobj %nobj %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+for j = 1:nobj 
     objective = char(objectives(j));
     
     [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling);

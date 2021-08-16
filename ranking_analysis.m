@@ -1,4 +1,4 @@
-function [t, Best_ranking, AUC_ranking,b] = ranking_analysis(data_path, names, objectives, algos, nreps, maxiter, suffix)
+function [t, Best_ranking, AUC_ranking,b, signobj] = ranking_analysis(data_path, names, objectives, algos, nreps, maxiter, suffix)
 
 nobj = numel(objectives);
 nacq = numel(algos);
@@ -103,6 +103,14 @@ Best_ranking = Best_ranking(b,b);
 AUC_ranking = squeeze(sum(R_AUC,1))/nobj;
 AUC_ranking =  AUC_ranking(b,b);
 
+
+% 5 objectives with the most significant difference between algos
+[~,a] = sort(sum(borda_scores, 2));
+if numel(a)>5
+    signobj = a(end-4:end);
+else
+    signobj = a;
+end
 % table2latex(t, 'PBO_benchmark_results')
 end
 

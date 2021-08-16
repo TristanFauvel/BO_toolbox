@@ -7,9 +7,9 @@ acq_funs = {'EIIG', 'Dueling_UCB', 'MaxEntChallenge','DTS','random_acquisition_p
 
 load('/home/tfauvel/Documents/BO_toolbox/Acquisition_funs_table','T')
 acquisition_funs = cellstr(char(T(any(T.acq_funs == acq_funs,2),:).acq_funs)); 
-acquisition_names = char(T(any(T.acq_funs == acquisition_funs,2),:).names); 
-acquisition_names_citation = char(T(any(T.acq_funs == acquisition_funs,2),:).names_citations); 
-short_acq_names= T(any(T.acq_funs == acquisition_funs,2),:).short_names; 
+acquisition_names = char(T(any(T.acq_funs == acq_funs,2),:).names); 
+acquisition_names_citation = char(T(any(T.acq_funs == acq_funs,2),:).names_citations); 
+short_acq_names= char(T(any(T.acq_funs == acq_funs,2),:).short_names); 
 
 
 load('benchmarks_table.mat')
@@ -19,14 +19,12 @@ nobj =numel(objectives);
 
 nreps = 20;
 maxiter = 50;
-[t, Best_ranking, AUC_ranking,b] = ranking_analysis(data_dir, acquisition_names_citation, objectives, acquisition_funs, nreps, maxiter, []);
+[t, Best_ranking, AUC_ranking,b,signobj] = ranking_analysis(data_dir, acquisition_names_citation, objectives, acquisition_funs, nreps, maxiter, []);
 
-table2latex(t, [figure_folder, '/PBO_benchmark_results'])
+table2latex(t, [figure_folder, '/home/tfauvel/Documents/BO_toolbox/PBO_benchmark_results'])
 
 rescaling = 0;
-objectives = categorical({'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12'}); 
-
-
+objectives = objectives(signobj);
 objectives_names = benchmarks_table(any(benchmarks_table.fName == objectives',2),:).Name; 
 fig = plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, acquisition_names, figure_folder,data_dir, figname, nreps, maxiter, rescaling);
 

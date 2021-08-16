@@ -2,7 +2,7 @@ function [x_duel1, x_duel2,new_duel] = maxvar_challenge(theta, xtrain_norm, ctra
 
 options.method = 'lbfgs';
 options.verbose = 1;
-D = size(xtrain_norm,1)/2;
+D = model.D;
 ncandidates =5;
 init_guess = [];
 

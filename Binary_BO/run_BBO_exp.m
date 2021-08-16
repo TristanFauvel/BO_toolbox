@@ -6,11 +6,12 @@ close all
 data_dir =  [pathname,'/Binary_BO/Data/'];
 
 
-acquisition_funs = {'BKG','TS_binary','random_acquisition_binary'};
+acquisition_funs = {'TS_binary','random_acquisition_binary', 'UCB_binary', 'UCB_binary_latent', 'bivariate_EI_binary', 'EI_Tesch'};
+acquisition_funs = {'BKG'};
 
 maxiter = 60; %total number of iterations : 200
 
-nreplicates = 40; %20;
+nreplicates = 20;
 
 nacq = numel(acquisition_funs);
 nbo = 2;
@@ -21,13 +22,17 @@ nobj =numel(objectives);
 seeds = 1:nreplicates;
 update_period = maxiter+2; % do not update the hyperparameters;
 rescaling = 1;
+link = @normcdf;
+modeltype = 'laplace';
 for j = 1:nobj
     objective = char(objectives(j));    
-    
-    link = @normcdf;
-    modeltype = 'exp_prop';
     [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling);
     close all
+    
+    model.link = link;
+    model.modeltype = modeltype;
+    model.type = 'classification';
+    
     for a =1:nacq
         acquisition_name = acquisition_funs{a};
         acquisition_fun = str2func(acquisition_name);

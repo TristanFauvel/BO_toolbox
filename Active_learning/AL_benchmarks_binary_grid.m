@@ -34,7 +34,7 @@ acquisition_funs = {'Variance_gradient_grid'}; %{'TME_sampling_binary', 'BALD_gr
 
 nobj = numel(objectives);
 nacq = numel(acquisition_funs);
-for j = 2:nobj
+for j = 1:nobj
     objective = [objectives{j}, '_', kernelnames{j}, '_',lengthscales{j}];
     [x, y, theta, lb, ub, theta_lb, theta_ub, kernelfun] = load_benchmarks_active_learning_grid(objectives{j}, kernelnames{j}, lengthscales{j});
     for ji = 1:nacq

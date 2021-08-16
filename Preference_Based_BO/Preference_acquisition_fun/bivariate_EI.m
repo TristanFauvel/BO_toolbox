@@ -29,14 +29,15 @@ function [BEI, dBEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_n
 
 [D,n]= size(x);
 x0 = model.condition.x0;
-[g_mu_c,  g_mu_y, g_sigma2_y,  ~, dmuc_dx, dmuy_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], model, post);
+[~, ~, g_sigma2_y,  ~, ~, dmuy_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], model, post);
 
-dmuy_dx = dmuy_dx(1:D,:);% A checker
+dmuy_dx = dmuy_dx(1:D,:);
 
 g_sigma_y = sqrt(g_sigma2_y);
-%% Find the maximum of the value function
-% [~,  max_mu_y,  g_sigma2_y1] = prediction_bin(theta, xtrain_norm, ctrain, [x_duel1;x0], kernelfun,kernelname, modeltype, post, regularization);
-[~, g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [x_duel1, x;x0*ones(1,n),x0*ones(1,n)], model, post);
+
+
+% Compute the joint predictive distribution of the best point (first duel member) and the candidate
+[~, g_mu_y, g_sigma2_y, g_Sigma2_y, ~, ~, ~, dSigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x_duel1, x;x0*ones(1,n),x0*ones(1,n)], model, post);
 
 g_sigma2_y = g_sigma2_y(1);
 max_mu_y = g_mu_y(1);
@@ -53,11 +54,10 @@ d(sigma_y==0)=0;
 normpdf_d =  normpdf(d);
 normcdf_d = normcdf(d);
 
-BEI = (g_mu_y - max_mu_y).*normcdf_d+ sigma_I.*normpdf_d;%Brochu
+BEI = (g_mu_y - max_mu_y).*normcdf_d+ sigma_I.*normpdf_d;
 BEI(sigma_y==0) = 0;
 
 if nargout>1   
-    [~, ~, ~, g_Sigma2_y, ~, ~, ~, dSigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x_duel1, x;x0*ones(1,n),x0*ones(1,n)], model, post);
 
     gaussder_d = -d.*normpdf_d; %derivative of the gaussian
     
@@ -73,79 +73,3 @@ end
 BEI = -BEI; %This is because the goal is to maximize EI, and I use a minimization algorithm
 
 end
-
-% 
-% if d==1
-%     N=100;
-%     input = linspace(0,1,N);
-%     ei = zeros(1,N);
-%     dei = zeros(d,N);
-% 
-%     for i = 1:N
-%         [EI, dEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_norm, input(i), ctrain, lb_norm, ub_norm, kernelfun,kernelname, x0, x_duel1,modeltype);
-%         ei(i) = EI;
-%         dei(i) = dEI_dx;
-%     end
-%     figure()
-%     plot(input,-ei)
-%     
-%      figure()
-%     plot(input,-dei)
-%     
-%     [~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [input;x0*ones(1,N)], kernelfun,kernelname, modeltype, post, regularization);
-%     
-%     figure()
-%     errorshaded(input, g_mu_y, sqrt(g_sigma2_y))
-%     
-%     [EI, dEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_norm, linspace(0,1,100), ctrain, lb_norm, ub_norm, kernelfun,kernelname, x0, x_duel1,modeltype)
-% else
-%     N=100;
-% 
-%     input =x_duel1*ones(1,N);    
-% %     input =rand(d,N);
-% 
-%     di=1;
-%     input(di,:) = linspace(0,1,N);
-% 
-%     ei = zeros(1,N);
-%     dei = zeros(d,N);
-%     for i = 1:N
-%         [EI, dEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_norm, input(:,i), ctrain, lb_norm, ub_norm, kernelfun,kernelname, x0, x_duel1,modeltype);
-%         ei(i) = EI;
-%         dei(:,i) = dEI_dx;
-%     end
-%     figure()
-%     plot(input(di,:), -ei)
-%     [~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [input;x0*ones(1,N)], kernelfun,kernelname, modeltype, post, regularization);
-% %         [~,  g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [input(:,i);x0], kernelfun,kernelname, modeltype, post, regularization);
-% 
-%     figure()
-%     errorshaded(input(di,:), g_mu_y, sqrt(g_sigma2_y))
-%     
-%     figure()
-%     plot(input(di,:), g_mu_y)
-% 
-%     
-%     figure()
-%     plot(sqrt(g_sigma2_y))
-%     
-%     for j = 1:d
-%         figure()
-%         plot(input(j,:), -dei(j,:))
-%     end
-%     
-%     k=@(x) compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun,kernelname, x0, x_duel1,modeltype);
-%     result = NaN(d,N);
-%     for i = 1:N
-%         result(:,i) = test_matrix_deriv(k, input(:,i), 1e-9);
-%     end
-%     
-%     for j = 1:d
-%         figure()
-%         plot(input(j,:), result(j,:))
-%     end
-%     
-%     [EI, dEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_norm, input, ctrain, lb_norm, ub_norm, kernelfun,kernelname, x0, x_duel1,modeltype)
-% 
-% 
-% end
