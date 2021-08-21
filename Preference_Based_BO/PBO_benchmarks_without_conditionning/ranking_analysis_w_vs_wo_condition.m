@@ -44,7 +44,7 @@ for j = 1:nobj
 end
 
 nacq = 2;
-alpha = 1e-2;
+alpha = 5e-4;
 %% Partial ranking based on Mann-Withney t-test at alpha = 5e-4 significance
 R_best = NaN(nobj, nacq, nacq);
 R_AUC = NaN(nobj, nacq, nacq);

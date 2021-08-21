@@ -32,13 +32,15 @@ options.cmap = C;
 rng(1);
 colors = colororder;
 options.colors = colors;
-ninit = 5;
+ 
+rescaling_table = load('benchmarks_rescaling.mat', 't');
+rescaling_table =rescaling_table.t;
 
 for j = 1:nobj
     nexttile
     objective = char(objectives(j));
     
-    if rescaling == 0 && strcmp(objective, 'goldpr')
+    if rescaling == 0 && rescaling_table(rescaling_table.Names == objectives_names(j),:).TakeLog == 1 
         options.semilogy = true; %true;
     else
         options.semilogy = false;
@@ -56,7 +58,10 @@ for j = 1:nobj
         n=['a',num2str(a)];
         
         scores{a} = cell2mat(eval(['score_', acquisition])');
-    
+        
+        if rescaling == 0 && any(reshape(scores{a},1,[])<0)
+             options.semilogy = false;
+        end
         catch 
            
             scores{a} = NaN(nreps, maxiter);

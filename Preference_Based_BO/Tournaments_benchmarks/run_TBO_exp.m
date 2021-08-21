@@ -35,7 +35,7 @@ feedback = 'best'; %'all'
 more_repets= 1;
 for j = 1:nobj
     objective = char(objectives(j));
-    
+
     link = @normcdf;
     modeltype = 'exp_prop';
     [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling);
@@ -44,14 +44,13 @@ for j = 1:nobj
         acquisition_name = acquisition_funs{a};
         acquisition_fun = str2func(acquisition_name);
         clear('xtrain', 'xtrain_norm', 'ctrain', 'score');
-        
+
         filename = [data_dir,objective,'_',acquisition_name, '_', feedback];
-        
+
         if more_repets
             load(filename, 'experiment')
-            
-            for k = 1:nreplicates 
-                n = numel(experiment.(['xtrain_',acquisition_name]));
+            n = numel(experiment.(['xtrain_',acquisition_name]));
+            for k = 1:nreplicates
                 disp(['Repetition : ', num2str(n+k)])
                 seed =n+k;
                 [experiment.(['xtrain_',acquisition_name]){n+k}, experiment.(['xtrain_norm_',acquisition_name]){n+k}, experiment.(['ctrain_',acquisition_name]){n+k}, experiment.(['score_',acquisition_name]){n+k}]=  TBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model, tsize,feedback);
@@ -71,7 +70,7 @@ for j = 1:nobj
             fi = ['score_',acquisition_name];
             experiment.(fi) = score;
         end
-        
+
         close all
         save(filename, 'experiment')
     end

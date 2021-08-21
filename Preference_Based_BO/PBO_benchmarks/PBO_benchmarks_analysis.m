@@ -1,10 +1,12 @@
 add_bo_module;
 data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data'];
 figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
+folder = '/home/tfauvel/Documents/BO_toolbox/Preference_Based_BO/PBO_benchmarks/Figures';
+
 figname =  'PBO_scores_benchmarks';
 
-acq_funs = {'EIIG', 'Dueling_UCB', 'MaxEntChallenge','DTS','random_acquisition_pref','kernelselfsparring','maxvar_challenge', 'bivariate_EI', 'Brochu_EI', 'Thompson_challenge'};
-
+all_acq_funs = {'EIIG', 'Dueling_UCB',  'DTS','random_acquisition_pref','kernelselfsparring','maxvar_challenge', 'bivariate_EI', 'Brochu_EI', 'Thompson_challenge'};
+acq_funs = all_acq_funs;
 load('/home/tfauvel/Documents/BO_toolbox/Acquisition_funs_table','T')
 acquisition_funs = cellstr(char(T(any(T.acq_funs == acq_funs,2),:).acq_funs)); 
 acquisition_names = char(T(any(T.acq_funs == acq_funs,2),:).names); 
@@ -14,27 +16,14 @@ short_acq_names= char(T(any(T.acq_funs == acq_funs,2),:).short_names);
 
 load('benchmarks_table.mat')
 objectives = benchmarks_table.fName; 
-objectives_names = benchmarks_table.fName; 
+objectives_names = benchmarks_table.Name; 
 nobj =numel(objectives);
 
 nreps = 20;
 maxiter = 50;
-[t, Best_ranking, AUC_ranking,b,signobj] = ranking_analysis(data_dir, acquisition_names_citation, objectives, acquisition_funs, nreps, maxiter, []);
+[t, Best_ranking, AUC_ranking,b,signobj,ranking, final_values, AUCs] = ranking_analysis(data_dir, acquisition_names_citation, objectives, acquisition_funs, nreps, maxiter, []);
 
-table2latex(t, [figure_folder, '/home/tfauvel/Documents/BO_toolbox/PBO_benchmark_results'])
-
-rescaling = 0;
-objectives = objectives(signobj);
-objectives_names = benchmarks_table(any(benchmarks_table.fName == objectives',2),:).Name; 
-fig = plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, acquisition_names, figure_folder,data_dir, figname, nreps, maxiter, rescaling);
-
-figname  = 'optim';
-folder = ['/home/tfauvel/Documents/BO_toolbox/Preference_Based_BO/PBO_benchmarks/',figname];
-savefig(fig, [folder, figname, '.fig'])
-exportgraphics(fig, [folder,figname, '.pdf']);
-exportgraphics(fig, [folder, figname, '.png'], 'Resolution', 300);
-
-
+table2latex(t,[folder,'/PBO_benchmarks_results'])
 
 mr = 2;
 mc= 1;
@@ -59,9 +48,40 @@ text(legend_pos(1), legend_pos(2),['$\bf{', letters(i), '}$'],'Units','normalize
 
 % colormap(cmap)
 
-figname  = 'Matrices';
-savefig(fig, [figure_folder, figname, '.fig'])
-exportgraphics(fig, [figure_folder, figname, '.pdf']);
-exportgraphics(fig, [figure_folder, figname, '.png'], 'Resolution', 300);
+figname  = 'PBO_Matrices';
+figure_file = [folder,'/' figname];
+savefig(fig, [figure_file,'.fig'])
+exportgraphics(fig, [figure_file, '.pdf']);
+exportgraphics(fig, [figure_file, '.png'], 'Resolution', 300);
 
 
+
+%%
+acq_funs = all_acq_funs;
+acq_funs = acq_funs(b); %plot only the n best acquisition functions
+acq_funs = acq_funs(1:5);
+acquisition_funs = cellstr(char(T(any(T.acq_funs == acq_funs,2),:).acq_funs)); 
+acquisition_names = char(T(any(T.acq_funs == acq_funs,2),:).names); 
+acquisition_names_citation = char(T(any(T.acq_funs == acq_funs,2),:).names_citations); 
+short_acq_names= char(T(any(T.acq_funs == acq_funs,2),:).short_names); 
+
+[~,~,~,~,signobj] = ranking_analysis(data_dir, acquisition_names_citation, objectives, acquisition_funs, nreps, maxiter, []);
+
+objectives = objectives(signobj(1:5));
+objectives_names = objectives_names(signobj(1:5));
+
+% objectives_names = benchmarks_table(any(benchmarks_table.fName == objectives',2),:).Name;
+
+
+fig = plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, acquisition_names, figure_folder,data_dir, figname, nreps, maxiter, rescaling, []);
+
+figname  = 'optim_trajectories_PBO';
+figure_file = [folder,'/' figname];
+savefig(fig, [figure_file,'.fig'])
+exportgraphics(fig, [figure_file, '.pdf']);
+exportgraphics(fig, [figure_file, '.png'], 'Resolution', 300);
+
+
+
+legends = T(any(T.acq_funs == acq_funs,2),:).short_names; 
+fig =  plot_benchmarks_histograms(final_values, AUCs, legends, b);

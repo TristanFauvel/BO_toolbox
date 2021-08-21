@@ -1,4 +1,4 @@
-function t = ranking_analysis_AL_w_vs_wo_condition(data_dir, names, objectives, algos, nreps, maxiter)
+function [t,signobj] = ranking_analysis_AL_w_vs_wo_condition(data_dir, names, objectives, algos, nreps, maxiter)
 
 nobj = numel(objectives);
 nacq = numel(algos);
@@ -100,6 +100,11 @@ names = {'With conditioning', 'Without conditioning'};
 ordered_names = names(b);
 t = table(ordered_names(:), ranking(b)', Borda_score(b)', 'VariableNames', {'Acquisition rule', 'Rank', 'Borda score'});
 % table2latex(t, 'PBO_benchmark_results')
+
+% objectives with the most significant difference between algos
+[s,a] = sort(sum(borda_scores, 2));
+    signobj = flipud(a(s>0));
+
 end
 
 function U  = rank_with_ties(V)

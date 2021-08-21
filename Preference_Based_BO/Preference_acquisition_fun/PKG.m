@@ -1,13 +1,16 @@
 function [new_x, new_x_norm] = PKG(theta, xtrain_norm, ctrain, model, post, approximation)
 
-if ~strcmp(modeltype, 'laplace')
+if ~strcmp(model.modeltype, 'laplace')
     error('This acquisition function is only implemented with Laplace approximation')
 end
 init_guess = [];
 options.method = 'lbfgs';
 options.verbose = 1;
 ncandidates = 5;
-[xbest, ybest] = multistart_minConf(@(x)to_maximize_value_GP(train, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+lb_norm = [model.lb_norm; model.lb_norm];
+ub_norm = [model.ub_norm; model.ub_norm];
+
+[xbest, ybest] = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
 ybest = -ybest;
 
 c0 = [ctrain, 0];

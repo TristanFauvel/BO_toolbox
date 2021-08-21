@@ -8,7 +8,7 @@ close all
 data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
 
 acquisition_funs = {'Dueling_UCB','EIIG','random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI','bivariate_EI', 'Thompson_challenge','DTS'};
-acquisition_funs = {'MaxEntChallenge'};
+acquisition_funs = {'PKG'};
 % acquisition_funs = {'DTS'};
 
 maxiter = 50;%100; %total number of iterations : 200
@@ -31,32 +31,39 @@ nobj =numel(objectives);
 seeds = 1:nreplicates;
 update_period = maxiter+2;
 more_repets = 0;
-for j = 1:nobj 
+
+for j = 1:nobj
     objective = char(objectives(j));
-    
+
     [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling);
     model.link = @normcdf;
-    model.modeltype = 'exp_prop';
+
     model.max_x = [model.ub;model.ub];
     model.min_x = [model.lb;model.lb];
-    
+
     close all
     for a =1:nacq
         acquisition_name = acquisition_funs{a};
+         if strcmp(acquisition_name, 'PKG')
+            modeltype = 'laplace';
+        else
+            modeltype = 'exp_prop';
+        end
+            model.modeltype = modeltype;
         acquisition_fun = str2func(acquisition_name);
         clear('xtrain', 'xtrain_norm', 'ctrain', 'score');
-        
+
         filename = [data_dir,objective,'_',acquisition_name];
-        
+
         if more_repets
             load(filename, 'experiment')
-            
+            n = numel(experiment.(['xtrain_',acquisition_name]));
             for k = 1:nrepets
-                n = numel(experiment.(['xtrain_',acquisition_name]));
+
                 disp(['Repetition : ', num2str(n+k)])
                 seed =n+k;
                 [experiment.(['xtrain_',acquisition_name]){n+k}, experiment.(['xtrain_norm_',acquisition_name]){n+k}, experiment.(['ctrain_',acquisition_name]){n+k}, experiment.(['score_',acquisition_name]){n+k}]=  PBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model);
-            end
+            end             
         else
             for r=1:nreplicates  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 seed  = seeds(r)
@@ -76,7 +83,7 @@ for j = 1:nobj
         filename = [data_dir,objective,'_',acquisition_name];
         close all
         save(filename, 'experiment')
-        %         save([data_dir,'/synthetic_experiments_data/', objective, '_', acquisition_funs{a}], 'experiment')
+
     end
 end
 % cmap = gray(256);

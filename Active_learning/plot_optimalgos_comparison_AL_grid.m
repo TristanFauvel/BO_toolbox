@@ -1,16 +1,4 @@
 function fig = plot_optimalgos_comparison_AL_grid(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname, nreps, maxiter, rescaling)
-
-% data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data'];
-% figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
-% figname =  'PBO_scores_benchmarks';
-
-% objectives = {'GP1d', 'forretal08', 'grlee12', 'levy', 'goldpr', 'camel6', 'Ursem_waves'};
-% objectives_names = {'GP1d','Forrester (2008)', 'Gramacy and Lee (2012)', 'Levy', 'Goldstein-Price', 'Six Hump Camel', 'Ursem-Waves'};
-% acquisition_funs = {'random_acquisition_pref', 'new_DTS','active_sampling', 'MES', 'brochu_EI', 'bivariate_EI', 'random', 'decorrelatedsparring', 'kernelselfsparring'};
-% acquisition_funs = {'DTS','random_acquisition_pref','kernelselfsparring','maxvar_challenge', 'bivariate_EI', 'Brochu_EI', 'Thompson_challenge'};
-% names = {'DTS','Random', 'KSS', 'MVC', 'Bivariate EI (Nielsen 2015)', 'EI (Brochu 2010)', 'Thompson Challenge',};
-% names = {'Duel Thompson Sampling','Random', 'Kernel Self-Sparring', 'Maximum Variance Challenge', 'Bivariate Expected Improvement (Nielsen 2015)', 'Expected Improvement (Brochu 2010)', 'Thompson Challenge'};
-% 
  
 nobj = numel(objectives);
 
@@ -30,10 +18,7 @@ options.semilogy = false;
 options.cmap = C;
 options.colors = colororder;
 rng(1);
-% colors = rand(nacq,3);
-% options.colors = colors;
-ninit = 5;
-
+ 
 for j = 1:nobj
     nexttile
     objective = char(objectives(j));

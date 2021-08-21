@@ -28,7 +28,7 @@ options.error= 'sem';
 options.line_width = linewidth/2;
 options.semilogy = false;
 options.cmap = C;
-
+options.colors = colororder;
 rng(1);
 % colors = rand(nacq,3);
 % options.colors = colors;

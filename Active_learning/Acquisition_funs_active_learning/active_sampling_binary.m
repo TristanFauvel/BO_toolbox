@@ -1,4 +1,4 @@
-function [new_x, new_x_norm] = active_sampling_binary(theta, xtrain_norm, ctrain, model, post)
+function [new_x, new_x_norm] = active_sampling_binary(theta, xtrain_norm, ctrain, model, post, ~)
 ncandidates = 10;
 init_guess = [];
 options.method = 'lbfgs';

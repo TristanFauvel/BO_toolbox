@@ -1,7 +1,6 @@
 function [xtrain, xtrain_norm, ctrain, score]= BBO_loop(acquisition_fun, nopt, seed, maxiter, theta, g, update_period, model)
 
 % g : objective function
-
 % maxiter : number of iterations
 % nopt : number of time steps before starting using the acquisition
 % ninit : number of time steps before starting updating the hyperparameters

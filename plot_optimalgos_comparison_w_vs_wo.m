@@ -29,9 +29,10 @@ options.line_width = linewidth/2;
 options.semilogy = false;
 options.cmap = C;
 
+
 rng(1);
-% colors = rand(nacq,3);
-% options.colors = colors;
+colors = colororder;
+options.colors = colors;
 ninit = 5;
 
 for j = 1:nobj

@@ -1,4 +1,4 @@
-function [t, Best_ranking, AUC_ranking,b, signobj] = ranking_analysis(data_path, names, objectives, algos, nreps, maxiter, suffix)
+function [t, Best_ranking, AUC_ranking,b, signobj, ranking, final_values, AUCs] = ranking_analysis(data_path, names, objectives, algos, nreps, maxiter, suffix)
 
 nobj = numel(objectives);
 nacq = numel(algos);
@@ -7,6 +7,9 @@ graphics_style_paper;
 rng(1);
 benchmarks_results = cell(1,nobj);
 scores = cell(1,nacq);
+final_values = zeros(nacq,nobj, nreps);
+AUCs = zeros(nacq,nobj, nreps);
+
 for j = 1:nobj
     %     objective = objectives{j};
     objective = char(objectives(j));
@@ -16,9 +19,10 @@ for j = 1:nobj
         filename = [data_path,'/',objective, '_',acquisition,suffix];
         try
             load(filename, 'experiment');
-            UNPACK_STRUCT(experiment, false)           
-            scores{a} = cell2mat(eval(['score_', acquisition])');
-            
+            score= cell2mat(experiment.(['score_', acquisition])');
+             scores{a} = score;
+            final_values(a,j,:) = score(:,end); 
+            AUCs(a,j,:) = mean(score,2); 
         catch
             scores{a} = NaN(nreps, maxiter);
         end
@@ -27,12 +31,6 @@ for j = 1:nobj
     benchmarks_results{j} = scores;
     %     [ranks, average_ranks]= compute_rank(scores, ninit);
 end
-
-%% To test the ranking algo : 
-
-
-
-%%
 
 alpha = 5e-4;
 %% Partial ranking based on Mann-Withney t-test at alpha = 5e-4 significance
@@ -71,7 +69,6 @@ borda_scores = NaN(size(partial_ranking));
 for i=1:nobj
     partial_ranking(i,:)  = get_ranking(partial_ranking(i,:));
     borda_scores(i,:)  = get_Borda_from_ranking(partial_ranking(i,:));
-
 end
 
 %% Ties from the previous step are broken based on the Area Under Curve
@@ -104,14 +101,18 @@ AUC_ranking = squeeze(sum(R_AUC,1))/nobj;
 AUC_ranking =  AUC_ranking(b,b);
 
 
-% 5 objectives with the most significant difference between algos
-[~,a] = sort(sum(borda_scores, 2));
-if numel(a)>5
-    signobj = a(end-4:end);
-else
-    signobj = a;
-end
-% table2latex(t, 'PBO_benchmark_results')
+% objectives with the most significant difference between algos
+[s,a] = sort(sum(borda_scores, 2));
+ signobj = flipud(a(s>0));
+ 
+  signobj = sum(borda_scores,2)>0;
+
+ 
+% objectives that agree the most with the final ranking
+% [s2,a] = sort(mean((borda_scores- (nacq-ranking)).^2,2));
+% 
+%  signobj = a;
+
 end
 
 function U  = rank_with_ties(V)

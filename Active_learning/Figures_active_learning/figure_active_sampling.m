@@ -159,7 +159,7 @@ xticklabels({'0', '1'})
 % yticks([0,1])
 % yticklabels({'0', '1'})
 ylabel('Utility function')
-legend([h1 h2], '$I(c,f|x, \mathcal{D})$','$V(\mu_c(x)|\mathcal{D})$', 'Location', 'northeast');
+legend([h1 h2], '$I(c,f|x, \mathcal{D})$','$V(Phi(f(x))|\mathcal{D})$', 'Location', 'northeast');
 
 xlabel('$x$')
 box off
