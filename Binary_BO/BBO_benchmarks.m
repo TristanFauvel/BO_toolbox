@@ -6,7 +6,7 @@ close all
 data_dir =  [pathname,'/Binary_BO/Data/'];
 
 
-acquisition_funs = { 'TS_binary','random_acquisition_binary', 'UCB_binary', 'UCB_binary_latent', 'bivariate_EI_binary', 'EI_Tesch'};
+acquisition_funs = {'EI_Tesch', 'TS_binary','random_acquisition_binary', 'UCB_binary', 'UCB_binary_latent', 'bivariate_EI_binary'};
 %Puis faire BKG 
 maxiter = 50; %total number of iterations : 200
 

@@ -2,7 +2,7 @@ function [U, dUdx] = knowledge_grad(theta, xtrain_norm, ctrain, xt,model, post, 
 
 kernelfun = model.kernelfun;
 
-ncandidates =150;
+ncandidates =15;
 init_guess = [];
 options.verbose= 1;
 options.method = 'lbfgs';
@@ -22,7 +22,7 @@ else
     
 end
 
-ybest1 = - ybest1; 
+ybest1 = - ybest1;
 ybest0 = -ybest0;
 
 U = mu_c.*ybest1 + (1-mu_c).*ybest0 -ybest;
@@ -46,14 +46,12 @@ if nargout >1
         dk0dx = dk0dx(:,:,end)';
     end
     %%
-    if ~strcmp(model.kernelname, 'sigmoid_kernelfun') %only for stationnary kernel
-        [k, ~, dkdx] = kernelfun(theta, [xtrain_norm, xt], xt, false, model.regularization);
-        dkdx = squeeze(dkdx); % (ntr+1) x D
-    else
-        [k, ~, dkdx] = kernelfun(theta, [xtrain_norm, xt], xt, false, model.regularization);
-        dkdx = squeeze(dkdx); % (ntr+1) x D
+    
+    [k, ~, dkdx] = kernelfun(theta, [xtrain_norm, xt], xt, false, model.regularization);
+    dkdx = squeeze(dkdx); % (ntr+1) x D
+    if isfield(model, 'context') && model.context ==1
         [~, ~, ~, dkxxdx] = kernelfun(theta, xt, xt, false, model.regularization);
-        dkdx(end,1)= dkxxdx;
+        dkdx(end,:)= dkxxdx; % dkdx(end,1)= dkxxdx;
     end
     
     n = size(K,1);

@@ -1,0 +1,54 @@
+
+nx = 20;
+ns = 20;
+x_range = linspace(0,1,nx);
+s_range = linspace(0,1,ns);
+regularization = 'nugget';
+post = [];
+
+[p,q]= ndgrid(s_range, x_range);
+
+xtest = [p(:),q(:)]';
+c0 = [ctrain, 0];
+c1 = [ctrain,1];
+
+[mu_c,  mu_y, sigma2_y] =  prediction_bin(theta, xtrain_norm, ctrain, xtest, model, post);
+s0 = 0.5;
+[c, g] =  prediction_bin(theta, xtrain_norm, ctrain, [s0*ones(1,nx); x_range], model, post);
+gmax = max(g);
+cmax = max(c);
+N= size(mu_c,1);
+U = zeros(1,N);
+for i = 1:N
+    [mu_c0,  mu_y0] =  prediction_bin(theta, [xtrain_norm, xtest(:,i)], c0, [s0*ones(1,nx); x_range], model, post);
+    [mu_c1,  mu_y1] =  prediction_bin(theta, [xtrain_norm, xtest(:,i)], c1, [s0*ones(1,nx); x_range], model, post);
+    u = (max(mu_y0)-gmax).*(1-mu_c(i)) + (max(mu_y1)-gmax).*mu_c(i);
+%      u = (max(mu_c0)-cmax).*(1-mu_c(i)) + (max(mu_c1)-cmax).*mu_c(i);
+
+    U(i) = u;
+end
+
+
+init_guess = [];
+options.method = 'lbfgs';
+options.verbose = 1;
+ncandidates =5;
+ns = model.ns;
+% s0 = rand_interval(model.lb_norm(1:ns), model.ub_norm(1:ns));
+[xbest, ybest] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, xtrain_norm, ctrain, x, model, post), [s0; model.lb_norm(1+ns:end)], [s0; model.ub_norm(1+ns:end)],ncandidates,[], []);
+ybest = -ybest;
+
+c0 = [ctrain, 0];
+c1 = [ctrain,1];
+
+for i = 1:N
+    u_est(i) =  knowledge_grad(theta, xtrain_norm, ctrain, xtest(:,i),model, post, c0, c1, xbest, ybest, [s0; model.lb_norm(1+ns:end)],[s0; model.ub_norm(1+ns:end)]);
+end
+
+figure();
+subplot(1,2,1)
+imagesc(reshape(U, [nx, nx]))
+colorbar
+subplot(1,2,2)
+imagesc(reshape(-u_est,nx,nx))
+colorbar

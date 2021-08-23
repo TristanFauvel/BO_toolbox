@@ -11,7 +11,7 @@ nobj =numel(objectives);
 
  
  %'BKG'
-all_acq_funs = {'TS_binary', 'random_acquisition_binary','UCB_binary', 'UCB_binary_latent', 'EI_Tesch'}; %, 'bivariate_EI_binary'};
+all_acq_funs = {'TS_binary', 'random_acquisition_binary','UCB_binary', 'UCB_binary_latent', 'EI_Tesch', 'bivariate_EI_binary'};
  
 acq_funs = all_acq_funs;
 load('/home/tfauvel/Documents/BO_toolbox/Acquisition_funs_table','T')
@@ -23,7 +23,7 @@ short_acq_names= char(T(any(T.acq_funs == acq_funs,2),:).short_names);
  
 nreps = 20;
 
-maxiter= 60;
+maxiter= 50;
 
 [t, Best_ranking, AUC_ranking,b, signobj] = ranking_analysis(data_dir, char(acquisition_names_citation), objectives, acquisition_funs, nreps, maxiter,[]);
 
