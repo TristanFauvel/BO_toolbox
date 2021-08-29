@@ -17,15 +17,15 @@ for j = 1:nobj
     for a = 1:nacq
         acquisition = algos{a};
         filename = [data_path,'/',objective, '_',acquisition,suffix];
-        try
+%         try
             load(filename, 'experiment');
             score= cell2mat(experiment.(['score_', acquisition])');
              scores{a} = score;
             final_values(a,j,:) = score(:,end); 
             AUCs(a,j,:) = mean(score,2); 
-        catch
-            scores{a} = NaN(nreps, maxiter);
-        end
+%         catch
+%             scores{a} = NaN(nreps, maxiter);
+%         end
         
     end
     benchmarks_results{j} = scores;

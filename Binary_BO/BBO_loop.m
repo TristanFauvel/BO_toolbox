@@ -12,7 +12,7 @@ lb_norm = model.lb_norm;
 ub_norm = model.ub_norm;
 
 D = numel(ub);
- 
+
 xtrain = [];
 xtrain_norm = [];
 ctrain = [];
@@ -46,17 +46,19 @@ for i =1:maxiter
     xtrain = [xtrain, new_x];
     xtrain_norm = [xtrain_norm, new_x_norm];
     ctrain = [ctrain, new_c];
-      
+    
     
     if i > ninit
         %Local optimization of hyperparameters
         if mod(i, update_period) ==0
             init_guess = theta;
             theta = multistart_minConf(@(hyp)minimize_negloglike_bin(hyp, xtrain_norm, ctrain, kernelfun, meanfun, update, post), theta_lb, theta_ub,10, init_guess, options_theta);
+            [approximation.phi, approximation.dphi_dx] = sample_features_GP(theta(:), model, approximation);
+            
         end
     end
     post =  prediction_bin(theta, xtrain_norm, ctrain, [], model, []);
-
+    
     if i> nopt
         [new_x, new_x_norm] = acquisition_fun(theta, xtrain_norm, ctrain,model, post, approximation);
     else

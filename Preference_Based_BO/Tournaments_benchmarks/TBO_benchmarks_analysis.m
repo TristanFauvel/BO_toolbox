@@ -20,9 +20,9 @@ nobj =numel(objectives);
 
 nreps = 30;  
 maxiter = 30;
-feedback ='all';  
+feedback ='all';  %'all' 
 suffix = ['_',feedback];
-[t, Best_ranking, AUC_ranking,b] = ranking_analysis(data_dir, char(acquisition_names_citation), objectives, acquisition_funs, nreps, maxiter,suffix);
+[t, Best_ranking, AUC_ranking,b, signobj, ranking, final_values, AUCs] = ranking_analysis(data_dir, char(acquisition_names_citation), objectives, acquisition_funs, nreps, maxiter,suffix);
 
 table2latex(t, [figure_folder, '/TBO_benchmark_results', suffix])
 

@@ -15,10 +15,6 @@ nreplicates = 20;
 nacq = numel(acquisition_funs);
 nbo = 2;
 
-load('benchmarks_table.mat')
-objectives = benchmarks_table.fName; %; 'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12';'forretal08'};
-% objectives = {'spheref'}; %%%%%%%%%%%%%%%%%
-nobj =numel(objectives);
 seeds = 1:nreplicates;
 update_period = maxiter+2; % do not update the hyperparameters;
 
@@ -28,6 +24,10 @@ if rescaling == 0
 else
     load('benchmarks_table_rescaled.mat')
 end
+
+objectives = benchmarks_table.fName; %; 'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12';'forretal08'};
+% objectives = {'spheref'}; %%%%%%%%%%%%%%%%%
+nobj =numel(objectives);
 
 
 link = @normcdf;

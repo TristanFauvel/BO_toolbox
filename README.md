@@ -26,7 +26,7 @@ This toolbox was primarily intended to perform preferential Bayesian optimizatio
 * Simply add BO_toolbox to your Matlab path
 
 ## User guide
-* You can test the installation by running test.m
+* Explanations are provided in the /Examples subfolders
 
 ## License
 This software is distributed under the MIT License. Please refer to the file LICENCE.txt included for details.

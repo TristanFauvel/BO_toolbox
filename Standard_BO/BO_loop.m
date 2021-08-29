@@ -67,6 +67,7 @@ for i =1:maxiter
         hyp = multistart_minConf(@(hyp)minimize_negloglike(hyp, xtrain_norm, ytrain, model.kernelfun, model.meanfun, ncov_hyp, nmean_hyp, update), theta_lb, theta_ub,10, init_guess, options_theta); 
         theta.cov = hyp(1:ncov_hyp);
         theta.mean = hyp(ncov_hyp+1:ncov_hyp+nmean_hyp);
+        [approximation.phi, approximation.dphi_dx]= sample_features_GP(theta.cov, D, model, approximation);
     end
     if i> nopt              
         [new_x, new_x_norm] = acquisition_fun(theta, xtrain_norm, ytrain, model, post, approximation);        
