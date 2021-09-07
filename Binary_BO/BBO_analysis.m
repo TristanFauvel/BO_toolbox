@@ -1,5 +1,5 @@
 pathname = '/home/tfauvel/Documents/BO_toolbox';
-data_dir =  [pathname,'/Binary_BO/Data/'];
+data_dir =  [pathname,'/Binary_BO/Data'];
 figure_folder = [pathname,'/Binary_BO/Figures/'];
 figname =  'PBO_scores_benchmarks';
 
@@ -25,10 +25,9 @@ nreps = 20;
 
 maxiter= 50;
 
-[t, Best_ranking, AUC_ranking,b, signobj] = ranking_analysis(data_dir, char(acquisition_names_citation), objectives, acquisition_funs, nreps, maxiter,[]);
+[t, Best_ranking, AUC_ranking,b, signobj] = ranking_analysis(data_dir, char(acquisition_names_citation), objectives, acquisition_funs, nreps,[],[], 'max');
 
 table2latex(t, [figure_folder,'BBO_benchmark_results'])
-
 
 %%
 acq_funs = all_acq_funs;

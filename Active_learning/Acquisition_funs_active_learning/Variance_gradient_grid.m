@@ -33,8 +33,6 @@ c1 = [ctrain, 1];
 post = [];
 [~,  ~, ~, ~, ~,~,~,~, var_muc0] =  prediction_bin(theta, [xtrain_norm, xnorm], c0, xnorm, model, post);
 [~,  ~, ~, ~, ~,~,~,~, var_muc1] =  prediction_bin(theta, [xtrain_norm, xnorm], c1, xnorm, model, post);
-
-
 vargrad_x = var_muc-(mu_c.*var_muc1 + (1-mu_c).*var_muc0);
 end
 

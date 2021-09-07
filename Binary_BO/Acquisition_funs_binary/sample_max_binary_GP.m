@@ -1,4 +1,4 @@
-function [sample_normalized, sample] = sample_max_binary_GP(approximation, xtrain_norm, ctrain, theta, model, post)
+function [sample_normalized, sample] = sample_max_binary_GP(approximation, xtrain_norm, ctrain, theta, model, post, s0)
 phi = approximation.phi;
 dphi_dx = approximation.dphi_dx;
 
@@ -9,16 +9,32 @@ ncandidates= 5;
 [sample_g, dsample_g_dx] = sample_binary_GP_precomputed_features(phi, dphi_dx, xtrain_norm, ctrain, theta,model, approximation, post);
 
 init_guess = [];
+    xdims =  (model.ns+1):model.D;
 
-sample_normalized = multistart_minConf(@(x)deriv(x,sample_g, dsample_g_dx), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
- sample = sample_normalized.*(model.ub-model.lb) + model.lb;
+if strcmp(model.task, 'max') %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%check
+    f = sample_g;
+    dfdx = dsample_g_dx;
+    xdims = (model.ns+1):model.D;
+elseif strcmp(model.task, 'average')
+    sdims = 1:model.ns;
+    xdims =  (model.ns+1):model.D;
+    f = @(x) integral(@(s) sample_g([s;x*ones(1,size(s,2))]), model.lb_norm(sdims), model.ub_norm(sdims));
+    dfdx = @(x) integral(@(s) dsample_g_dx([s;x*ones(1,size(s,2))]), model.lb_norm(sdims), model.ub_norm(sdims),'ArrayValued', true);
+end
+sample_normalized = multistart_minConf(@(x)takemax(x,f, dfdx, xdims), model.lb_norm(xdims), model.ub_norm(xdims), ncandidates,init_guess, options);
+sample = sample_normalized.*(model.ub(xdims)-model.lb(xdims)) + model.lb(xdims);
+
+% sample_normalized = multistart_minConf(@(x)takemax(x,f, dfdx), model.lb_norm(xdims), model.ub_norm(xdims), ncandidates,init_guess, options);
+% sample = sample_normalized.*(model.ub(xdims)-model.lb(xdims)) + model.lb(xdims);
 end
 
-function [fx, dfdx] = deriv(x,f,df)
+function [fx, dfdx] = takemax(x,f,df, xdims)
 if any(isnan(x))
     warning('x is NaN')
 end
 % Function that groups f and df to use minFunc
 fx = -f(x);
 dfdx = - df(x);
+dfdx = dfdx(xdims);
+dfdx = dfdx(:);
 end

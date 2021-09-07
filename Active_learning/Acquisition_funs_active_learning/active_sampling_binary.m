@@ -3,6 +3,11 @@ ncandidates = 10;
 init_guess = [];
 options.method = 'lbfgs';
 options.verbose = 1;
+
+if strcmp(model.type, 'preference') && numel(model.lb_norm)<2*model.D
+        model.lb_norm = [model.lb_norm;model.lb_norm((end-model.D+1):end)];
+        model.ub_norm = [model.ub_norm;model.ub_norm((end-model.D+1):end)];
+end
 new_x_norm = multistart_minConf(@(x)adaptive_sampling_binary(x, theta, xtrain_norm, ctrain,model, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
 new_x = new_x_norm.*(model.max_x-model.min_x) + model.min_x;
 end
@@ -20,15 +25,14 @@ if strcmp(func2str(model.link), 'normcdf')
     
     I1 = h(mu_c);
     I2 =  log(2)*C.*exp(-0.5*mu_y.^2./(sigma2_y+C^2))./sqrt(sigma2_y+C^2);
-   
+    
 elseif strcmp(func2str(model.link), 'logistic')
     %for a sigmoid link
     C = sqrt(2*log(2));
     I1 = h(mu_c) ;
     I2 = 2*C.*exp(-0.5*mu_y.^2./(sigma2_y+C^2))./sqrt(sigma2_y+C^2);
-    
 end
-    I = I1 - I2;
+I = I1 - I2;
 
 dhdp = @(p) -log(p)+log(1-p);
 % arg = mu_y./sqrt(sigma2_y+C^2);

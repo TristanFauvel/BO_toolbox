@@ -1,4 +1,4 @@
-function fig =  plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname, nreps, maxiter, rescaling, suffix)
+function fig =  plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname, nreps, maxiter, rescaling, suffix, prefix)
 
 % data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data'];
 % figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
@@ -48,7 +48,7 @@ for j = 1:nobj
     clear('score')
     for a = 1:nacq
         acquisition = acquisition_funs{a};
-        filename = [data_dir,'/',objective, '_',acquisition, suffix];
+        filename = [data_dir,'/',prefix, objective, '_',acquisition, suffix];
         try
         load(filename, 'experiment');
         UNPACK_STRUCT(experiment, false)

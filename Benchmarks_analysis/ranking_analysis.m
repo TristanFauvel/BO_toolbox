@@ -1,5 +1,6 @@
-function [t, Best_ranking, AUC_ranking,b, signobj, ranking, final_values, AUCs] = ranking_analysis(data_path, names, objectives, algos, nreps, maxiter, suffix)
+function [t, Best_ranking, AUC_ranking,b, signobj, ranking, final_values, AUCs] = ranking_analysis(data_path, names, objectives, algos, nreps, suffix, prefix, optim)
 
+%optim = 'max' or 'min'
 nobj = numel(objectives);
 nacq = numel(algos);
 graphics_style_paper;
@@ -16,17 +17,18 @@ for j = 1:nobj
     
     for a = 1:nacq
         acquisition = algos{a};
-        filename = [data_path,'/',objective, '_',acquisition,suffix];
-%         try
-            load(filename, 'experiment');
-            score= cell2mat(experiment.(['score_', acquisition])');
-             scores{a} = score;
-            final_values(a,j,:) = score(:,end); 
-            AUCs(a,j,:) = mean(score,2); 
-%         catch
-%             scores{a} = NaN(nreps, maxiter);
-%         end
+        filename = [data_path,'/', prefix, objective, '_',acquisition,suffix];
+        %         try
+        load(filename, 'experiment');
         
+        
+        score= cell2mat(experiment.(['score_', acquisition])');
+        if strcmp(optim, 'min')
+            score= -score;
+        end
+        scores{a} = score;
+        final_values(a,j,:) = score(:,end);
+        AUCs(a,j,:) = mean(score,2);       
     end
     benchmarks_results{j} = scores;
     %     [ranks, average_ranks]= compute_rank(scores, ninit);
@@ -83,7 +85,7 @@ for k = 1:nobj
             %comparisons
             auc_comparisons = squeeze(sum(R_AUC(k,eq,eq),3)); % Only use the comparisons within the ties %%
             borda_modifier = get_Borda_from_ranking(get_ranking(auc_comparisons));
-            borda_scores(k,eq) = borda_scores(k,eq)+borda_modifier;           
+            borda_scores(k,eq) = borda_scores(k,eq)+borda_modifier;
         end
     end
 end
@@ -103,14 +105,14 @@ AUC_ranking =  AUC_ranking(b,b);
 
 % objectives with the most significant difference between algos
 [s,a] = sort(sum(borda_scores, 2));
- signobj = flipud(a(s>0));
- 
-  signobj = sum(borda_scores,2)>0;
+signobj = flipud(a(s>0));
 
- 
+%   signobj = sum(borda_scores,2)>0;
+
+
 % objectives that agree the most with the final ranking
 % [s2,a] = sort(mean((borda_scores- (nacq-ranking)).^2,2));
-% 
+%
 %  signobj = a;
 
 end
