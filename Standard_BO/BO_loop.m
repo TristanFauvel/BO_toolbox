@@ -1,4 +1,4 @@
-function [xtrain, xtrain_norm, ytrain, score, cum_regret, theta_evo]= BO_loop(g, maxiter, nopt, model, theta, acquisition_fun, ninit, max_g, seed)
+function [xtrain, xtrain_norm, ytrain, score, xbest, cum_regret, theta_evo]= BO_loop(g, maxiter, nopt, model, theta, acquisition_fun, ninit, max_g, seed)
 % Run a Bayesian optimization loop
 % g : objective function
 % max_g : maximum of the objective function
@@ -60,7 +60,7 @@ for i =1:maxiter
     cum_regret_i  =cum_regret_i + max_g-max_ytrain;
     cum_regret(i+1) = cum_regret_i;       
     score(i) =  g(xtrain(:,b));
-    
+    xbest(:,i) = xtrain(:,b);
     if i > ninit
         update = 'cov';       
         init_guess = [theta.cov; theta.mean];

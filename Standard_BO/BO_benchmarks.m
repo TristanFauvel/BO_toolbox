@@ -47,19 +47,9 @@ for j = 1:nobj
         for k = 1:nrepets
             disp(['Repetition ', num2str(k)])
             seed = seeds(k);
-            [xtrain{k}, xtrain_norm{k}, ytrain{k}, score{k}]= BO_loop(g, maxiter, nopt, model, theta, acquisition_fun, ninit, max_g, seed);
+            [xtrain{k}, xtrain_norm{k}, ytrain{k}, score{k}, xbest{k}]= BO_loop(g, maxiter, nopt, model, theta, acquisition_fun, ninit, max_g, seed);
         end
-        clear('experiment')
-        fi = ['xtrain_',acquisition_name];
-        experiment.(fi) = xtrain;
-        fi = ['xtrain_norm_',acquisition_name];
-        experiment.(fi) = xtrain_norm;
-        fi = ['ctrain_',acquisition_name];
-        experiment.(fi) = ytrain;
-        fi = ['score_',acquisition_name];
-        experiment.(fi) = score;
-        
-        filename = [pathname,'/Standard_BO/Data_BO/',objective,'_',acquisition_name];
-        save(filename, 'experiment')
+               save_benchmark_results(acquisition_name, xtrain, xtrain_norm, ctrain, score, xbest, g, objective, data_dir)         
+
     end
 end

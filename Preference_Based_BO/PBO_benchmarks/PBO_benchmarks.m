@@ -9,6 +9,7 @@ data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
 
 acquisition_funs = {'Dueling_UCB','EIIG','random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI','bivariate_EI', 'Thompson_challenge','DTS'};
 acquisition_funs = {'PKG'};
+acquisition_funs = {'Brochu_EI'};
 % acquisition_funs = {'DTS'};
 
 maxiter = 50;%100; %total number of iterations : 200
@@ -27,6 +28,12 @@ else
     load('benchmarks_table_rescaled.mat')
 end
 objectives = benchmarks_table.fName;
+
+%%%
+
+objectives = benchmarks_table(benchmarks_table.D == 1,:).fName;
+
+%%%
 nobj =numel(objectives);
 seeds = 1:nreplicates;
 update_period = maxiter+2;
@@ -62,28 +69,20 @@ for j = 1:nobj
 
                 disp(['Repetition : ', num2str(n+k)])
                 seed =n+k;
-                [experiment.(['xtrain_',acquisition_name]){n+k}, experiment.(['xtrain_norm_',acquisition_name]){n+k}, experiment.(['ctrain_',acquisition_name]){n+k}, experiment.(['score_',acquisition_name]){n+k}]=  PBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model);
-            end             
+                [experiment.(['xtrain_',acquisition_name]){n+k}, experiment.(['xtrain_norm_',acquisition_name]){n+k}, experiment.(['ctrain_',acquisition_name]){n+k}, experiment.(['score_',acquisition_name]){n+k},experiment.(['xbest_',acquisition_name]){n+k}]=  PBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model);
+            end   
+                    save(filename, 'experiment')
+
         else
             for r=1:nreplicates  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 seed  = seeds(r)
                 %             waitbar(((a-1)*nreplicates+r)/(nreplicates*nacq),wbar,'Computing...');
-                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}] =  PBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model);
+                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}, xbest{r}] =  PBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model);
             end
-            clear('experiment')
-            fi = ['xtrain_',acquisition_name];
-            experiment.(fi) = xtrain;
-            fi = ['xtrain_norm_',acquisition_name];
-            experiment.(fi) = xtrain_norm;
-            fi = ['ctrain_',acquisition_name];
-            experiment.(fi) = ctrain;
-            fi = ['score_',acquisition_name];
-            experiment.(fi) = score;
-        end
-        filename = [data_dir,objective,'_',acquisition_name];
-        close all
-        save(filename, 'experiment')
+                    save_benchmark_results(acquisition_name, xtrain, xtrain_norm, ctrain, score, xbest, g, objective, data_dir)         
 
+        end
+ 
     end
 end
 % cmap = gray(256);

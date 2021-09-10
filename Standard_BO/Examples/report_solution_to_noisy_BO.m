@@ -92,7 +92,7 @@ nsamps = 100000;
 samps = mvnrnd(mu_y, Sigma2_y, nsamps);
 [a,b]= max(samps,[],2);
 
-for i = 1:model.nsamps
+for i = 1: nsamps
     index=find(samps(i,:)==a(i));
     if numel(index)>1
         b(i) = randsample(index);
@@ -104,9 +104,6 @@ bx = x(b);
 
 [N,edges] = histcounts(bx, n, 'Normalization','probability');
 edges = edges(2:end) - (edges(2)-edges(1))/2;
-figure()
-plot(edges, N);
-
 
 mr = 1;
 mc = 1;
@@ -118,12 +115,12 @@ i = 0;
 Xlim = [0,1];
 i=i+1;
 yyaxis left
-plot_gp(x,mu_y, sigma2_y, C(1,:), linewidth); hold on
-plot(x, g, '-', 'Color',  C(2,:),'LineWidth', linewidth); hold on;
+h1 = plot_gp(x,mu_y, sigma2_y, C(1,:), linewidth); hold on
+h2 = plot(x, g, '-', 'Color',  C(2,:),'LineWidth', linewidth); hold on;
 % errorshaded(x,mu_y, sqrt(sigma2_y), 'Color',  C(1,:),'LineWidth', linewidth, 'Fontsize', Fontsize); hold on
 vline(xmax_mu,'Linewidth',linewidth, 'ymax', max_mu, 'Color', C(1,:)); hold on;
 
-plot(x_tr, y_tr, 'ro', 'MarkerSize', 10, 'color', C(2,:)); hold on;
+h3 = plot(x_tr, y_tr, 'ro', 'MarkerSize', 10, 'color', C(2,:)); hold on;
 scatter(x_tr, y_tr, markersize, C(2,:), 'filled'); hold on;
 set(gca, 'Fontsize', Fontsize, 'Xlim', Xlim); %,  'Ylim',Ylim)
 grid off
@@ -133,10 +130,10 @@ ylabel('$f(x)$','Fontsize',Fontsize)
 
 [a,b]= max(N);
 yyaxis right
-plot(edges, N,'Color',  'k','LineWidth', linewidth); hold on;
+h4 = plot(edges, N,'Color',  'k','LineWidth', linewidth); hold on;
 vline(edges(b),'Linewidth',linewidth, 'ymax', N(b)); hold off;
 xlabel('$x$','Fontsize',Fontsize)
-ylabel('$P(x|\mathcal{D})$','Fontsize',Fontsize)
+ylabel('$p(x^\star|\mathcal{D})$','Fontsize',Fontsize)
 set(gca, 'Fontsize', Fontsize, 'Xlim', Xlim)
 grid off
 box off
@@ -148,7 +145,8 @@ ax = gca;
 ax.YAxis(1).Color = 'k';
 ax.YAxis(2).Color = 'k';
 
-
+legend([h1, h2, h3], 'Posterior GP', 'True function', 'Data', 'NumColumns',1)
+legend box off
 figname  = 'BO_solution_wnoise';
 folder = [figure_path,figname];
 savefig(fig, [folder,'\', figname, '.fig'])

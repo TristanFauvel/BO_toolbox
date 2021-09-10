@@ -1,4 +1,4 @@
-function [xtrain, xtrain_norm, ctrain, score]= BBO_loop(acquisition_fun, nopt, seed, maxiter, theta, g, update_period, model)
+function [xtrain, xtrain_norm, ctrain, score,x_best]= BBO_loop(acquisition_fun, nopt, seed, maxiter, theta, g, update_period, model)
 
 % g : objective function
 % maxiter : number of iterations
@@ -40,6 +40,9 @@ approximation.nfeatures = 256;
 x_best_norm = zeros(D, maxiter);
 x_best = zeros(D, maxiter);
 score = zeros(1,maxiter);
+
+
+identification = 'mu_c';
 for i =1:maxiter
     disp(i)
     new_c = g(new_x)>rand;
@@ -66,7 +69,13 @@ for i =1:maxiter
         new_x = new_x_norm.*(ub - lb)+lb;
     end
     init_guess = [];
-    x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+    
+    if strcmp(identification, 'mu_c')
+        x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_mu_c_GP(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+    elseif strcmp(identification, 'mu_g')
+        x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+    end
+    
     x_best(:,i) = x_best_norm(:,i) .*(ub-lb) + lb;
     score(i) = g(x_best(:,i));
 end

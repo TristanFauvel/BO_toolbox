@@ -39,6 +39,7 @@ model.modeltype = modeltype;
 model.kernelname = base_kernelname;
 model.condition = condition;
 post = [];
+model.D = 1;
 % gfunc = @(x) forretal08(x)/10;
 % gfunc = @(x) normpdf(x, 0.5, 0.2);
 % g = gfunc(x)-gfunc(x0);
@@ -61,7 +62,7 @@ ctrain = link(ytrain)>rand(nsamp,1);
 [mu_c,  mu_f, sigma2_f] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), x2d, model, post);
 [~,  mu_g, sigma2_g, Sigma2_g, ~,~,~,~,~,~,post] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x; x0*ones(1,n^d)], model, post);
 mu_g = -mu_g; %(because prediction_bin considers P(x1 > x2);
-    
+
 
 
 %% Find the true global optimum of g
@@ -142,8 +143,11 @@ box off
 
 %% Plot a sample
 approximation.decoupled_bases = 1;
-approximation.approximation.nfeatures = 256;
+approximation.nfeatures = 256;
 approximation.method = 'RRGP';
+
+[approximation.phi_pref, approximation.dphi_pref_dx, approximation.phi, approximation.dphi_dx]= sample_features_preference_GP(theta, d, model, approximation);
+
 [sample_f, sample_g]= sample_preference_GP(x, theta, xtrain(:,1:ntr), ctrain(1:ntr), model, approximation, post);
 
 

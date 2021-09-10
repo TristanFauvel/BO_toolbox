@@ -98,6 +98,7 @@ cum_regret_rand= NaN(nreps,maxiter+1);
 cum_regret_BALD= NaN(nreps,maxiter+1);
 cum_regret_VG= NaN(nreps,maxiter+1);
 cum_regret_MIG= NaN(nreps,maxiter+1);
+cum_regret_exploitation= NaN(nreps,maxiter+1);
 
 ninit = 15000;
 
@@ -106,6 +107,8 @@ seed = s;
 [~,~, cum_regret_maxvar(s,:)] = AL_loop_binary_grid(x, y, maxiter, nopt, model, theta, @maxvar_binary_grid, ninit, seed);
  [~,~, cum_regret_rand(s,:)] = AL_loop_binary_grid(x, y, maxiter, maxiter+1, model, theta, @random, ninit, seed);
 [~,~, cum_regret_BALD(s,:)] = AL_loop_binary_grid(x, y, maxiter, nopt, model, theta, @BALD_grid, ninit, seed);
+[~,~, cum_regret_exploitation(s,:)] = AL_loop_binary_grid(x, y, maxiter, nopt, model, theta, @exploitation, ninit, seed);
+
 % [~,~, cum_regret_VG(s,:)]=  AL_loop_binary_grid(x, y, maxiter, nopt, model, theta, @Variance_gradient_grid, ninit, seed);
 % [~,~, cum_regret_MIG(s,:)]=  AL_loop_binary_grid(x, y, maxiter, nopt, model, theta, @MI_gradient_grid, ninit, seed);
 end
@@ -176,12 +179,16 @@ options.line_width = linewidth;
 options.color_area = C(1,:);
 options.color_line = C(1,:);
 h1 = plot_areaerrorbar(cum_regret_maxvar, options); hold on;
-options.color_area = C(2,:);
-options.color_line = C(2,:);
-h2 = plot_areaerrorbar(cum_regret_rand, options); hold on;
 options.color_area = C(3,:);
 options.color_line = C(3,:);
+h2 = plot_areaerrorbar(cum_regret_rand, options); hold on;
+options.color_area = C(2,:);
+options.color_line = C(2,:);
 h3 = plot_areaerrorbar(cum_regret_BALD, options); hold on;
+options.color_area = C(4,:);
+options.color_line = C(4,:);
+h4 = plot_areaerrorbar(cum_regret_exploitation, options); hold on;
+
 % options.color_area = C(4,:);
 % options.color_line = C(4,:);
 % h4 = plot_areaerrorbar(cum_regret_VG, options); hold on;
@@ -190,7 +197,7 @@ h3 = plot_areaerrorbar(cum_regret_BALD, options); hold on;
 % h5 = plot_areaerrorbar(cum_regret_MIG, options); hold on;
 
 % legend([h1 h2 h3 h4], 'Maximum variance', 'Random', 'BALD', 'VG', 'MIG', 'Location', 'northwest');
-legend([h1 h2 h3], 'Maximum variance', 'Random', 'BALD', 'Location', 'northwest');
+legend([h1 h2 h3 h4], 'Maximum variance', 'Random', 'BALD', 'Exploitation', 'Location', 'northwest');
 xlabel('Iteration','Fontsize',Fontsize)
 ylabel('Cumulative regret','Fontsize',Fontsize)
 set(gca, 'Fontsize', Fontsize, 'Xlim', [0, maxiter])

@@ -1,4 +1,4 @@
-function [x_tr, y_tr, cum_regret]= BO_loop_grid(n,maxiter, nopt, kernelfun, meanfun, theta, x, y, acquisition, ninit)
+function [x_tr, y_tr, cum_regret]= BO_loop_grid(n,maxiter, nopt, model, theta, x, y, acquisition, ninit)
 
 idx= randsample(n,maxiter); % for random sampling
 

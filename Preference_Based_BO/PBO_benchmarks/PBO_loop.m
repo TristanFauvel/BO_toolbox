@@ -1,4 +1,4 @@
-function [xtrain, xtrain_norm, ctrain, score] = PBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model)
+function [xtrain, xtrain_norm, ctrain, score,x_best] = PBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model)
 
 lb = model.lb;
 ub = model.ub;

@@ -33,6 +33,9 @@ c= othercolor('GnBu7');
 
 rng(5)
 regularization = 'nugget';
+model.meanfun = meanfun;
+model.kernelfun = kernelfun;
+model.regularization = regularization;
 
 %generate a function
 y = mvnrnd(meanfun(x,0), kernelfun(theta_true, x,x, 'true', regularization));
@@ -59,7 +62,8 @@ new_y = y(:,i_tr);
 
 x_tr = [];
 y_tr = [];
-for i =1:2
+
+ for i =1:2
     x_tr = [x_tr, new_x];
     y_tr = [y_tr, new_y];
     
@@ -81,7 +85,10 @@ for i =1:2
         
         
     end
-end
+ end
+
+ 
+
 
 
 maxiter = 30;
@@ -94,9 +101,9 @@ cum_regret_TS= NaN(nreps,maxiter+1);
 ninit = maxiter+1;
 for s = 1:nreps
     rng(s)
-    [~,~, cum_regret_EI(s,:)]= BO_loop_grid(n,maxiter, nopt, kernelfun, meanfun, theta, x, y, 'EI', ninit);
-    [~,~, cum_regret_rand(s,:)]= BO_loop_grid(n,maxiter, nopt, kernelfun, meanfun,theta,  x, y, 'random', ninit);
-    [~,~, cum_regret_TS(s,:)]= BO_loop_grid(n,maxiter, nopt, kernelfun, meanfun,theta,  x, y, 'TS', ninit);
+    [~,~, cum_regret_EI(s,:)]= BO_loop_grid(n,maxiter, nopt,model, theta, x, y, 'EI', ninit);
+    [~,~, cum_regret_rand(s,:)]= BO_loop_grid(n,maxiter, nopt,model,theta,  x, y, 'random', ninit);
+    [~,~, cum_regret_TS(s,:)]= BO_loop_grid(n,maxiter, nopt,model,theta,  x, y, 'TS', ninit);
 end
 
 
@@ -118,10 +125,10 @@ Xlim = [0,1];
 nexttile(layout1, 1, [1,2]);
 i=i+1;
 % errorshaded(x,mu_y, sqrt(sigma2_y), 'Color',  C(1,:),'LineWidth', linewidth, 'Fontsize', Fontsize); hold on
-plot_gp(x,mu_y, sigma2_y, C(1,:), linewidth); hold on
-plot(x, y, 'Color',  C(2,:),'LineWidth', linewidth); hold on;
-plot(x_tr, y_tr, 'ro', 'MarkerSize', 10, 'color', C(2,:)); hold on;
-scatter(x_tr, y_tr, markersize, C(2,:), 'filled'); hold on;
+h1 = plot_gp(x,mu_y, sigma2_y, C(1,:), linewidth); hold on
+h2 = plot(x, y, 'Color',  C(2,:),'LineWidth', linewidth); hold on;
+h3 = plot(x_tr, y_tr, 'ro', 'MarkerSize', 10, 'color', C(2,:)); hold on;
+h4 = scatter(x_tr, y_tr, markersize, C(2,:), 'filled'); hold on;
 % xlabel('$x$')
 ylabel('$f(x)$')
 set(gca, 'Fontsize', Fontsize, 'Xlim', Xlim); %,  'Ylim',Ylim)
@@ -129,6 +136,8 @@ grid off
 box off
 text(legend_pos(1), legend_pos(2),['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
 set(gca, 'Xtick', [0,1])
+legend([h1 h2 h3], 'Posterior GP', 'True function', 'Data', 'numColumns', 2)
+legend box off
 
 nexttile(layout1, 4, [1,2]);
 i=i+1;
