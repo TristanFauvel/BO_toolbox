@@ -1,12 +1,10 @@
 function [sample_normalized, sample] = sample_max_binary_GP(approximation, xtrain_norm, ctrain, theta, model, post, s0)
-phi = approximation.phi;
-dphi_dx = approximation.dphi_dx;
-
+ 
 options.method = 'lbfgs';
 options.verbose = 1;
 ncandidates= 5;
 
-[sample_g, dsample_g_dx] = sample_binary_GP_precomputed_features(phi, dphi_dx, xtrain_norm, ctrain, theta,model, approximation, post);
+[sample_g, dsample_g_dx] = sample_binary_GP_precomputed_features(xtrain_norm, ctrain, theta,model, approximation, post);
 
 init_guess = [];
     xdims =  (model.ns+1):model.D;

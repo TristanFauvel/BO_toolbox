@@ -113,6 +113,9 @@ seed = s;
 % [~,~, cum_regret_MIG(s,:)]=  AL_loop_binary_grid(x, y, maxiter, nopt, model, theta, @MI_gradient_grid, ninit, seed);
 end
 
+Y = normcdf(mvnrnd(mu_y,Sigma2_y,5000));
+ 
+
 i=0;
 mr = 2;
 mc = 3;
@@ -123,9 +126,11 @@ layout1 = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
 nexttile(layout1, 1, [1,2]);
 i=i+1;
 %         errorshaded(x, mu_y, sqrt(sigma2_y), 'Color', cmap(1,:),'DisplayName','Prediction', 'Opacity', 0.2); hold on;
-p1 = plot(x,mu_c,'LineWidth',linewidth); hold on;
+%p1 = plot(x,mu_c,'LineWidth',linewidth); hold on;
+[p1, p2] = plot_distro(x, mu_c, Y, C(3,:), C(1,:), linewidth); hold on;
+
 %         p2 = plot(x,g(x),'LineWidth',linewidth,'Color', cmap(1,:)); hold on;
-p2 = plot(x,c,'LineWidth',linewidth); hold on;
+p3 = plot(x,c,'color', C(2,:), 'LineWidth',linewidth); hold on;
 
 scatter(xtrain(ctrain == 1), ctrain(ctrain == 1), markersize, 'MarkerFaceColor', 'k', 'MarkerEdgeColor','k'); hold on;
 scatter(xtrain(ctrain == 0), ctrain(ctrain == 0), markersize, 'MarkerFaceColor', 'w', 'MarkerEdgeColor','k') ; hold off;
@@ -141,7 +146,7 @@ yticklabels({'0', '1'})
 % ylabel('f(x)','Fontsize',Fontsize)
 grid off
 box off
-legend([p1, p2],'$\mu_c(x)$', '$P(c=1|x)$', 'Location', 'northeast');
+legend([p1, p2, p3],'$\mu_c(x)$', '$p(\Phi(f(x))|\mathcal{D})$','$P(c=1|x)$', 'Location', 'northeast');
 legend boxoff
 text(legend_pos(1), legend_pos(2),['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
 set(gca,'Fontsize',Fontsize)
@@ -160,7 +165,7 @@ xticks([0,1])
 xticklabels({'0', '1'})
 % yticks([0,1])
 % yticklabels({'0', '1'})
-ylabel('Utility function')
+ylabel('Normalized utility')
 legend([h1 h2], '$I(c,f|x, \mathcal{D})$','$V(\Phi(f(x))|\mathcal{D})$', 'Location', 'northeast');
 
 xlabel('$x$')

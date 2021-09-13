@@ -22,21 +22,19 @@ theta_init = theta;
 ninit = 5; % number of time steps before starting using the acquisition function
 
 rng(seed)
-if any(strcmp(func2str(acquisition_fun), {'DTS', 'kernelselfsparring', 'Thompson_challenge'}))
-    if strcmp(model.kernelname, 'Matern52') || strcmp(model.kernelname, 'Matern32') %|| strcmp(model.kernelname, 'ARD')
-        approximation.method = 'RRGP';
-    else
-        approximation.method = 'SSGP';
-    end
-    approximation.nfeatures = 4096;
-    %approximation.phi : ntest x nfeatures
-    %approximation.phi_pref : ntest x nfeatures
-    % approximation.dphi_dx : nfeatures x D
-    % approximation.dphi_dx : nfeatures x 2D
-    [approximation.phi_pref, approximation.dphi_pref_dx, approximation.phi, approximation.dphi_dx]= sample_features_preference_GP(theta, D, model, approximation);
+
+if strcmp(model.kernelname, 'Matern52') || strcmp(model.kernelname, 'Matern32') %|| strcmp(model.kernelname, 'ARD')
+    approximation.method = 'RRGP';
 else
-    approximation = [];
+    approximation.method = 'SSGP';
 end
+approximation.nfeatures = 4096;
+%approximation.phi : ntest x nfeatures
+%approximation.phi_pref : ntest x nfeatures
+% approximation.dphi_dx : nfeatures x D
+% approximation.dphi_dx : nfeatures x 2D
+[approximation.phi_pref, approximation.dphi_pref_dx, approximation.phi, approximation.dphi_dx]= sample_features_preference_GP(theta, D, model, approximation);
+
 approximation.decoupled_bases = 1;
 
 options_theta.method = 'lbfgs';
