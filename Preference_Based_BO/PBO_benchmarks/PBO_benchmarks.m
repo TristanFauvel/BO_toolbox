@@ -5,13 +5,9 @@
 add_bo_module;
 close all
 
-data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
 
 acquisition_funs = {'Dueling_UCB','EIIG','random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI','bivariate_EI', 'Thompson_challenge','DTS'};
-acquisition_funs = {'PKG'};
-acquisition_funs = {'Brochu_EI'};
-% acquisition_funs = {'DTS'};
-
+% acquisition_funs = {'PKG'};
 maxiter = 50;%100; %total number of iterations : 200
 
 
@@ -21,19 +17,17 @@ nacq = numel(acquisition_funs);
 
 
 % wbar = waitbar(0,'Computing...');
-rescaling = 0;
+rescaling = 1;
 if rescaling ==0
     load('benchmarks_table.mat')
+    data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data_wo_rescaling/'];
 else
     load('benchmarks_table_rescaled.mat')
+    data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
 end
 objectives = benchmarks_table.fName;
 
-%%%
 
-objectives = benchmarks_table(benchmarks_table.D == 1,:).fName;
-
-%%%
 nobj =numel(objectives);
 seeds = 1:nreplicates;
 update_period = maxiter+2;

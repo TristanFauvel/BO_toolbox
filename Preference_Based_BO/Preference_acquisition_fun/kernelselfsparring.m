@@ -1,8 +1,7 @@
 function [x_duel1, x_duel2, new_duel] = kernelselfsparring(theta, xtrain_norm, ctrain, model, post, approximation)
 
 
-nsamples=2;
- 
+  
 for k =1:model.nsamples %sample g* from p(g*|D)
     loop = 1;
     while loop

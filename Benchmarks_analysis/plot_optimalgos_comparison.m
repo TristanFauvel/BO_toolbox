@@ -71,14 +71,16 @@ for j = 1:nobj
 %     [ranks, average_ranks]= compute_rank(scores, ninit);
     plots =  plot_areaerrorbar_grouped(scores, options);
     box off
-    ylabel('Value $g(x^*)$');
+    ylabel('Value $g(x^*_t)$');
     title(objectives_names(j))
     set(gca, 'Fontsize', Fontsize)
-end
-legend(plots, legends, 'Fontsize', Fontsize);
-legend boxoff
-xlabel('Iteration \#')
 
+    if j == nobj || j ==nobj
+        legend(plots, legends, 'Fontsize', Fontsize);
+        legend boxoff
+        xlabel('Iteration \#')
+    end
+end
 axes1 = gca;
 legend1 = legend(axes1,'show');
 set(legend1,...

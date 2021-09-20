@@ -39,7 +39,7 @@ approximation.decoupled_bases = 1;
 
 options_theta.method = 'lbfgs';
 options_theta.verbose = 1;
-
+model.nsamples = 2;
 % Warning : the seed has to be re-initialized after the random kernel
 % approximation.
 rng(seed)

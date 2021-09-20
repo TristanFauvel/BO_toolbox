@@ -45,7 +45,7 @@ score = zeros(1,maxiter);
 identification = 'mu_c';
 for i =1:maxiter
     disp(i)
-    new_c = g(new_x)>rand;
+    new_c = model.link(g(new_x))>rand;
     xtrain = [xtrain, new_x];
     xtrain_norm = [xtrain_norm, new_x_norm];
     ctrain = [ctrain, new_c];
@@ -78,5 +78,40 @@ for i =1:maxiter
     
     x_best(:,i) = x_best_norm(:,i) .*(ub-lb) + lb;
     score(i) = g(x_best(:,i));
+    
+   
 end
+return
+
+%%
+graphics_style_paper
+xx = linspace(ub, lb, 100);
+xx_norm = linspace(ub_norm, lb_norm, 100);
+[mu_c,  mu_y, sigma2_y, Sigma2_y] =  prediction_bin(theta, xtrain_norm, ctrain, xx_norm, model, post);
+figure()
+plot_gp(xx, mu_y, sigma2_y, C(1,:), 2); hold on;
+plot(xx, g(xx));  
+scatter(xtrain, ctrain, markersize, 'k', 'filled'); 
+
+init_guess = theta;
+theta = multistart_minConf(@(hyp)negloglike_bin(hyp, xtrain_norm, ctrain, model), model.theta_lb, model.theta_ub,10, init_guess, options_theta);
+[mu_c,  mu_y, sigma2_y, Sigma2_y] =  prediction_bin(theta, xtrain_norm, ctrain, xx_norm, model, post);
+
+
+Y = normcdf(mvnrnd(mu_y, Sigma2_y,10000));
+figure()
+[p1,p2, h] = plot_distro(xx, mu_c, Y, C(1,:), C(2,:),linewidth); hold on
+scatter(xtrain, ctrain, markersize, 'k', 'filled'); 
+plot(xx, normcdf(g(xx)), 'color', 'k')
+
+
+ytrain = g(xtrain);
+hyp.cov = theta;
+hyp.mean = 0;
+[mu_y, sigma2_y] = prediction(hyp, xtrain_norm, ytrain, xx_norm, model, []);
+figure()
+plot_gp(xx, mu_y, sigma2_y, C(1,:), 2); hold on;
+plot(xx, g(xx));  
+scatter(xtrain_norm, ytrain, markersize, 'k', 'filled'); 
+
 

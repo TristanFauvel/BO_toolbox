@@ -6,11 +6,10 @@ close all
 data_dir =  [pathname,'/Binary_BO/Data/'];
 
 
-acquisition_funs = {'EI_Tesch', 'TS_binary','random_acquisition_binary', 'UCB_binary', 'UCB_binary_latent', 'bivariate_EI_binary'};
-acquisition_funs = {'EI_Tesch', 'UCB_binary_latent', 'bivariate_EI_binary'};
-
-%Puis faire BKG
-maxiter = 50; %total number of iterations : 200
+acquisition_funs = {'EI_Tesch', 'TS_binary','random_acquisition_binary', 'UCB_binary', 'UCB_binary_latent','BKG'}; %, 'bivariate_EI_binary'};
+% acquisition_funs = {'random_acquisition_binary'} %, 'UCB_binary_latent', 'bivariate_EI_binary'};
+ 
+ maxiter = 50; %total number of iterations : 200
 
 nreplicates = 20;
 
@@ -26,14 +25,15 @@ if rescaling == 0
 else
     load('benchmarks_table_rescaled.mat')
 end
+load('benchmarks_table.mat') %%%%%%%%%%%%%%%%%%%%%%
 
-objectives = benchmarks_table.fName; %; 'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12';'forretal08'};
-% objectives = {'spheref'}; %%%%%%%%%%%%%%%%%
+
+objectives = benchmarks_table.fName;  
 nobj =numel(objectives);
 
 
 link = @normcdf;
- for j = 1:nobj
+ for j = 1:nobj %%%%%%%%%%%%%%%%
     objective = char(objectives(j));
     [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling);
     close all

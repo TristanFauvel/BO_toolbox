@@ -18,7 +18,7 @@ n = 3000;
 x = linspace(0,1, n);
 
 d =1;
-ntr = 80; %100
+ntr = 35; %100
 
 x0 =0;
 
@@ -156,6 +156,8 @@ h3 = scatter(xTS, normcdf(sample_g(xTS)-sample_g(x1)), 10*markersize, 'm','x','L
 h4 = scatter(xBrochu, normcdf(sample_g(xBrochu)-sample_g(x1)), 10*markersize,'g', 'x','LineWidth',1.5); hold on;
 h5 = scatter(xBEI, normcdf(sample_g(xBEI)-sample_g(x1)), 10*markersize, 'x','LineWidth',1.5); hold on;
 h6 = scatter(xUCB, normcdf(sample_g(xUCB)-sample_g(x1)), 10*markersize, 'c', 'o','LineWidth',1.5); hold on;
+vline(x1,'Linewidth',linewidth, 'ymax', 0.5,  'LineStyle', '--', ...
+    'Linewidth', 1); hold off;
 
 [xt,b] = sort([0,0.5, x1, 1]);
 xticks(xt)
@@ -164,14 +166,14 @@ xticklabels(lgs(b))
 
 xlabel('$x$', 'Fontsize', Fontsize)
 ylabel('$P(x>x_1)$', 'Fontsize', Fontsize)
-set(gca,'XTick',[0 0.5 1],'Fontsize', Fontsize)
+% set(gca,'XTick',[0 0.5 1],'Fontsize', Fontsize)
 ytick = get(gca,'YTick');
 set(gca,'YTick', linspace(min(ytick), max(ytick), 3), 'Fontsize', Fontsize)
 %title('Inferred value function $g(x)$','Fontsize', Fontsize)
 text(legend_pos(1), legend_pos(2),['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
 box off
 % pbaspect([1 1 1])
-legend([p3, p2, p1], '$P(x>x_1)$, Pareto front', '$P(x>x_1|\mathcal{D})$', '$\mu_c(x,x_1)$')
+legend([p4, p2, p1], '$P(x>x_1)$', '$p(\Phi[f(x,x_1)]|\mathcal{D})$', '$\mu_c(x,x_1)$')
 legend box off
 text(legend_pos(1), legend_pos(2),['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
 
@@ -179,12 +181,17 @@ text(legend_pos(1), legend_pos(2),['$\bf{', letters(i), '}$'],'Units','normalize
 nexttile();
 i=i+1;
 % s = scatter(not_pareto(1,:),not_pareto(2,:), markersize, 'k', 'filled'); hold on;
-h1 = plot(pareto_front(1,:),pareto_front(2,:),'color', C(2,:), 'linewidth', linewidth); hold on;
+[ordered_pareto_front(1,:),b] = sort(pareto_front(1,:));
+ordered_pareto_front(2,:) = pareto_front(2,b);
+plot(ordered_pareto_front(1,:), ordered_pareto_front(2,:), ':', 'linewidth', linewidth, 'color', C(2,:));hold on;
+
 h2 = plot(not_pareto(1,:),not_pareto(2,:),'color', 0.5*[1 1 1], 'linewidth', linewidth); hold on;
+h1 = plot(pareto_front(1,:),pareto_front(2,:),'color', C(2,:), 'linewidth', linewidth); hold on;
+
 
 box off
 xlabel('E$[\Phi(f(x, x_1))|\mathcal{D}]$')
-ylabel('V$[\Phi(f(x, x_1))|\mathcal{D}]$')
+ylabel('$\sqrt{V[\Phi(f(x, x_1))|\mathcal{D}]}$')
 set(gca, 'Fontsize', Fontsize);
 
 %%

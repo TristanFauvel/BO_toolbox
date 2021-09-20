@@ -2,7 +2,7 @@ function [U, dUdx] = knowledge_grad(theta, xtrain_norm, ctrain, xt,model, post, 
 
 kernelfun = model.kernelfun;
 
-ncandidates =15;
+ncandidates =10;
 init_guess = [];
 options.verbose= 1;
 options.method = 'lbfgs';
