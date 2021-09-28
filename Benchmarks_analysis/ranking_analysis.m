@@ -1,4 +1,4 @@
-function [t, Best_ranking, AUC_ranking,b, signobj, ranking, final_values, AUCs] = ranking_analysis(data_path, names, objectives, algos, nreps, suffix, prefix, optim)
+function [t, Best_ranking, AUC_ranking,b, signobj, ranking, final_values, AUCs] = ranking_analysis(data_path, names, objectives, algos, nreps, suffix, prefix, optim, score_measure)
 
 %optim = 'max' or 'min'
 nobj = numel(objectives);
@@ -21,10 +21,13 @@ for j = 1:nobj
         %         try
         load(filename, 'experiment');
         
-        
-        score= cell2mat(experiment.(['score_', acquisition])');
+         score= cell2mat(experiment.([score_measure, '_', acquisition])');%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%         score= cell2mat(experiment.(['score_', acquisition])');
         if strcmp(optim, 'min')
             score= -score;
+        elseif strcmp(optim, 'max_proba')
+            score= normcdf(score);
         end
         scores{a} = score;
         final_values(a,j,:) = score(:,end);
@@ -33,8 +36,8 @@ for j = 1:nobj
     benchmarks_results{j} = scores;
     %     [ranks, average_ranks]= compute_rank(scores, ninit);
 end
-
 alpha = 5e-4;
+
 %% Partial ranking based on Mann-Withney t-test at alpha = 5e-4 significance
 R_best = NaN(nobj, nacq, nacq);
 R_AUC = NaN(nobj, nacq, nacq);

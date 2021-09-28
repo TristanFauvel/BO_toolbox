@@ -38,6 +38,9 @@ new_duel = [x_duel1;x_duel2];
 %     x_duel2 = multistart_minConf(@(x)compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, model, x_duel1, post), model.lb_norm, model.ub_norm, 15,init_guess, options);   
 %         [~,  ymax2] = prediction_bin(theta, xtrain_norm, ctrain, [x_duel2;condition.x0], model, post);
 % 
+%      xx = sort(xtrain_norm,1);
+%      xx1 = xx(1,:);
+%      xx2 = xx(2,:);
 %     graphics_style_paper;
 %     mr = 2;
 %     mc = 3;
@@ -45,10 +48,27 @@ new_duel = [x_duel1;x_duel2];
 %     fig.Color =  [1 1 1];
 %     i = 0;
 %     tiledlayout(mr,mc, 'TileSpacing' , 'tight', 'Padding', 'tight')
-%     nexttile(1, [1,2])
+%     
+%     nexttile(1, [2,1])
+%     i=1;
+%     h1 = plot(1:size(xtrain_norm,2), xx1,'Color',  C(1,:),'linewidth',linewidth); hold on;
+%     h2 = plot(1:size(xtrain_norm,2), xx2,'Color',  C(2,:),'linewidth',linewidth); hold off;
+%     legend([h1, h2], '$x_1$', '$x_2$')
+%     xlabel('Iteration', 'Fontsize', Fontsize)
+%     ylabel('$x$', 'Fontsize', Fontsize)
+%     legend box off
+%     box off
+%     xlim([1,size(xtrain_norm,2)])
+%     ytick = get(gca,'YTick');
+%     set(gca,'YTick', linspace(min(ytick), max(ytick), 3),  'Fontsize', Fontsize)
+%     text(-0.08,1,['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
+%     figure_path = '/home/tfauvel/Documents/PhD/Figures/Thesis_figures/Chapter_1/';
+%     
+%     
+%     nexttile(2, [1,2])
 %     i=i+1
 %     %     plot(x, g_mu_c, C(1,:), linewidth); hold on;
-%     plot_gp(x, mu_g, sigma2_g, C(1,:), linewidth); hold on;
+%     p = plot_gp(x, mu_g, sigma2_g, C(1,:), linewidth); hold on;
 %     vline(x_duel1,'Linewidth',linewidth, 'ymax', ymax1,  'LineStyle', '--', ...
 %         'Linewidth', 1, 'Color', C(1,:)); hold on;
 %     vline(x_duel2,'Linewidth',linewidth, 'ymax', ymax2,  'LineStyle', '--', ...
@@ -61,52 +81,45 @@ new_duel = [x_duel1;x_duel2];
 %     ytick = get(gca,'YTick');
 %     set(gca,'YTick', linspace(min(ytick), max(ytick), 3))
 %     box off
+%     legend(p, 'Posterior GP')
+%     legend box off
 %     %title('Inferred value function $g(x)$','Fontsize', Fontsize)
 %     text(-0.08,1,['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
-%     
-%     nexttile(4, [1,2])
-%     L = expected_improvement_preference(theta, xtrain_norm, x, ctrain, max_mu_y, model, post)
-%     L = -L;
-%     h1 = plot(x, L, 'Color',  C(1,:),'linewidth',linewidth); hold on;
-%         xlabel('$x$', 'Fontsize', Fontsize)
-%     ylabel('$g(x)$', 'Fontsize', Fontsize)
-%     set(gca,'XTick',[0 0.5 1], 'Fontsize', Fontsize)
-%     ytick = get(gca,'YTick');
-%     set(gca,'YTick', linspace(min(ytick), max(ytick), 3))
+%      [xt,b] = sort([0,x_duel1, x_duel2, 1]);
+%     xticks(xt)
+%     lgs = {'0', '$x_1$', '$x_2$','1'};
+%     xticklabels(lgs(b))
+% 
+%     nexttile(5, [1,2])
+%     L1 = expected_improvement_preference(theta, xtrain_norm, x, ctrain, max_mu_y, model, post)
+%     L1 = -L1;
+%     h1 = plot(x, L1, 'Color',  C(1,:),'linewidth',linewidth); hold on;
+%  
+%     set(gca, 'Fontsize', Fontsize)
 %     box off
-%         vline(x_duel1,'Linewidth',linewidth, 'ymax', ymax1,  'LineStyle', '--', ...
+%         vline(x_duel1,'Linewidth',linewidth, 'ymax', max(L1),  'LineStyle', '--', ...
 %         'Linewidth', 1, 'Color', C(1,:)); hold on;
-%     L = compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, model, x_duel1, post)
-%     L = -L;
-% %      nexttile()
-%     h2 = plot(x, L, 'Color',  C(2,:),'linewidth',linewidth);
+%     L2 = compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, model, x_duel1, post)
+%     L2 = -L2;
+%     h2 = plot(x, L2, 'Color',  C(2,:),'linewidth',linewidth);
 %         xlabel('$x$', 'Fontsize', Fontsize)
 %     ylabel('$\alpha(x)$', 'Fontsize', Fontsize)
-%      ytick = get(gca,'YTick');
-%     set(gca,'YTick', linspace(min(ytick), max(ytick), 3), 'XTick',[0 0.5 1], 'Fontsize', Fontsize)
-%     box off
-%         vline(x_duel2,'Linewidth',linewidth, 'ymax', ymax2,  'LineStyle', '--', ...
+%      box off
+%         vline(x_duel2,'Linewidth',linewidth, 'ymax', max(L2),  'LineStyle', '--', ...
 %         'Linewidth', 1,'Color', C(2,:)); hold off;
 % 
 %     legend([h1, h2], 'EI', 'Bivariate EI')
 %     legend box off
-%     i=2
-%     text(-0.08,1,['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
-%     
-%     nexttile(3, [2,1])
-%     i=3;
-%     h1 = plot(1:size(xtrain_norm,2), xtrain_norm(1,:),'Color',  C(1,:),'linewidth',linewidth); hold on;
-%     h2 = plot(1:size(xtrain_norm,2), xtrain_norm(2,:),'Color',  C(2,:),'linewidth',linewidth); hold off;
-%     legend([h1, h2], '$x_1$', '$x_2$')
-%     xlabel('Iteration', 'Fontsize', Fontsize)
-%     ylabel('$x$', 'Fontsize', Fontsize)
-%     legend box off
-%     box off
-%     xlim([1,size(xtrain_norm,2)])
-%     ytick = get(gca,'YTick');
-%     set(gca,'YTick', linspace(min(ytick), max(ytick), 3),  'Fontsize', Fontsize)
-%     text(-0.08,1,['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
-%     figure_path = '/home/tfauvel/Documents/PhD/Figures/Thesis_figures/Chapter_1/';
+%     i=3
+%     text(-0.08,1.15,['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
+%     [xt,b] = sort([0,x_duel1, x_duel2, 1]);
+%     xticks(xt)
+%     lgs = {'0', '$x_1$', '$x_2$','1'};
+%     xticklabels(lgs(b))
+%     set(gca, 'ylim', [0, max([L1(:);L2(:)]')]);
+%          ytick = get(gca,'YTick');
+%     set(gca,'YTick', linspace(min(ytick), max(ytick), 3))
+% 
 %     
 %     figname  = 'Brochu_EI_pathology';
 %     folder = [figure_path,figname];

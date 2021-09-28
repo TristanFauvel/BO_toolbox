@@ -1,4 +1,4 @@
-function [xtrain, xtrain_norm, ctrain, score,x_best]= BBO_loop(acquisition_fun, nopt, seed, maxiter, theta, g, update_period, model)
+function [xtrain, xtrain_norm, ctrain, score_c, score_g,x_best_c, x_best_g]= BBO_loop(acquisition_fun, nopt, seed, maxiter, theta, g, update_period, model)
 
 % g : objective function
 % maxiter : number of iterations
@@ -37,8 +37,11 @@ end
 approximation.decoupled_bases = 1;
 approximation.nfeatures = 256;
 [approximation.phi, approximation.dphi_dx] = sample_features_GP(theta(:), model, approximation);
-x_best_norm = zeros(D, maxiter);
-x_best = zeros(D, maxiter);
+x_best_norm_c = zeros(D, maxiter);
+x_best_c = zeros(D, maxiter);
+x_best_norm_g = zeros(D, maxiter);
+x_best_g = zeros(D, maxiter);
+
 score = zeros(1,maxiter);
 
 
@@ -70,16 +73,24 @@ for i =1:maxiter
     end
     init_guess = [];
     
-    if strcmp(identification, 'mu_c')
-        x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_mu_c_GP(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
-    elseif strcmp(identification, 'mu_g')
-        x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
-    end
+    %     if strcmp(identification, 'mu_c')
+    x_best_norm_c(:,i) = multistart_minConf(@(x)to_maximize_mu_c_GP(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
     
-    x_best(:,i) = x_best_norm(:,i) .*(ub-lb) + lb;
-    score(i) = g(x_best(:,i));
+    %     elseif strcmp(identification, 'mu_g')
+    x_best_norm_g(:,i) = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+    %     end
     
-   
+    x_best_c(:,i) = x_best_norm_c(:,i) .*(ub-lb) + lb;
+    x_best_g(:,i) = x_best_norm_g(:,i) .*(ub-lb) + lb;
+    
+    score_c(i) = normcdf(g(x_best_c(:,i)));
+    score_g(i) = g(x_best_g(:,i));
+    
+%     if i == 200
+%         disp('stop')
+%     end
+    
+    
 end
 return
 
@@ -90,18 +101,33 @@ xx_norm = linspace(ub_norm, lb_norm, 100);
 [mu_c,  mu_y, sigma2_y, Sigma2_y] =  prediction_bin(theta, xtrain_norm, ctrain, xx_norm, model, post);
 figure()
 plot_gp(xx, mu_y, sigma2_y, C(1,:), 2); hold on;
-plot(xx, g(xx));  
-scatter(xtrain, ctrain, markersize, 'k', 'filled'); 
-
-init_guess = theta;
-theta = multistart_minConf(@(hyp)negloglike_bin(hyp, xtrain_norm, ctrain, model), model.theta_lb, model.theta_ub,10, init_guess, options_theta);
-[mu_c,  mu_y, sigma2_y, Sigma2_y] =  prediction_bin(theta, xtrain_norm, ctrain, xx_norm, model, post);
-
+plot(xx, g(xx));
+scatter(xtrain, ctrain, markersize, 'k', 'filled');
 
 Y = normcdf(mvnrnd(mu_y, Sigma2_y,10000));
 figure()
 [p1,p2, h] = plot_distro(xx, mu_c, Y, C(1,:), C(2,:),linewidth); hold on
-scatter(xtrain, ctrain, markersize, 'k', 'filled'); 
+scatter(xtrain, ctrain, markersize, 'k', 'filled');
+plot(xx, normcdf(g(xx)), 'color', 'k')
+
+
+samples_prior = mvnrnd(zeros(1,100), model.kernelfun(theta, xx,xx,[], 'none'), 10);
+figure()
+plot(samples_prior')
+%%
+init_guess = theta;
+theta = multistart_minConf(@(hyp)negloglike_bin(hyp, xtrain_norm, ctrain, model), model.theta_lb, model.theta_ub,10, init_guess, options_theta);
+[mu_c,  mu_y, sigma2_y, Sigma2_y] =  prediction_bin(theta, xtrain_norm, ctrain, xx_norm, model, post);
+
+figure()
+plot_gp(xx, mu_y, sigma2_y, C(1,:), 2); hold on;
+plot(xx, g(xx));
+scatter(xtrain, ctrain, markersize, 'k', 'filled');
+
+Y = normcdf(mvnrnd(mu_y, Sigma2_y,10000));
+figure()
+[p1,p2, h] = plot_distro(xx, mu_c, Y, C(1,:), C(2,:),linewidth); hold on
+scatter(xtrain, ctrain, markersize, 'k', 'filled');
 plot(xx, normcdf(g(xx)), 'color', 'k')
 
 
@@ -111,7 +137,7 @@ hyp.mean = 0;
 [mu_y, sigma2_y] = prediction(hyp, xtrain_norm, ytrain, xx_norm, model, []);
 figure()
 plot_gp(xx, mu_y, sigma2_y, C(1,:), 2); hold on;
-plot(xx, g(xx));  
-scatter(xtrain_norm, ytrain, markersize, 'k', 'filled'); 
+plot(xx, g(xx));
+scatter(xtrain_norm, ytrain, markersize, 'k', 'filled');
 
 

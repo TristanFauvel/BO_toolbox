@@ -1,7 +1,7 @@
-function x = random_acquisition_tour(~,~,~,~,~, ~, max_x, min_x, lb_norm, ub_norm, ~, ~, ~, tsize)
+function x = random_acquisition_tour(theta, xtrain_norm, ctrain, model, post, approximation)
 
-xnorm= rand_interval(lb_norm,ub_norm,'nsamples', tsize);
+xnorm= rand_interval(model.lb_norm,model.ub_norm,'nsamples', model.nsamples);
 
 
-x = xnorm.*(max_x-min_x) + min_x;
+x = xnorm.*(model.max_x-model.min_x) + model.min_x;
 

@@ -9,21 +9,20 @@ ncandidates= 5;
 init_guess = [];
     xdims =  (model.ns+1):model.D;
 
-if strcmp(model.task, 'max') %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%check
+if strcmp(model.task, 'max')
     f = sample_g;
     dfdx = dsample_g_dx;
     xdims = (model.ns+1):model.D;
 elseif strcmp(model.task, 'average')
+    tol = 1e-2;
     sdims = 1:model.ns;
     xdims =  (model.ns+1):model.D;
     f = @(x) integral(@(s) sample_g([s;x*ones(1,size(s,2))]), model.lb_norm(sdims), model.ub_norm(sdims));
-    dfdx = @(x) integral(@(s) dsample_g_dx([s;x*ones(1,size(s,2))]), model.lb_norm(sdims), model.ub_norm(sdims),'ArrayValued', true);
+    dfdx = @(x) integral(@(s) dsample_g_dx([s;x*ones(1,size(s,2))]), model.lb_norm(sdims), model.ub_norm(sdims),'ArrayValued', true,'RelTol', tol);
 end
 sample_normalized = multistart_minConf(@(x)takemax(x,f, dfdx, xdims), model.lb_norm(xdims), model.ub_norm(xdims), ncandidates,init_guess, options);
 sample = sample_normalized.*(model.ub(xdims)-model.lb(xdims)) + model.lb(xdims);
 
-% sample_normalized = multistart_minConf(@(x)takemax(x,f, dfdx), model.lb_norm(xdims), model.ub_norm(xdims), ncandidates,init_guess, options);
-% sample = sample_normalized.*(model.ub(xdims)-model.lb(xdims)) + model.lb(xdims);
 end
 
 function [fx, dfdx] = takemax(x,f,df, xdims)
@@ -36,3 +35,11 @@ dfdx = - df(x);
 dfdx = dfdx(xdims);
 dfdx = dfdx(:);
 end
+
+
+% xx = linspace(0,1,1000);
+% for i = 1:1000
+%     vf(i) = f(xx(i));
+% end
+% figure()
+% plot(xx, vf)

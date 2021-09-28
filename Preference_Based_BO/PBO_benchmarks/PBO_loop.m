@@ -45,6 +45,8 @@ model.nsamples = 2;
 rng(seed)
 options.method = 'lbfgs';
 ncandidates= 10;
+model.ncandidates = ncandidates;
+
 xduel1 =  rand_interval(lb,ub);
 xduel2 =  rand_interval(lb,ub);
 new_duel= [xduel1; xduel2]; %initial sample
@@ -58,10 +60,11 @@ max_x = [ub; ub];
 xtrain = NaN(2*D, maxiter);
 ctrain = NaN(1, maxiter);
 post = [];
+post.x_best_norm = NaN;
 for i =1:maxiter
     disp(i)
     x_duel1 = new_duel(1:D,:);
-    x_duel2 = new_duel(D+1:end,:);
+    x_duel2 = new_duel(D+1:(2*D),:);
     %Generate a binary sample
     c = model.link(g(x_duel1)-g(x_duel2))>rand;
     
@@ -82,6 +85,19 @@ for i =1:maxiter
     end
         post =  prediction_bin(theta, xtrain_norm(:,1:i), ctrain(1:i), [], model, post);
 
+        %%
+        if i == 1
+            init_guess = [];
+        else
+            init_guess = x_best_norm(:, end);
+        end
+        
+        x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm(:,1:i), ctrain(1:i), x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+        x_best(:,i) = x_best_norm(:,i) .*(model.ub(1:D)-model.lb(1:D)) + model.lb(1:D);
+        post.x_best_norm = x_best_norm(:,i);
+        
+        
+        %%Acquisition
     if i>ninit
         [x_duel1, x_duel2] = acquisition_fun(theta, xtrain_norm(:,1:i), ctrain(1:i), model, post, approximation);
     else %When we have not started to train the GP classification model, the acquisition is random
@@ -89,15 +105,7 @@ for i =1:maxiter
     end
     new_duel = [x_duel1;x_duel2];
     
-    if i == 1
-        init_guess = [];
-    else
-        init_guess = x_best(:, end);
-    end
-    
-    x_best_norm(:,i) = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm(:,1:i), ctrain(1:i), x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
-    x_best(:,i) = x_best_norm(:,i) .*(model.ub(1:D)-model.lb(1:D)) + model.lb(1:D);
-    
+     
     score(i) = g(x_best(:,i));
     if isnan(score(i))
         disp('bug')

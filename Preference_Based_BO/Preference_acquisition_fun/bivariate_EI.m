@@ -7,7 +7,7 @@ options.verbose = 1;
 
 D = size(xtrain_norm,1)/2;
 n = size(xtrain_norm,2);
-ncandidates =5;
+ncandidates =model.ncandidates;
 init_guess = [];
 
 % x_duel1 = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
@@ -18,8 +18,8 @@ x = [xtrain_norm(1:D,:), xtrain_norm((D+1):end,:)];
 x_duel1 = x(:,b);
 
 x_duel2 = multistart_minConf(@(x)compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, model, x_duel1, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
-x_duel1 = x_duel1.*(model.max_x(1:D)-model.max_x(1:D)) + model.max_x(1:D);
-x_duel2 = x_duel2.*(model.max_x(D+1:2*D)-model.min_x(D+1:2*D)) + model.min_x(D+1:2*D);
+x_duel1 = x_duel1.*(model.max_x(1:D)-model.min_x(1:D)) + model.min_x(1:D);
+x_duel2 = x_duel2.*(model.max_x((D+1):2*D)-model.min_x((D+1):2*D)) + model.min_x((D+1):2*D);
 
 new_duel = [x_duel1;x_duel2];
 

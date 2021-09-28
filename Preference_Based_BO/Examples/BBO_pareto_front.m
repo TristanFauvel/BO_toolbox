@@ -13,7 +13,7 @@ link = @normcdf; %inverse link function
 n = 3000;
 x = linspace(0,1, n);
 d =1;
-ntr = 50;
+ntr = 30;
 
 x0 = x(:,1);
 
@@ -24,7 +24,7 @@ kernelname = 'Matern52';
 link = @normcdf; %inverse link function for the classification model
 model.regularization = 'nugget';
 model.kernelfun = kernelfun;
-
+model.type = 'classification';
 model.link = link;
 model.modeltype = modeltype;
 model.kernelname = kernelname;
@@ -78,6 +78,9 @@ Y = normcdf(mvnrnd(mu_y,Sigma2_y,5000));
 [new_UCB, UCB] = UCB_binary(theta, xtrain, ctrain,model, post, approximation);
 [new_bivariateEI, bivariateEI] = bivariate_EI_binary(theta, xtrain, ctrain,model, post);
 [new_UCBf, UCBf] = UCB_binary_latent(theta, xtrain, ctrain,model, post, approximation);
+model2 = model;
+model2.modeltype = 'laplace';
+[new_BKG, bkg] = BKG(theta, xtrain, ctrain,model2, [], approximation);
 
 % xx = mu_y;
 % yy = sqrt(var_muc);
@@ -243,6 +246,7 @@ h2 = scatter(new_EI, normcdf(sample_g(new_EI)), 10*markersize, 'b', 'x','LineWid
 h3 = scatter(new_TS, normcdf(sample_g(new_TS)), 10*markersize, 'm','x','LineWidth',1.5); hold on;
 h4 = scatter(new_UCB, normcdf(sample_g(new_UCB)), 10*markersize, 'g','x','LineWidth',1.5); hold on;
 h5 = scatter(new_UCBf, normcdf(sample_g(new_UCBf)), 10*markersize, 'c','x','LineWidth',1.5); hold on;
+h6 = scatter(new_BKG, normcdf(sample_g(new_BKG)), 10*markersize, 'b','o','LineWidth',1.5); hold on;
 
 
 xlabel('$x$', 'Fontsize', Fontsize)
@@ -285,17 +289,47 @@ h4 = scatter(mu_c, sqrt(var_muc), 10*markersize,'g', 'x','LineWidth',1.5); hold 
 [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCBf, model, post);
 h5 = scatter(mu_c, sqrt(var_muc), 10*markersize,'c', 'x','LineWidth',1.5); hold on;
 
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_BKG, model, post);
+h6 = scatter(mu_c, sqrt(var_muc), 10*markersize,'b', 'o','LineWidth',1.5); hold on;
 
 s.AlphaData = 0.5;
 s.MarkerFaceAlpha = 'flat';
 
-legend([h1 h2 h3 h4 h5], 'Pareto front', 'EI (Tesch et al, 2013)', 'Thompson sampling', 'UCB$_{\Phi}$', 'UCB$_{f}$ (Tesch et al, 2013)') %, 'Bivariate EI')
+legend([h1 h2 h3 h4 h5 h6], 'Pareto front', 'EI (Tesch et al, 2013)', 'Thompson sampling', 'UCB$_{\Phi}$', 'UCB$_{f}$ (Tesch et al, 2013)', 'BKG') %, 'Bivariate EI')
 legend box off
 text(legend_pos(1), legend_pos(2),['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
+% 
+% figname  = 'Pareto_front';
+% folder = [figure_path,figname];
+% savefig(fig, [folder,'/', figname, '.fig'])
+% exportgraphics(fig, [folder,'/' , figname, '.pdf']);
+% exportgraphics(fig, [folder,'/' , figname, '.png'], 'Resolution', 300);
 
-figname  = 'Pareto_front';
-folder = [figure_path,figname];
-savefig(fig, [folder,'/', figname, '.fig'])
-exportgraphics(fig, [folder,'/' , figname, '.pdf']);
-exportgraphics(fig, [folder,'/' , figname, '.png'], 'Resolution', 300);
+%%
+
+n = 10000;
+e = linspace(0,20,n);
+for i = 1:n
+[new_UCB(i), UCB] = UCB_binary(theta, xtrain, ctrain,model, post, approximation, 'e', e(i));
+[new_UCBf(i), UCBf] = UCB_binary_latent(theta, xtrain, ctrain,model, post, approximation, 'e', e(i));
+end
+
+% h4 = scatter(new_UCB, normcdf(sample_g(new_UCB)), 10*markersize, 'g','x','LineWidth',1.5); hold on;
+% h5 = scatter(new_UCBf, normcdf(sample_g(new_UCBf)), 10*markersize, 'c','x','LineWidth',1.5); hold on;
+
+figure()
+plot(ordered_pareto_front(1,:), ordered_pareto_front(2,:), ':', 'linewidth', linewidth, 'color', C(2,:));hold on;
+
+h1 = plot(pareto_front(1,:),pareto_front(2,:),'color', C(2,:), 'linewidth', linewidth); hold on;
+h2 = plot(not_pareto(1,:),not_pareto(2,:),'color', 0.5*[1 1 1], 'linewidth', linewidth); hold on;
+
+box off
+xlabel('E$[\Phi(f(x))|\mathcal{D}]$')
+ylabel('$\sqrt{V[\Phi(f(x))|\mathcal{D}]}$')
+set(gca, 'Fontsize', Fontsize);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCB, model, post);
+h4 = scatter(mu_c, sqrt(var_muc), 10*markersize,'g', 'x','LineWidth',1.5); hold on;
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCBf, model, post);
+h5 = scatter(mu_c, sqrt(var_muc), 10*markersize,'c', 'x','LineWidth',1.5); hold on;
+legend([h4, h5], 'UCB$_\Phi$', 'UCB$_f$')
 

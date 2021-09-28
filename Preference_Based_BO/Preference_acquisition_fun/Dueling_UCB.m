@@ -5,11 +5,15 @@ D = model.D;
 %% Find the maximum of the value function
 options.method = 'lbfgs';
 
-ncandidates= 5;
+ncandidates =model.ncandidates;
 init_guess = [];
-x_duel1 = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
 
-init_guess = [];
+if ~isnan(post.x_best_norm)
+    x_duel1 = post.x_best_norm;
+else
+    x_duel1 = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+end
+
 x_duel2 = multistart_minConf(@(x)dUCB(theta, xtrain_norm, x, ctrain, x_duel1, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
 
 x_duel1 = x_duel1.*(model.max_x(1:D)-model.min_x(1:D)) + model.min_x(1:D);

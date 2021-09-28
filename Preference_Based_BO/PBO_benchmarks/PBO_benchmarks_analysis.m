@@ -1,11 +1,18 @@
 add_bo_module;
-data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data'];
 figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
 folder = '/home/tfauvel/Documents/BO_toolbox/Preference_Based_BO/PBO_benchmarks/Figures';
+
+rescaling = 0;
+if rescaling ==0
+    data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data_wo_rescaling/'];
+else
+    data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data_rescaling/'];
+end
 
 figname =  'PBO_scores_benchmarks';
 
 all_acq_funs = {'EIIG', 'Dueling_UCB',  'DTS','random_acquisition_pref','kernelselfsparring','maxvar_challenge', 'bivariate_EI', 'Brochu_EI', 'Thompson_challenge'};
+
 acq_funs = all_acq_funs;
 load('/home/tfauvel/Documents/BO_toolbox/Acquisition_funs_table','T')
 acquisition_funs = cellstr(char(T(any(T.acq_funs == acq_funs,2),:).acq_funs)); 
@@ -21,7 +28,8 @@ nobj =numel(objectives);
 
 nreps = 20;
 maxiter = 50;
-[t, Best_ranking, AUC_ranking,b,signobj,ranking, final_values, AUCs] = ranking_analysis(data_dir, acquisition_names_citation, objectives, acquisition_funs, nreps, maxiter, []);
+[t, Best_ranking, AUC_ranking,b,signobj,ranking, final_values, AUCs] = ranking_analysis(data_dir,...
+    acquisition_names_citation, objectives, acquisition_funs , nreps, [], [], 'max', 'score');
 
 table2latex(t,[folder,'/PBO_benchmarks_results'])
 
@@ -72,8 +80,10 @@ objectives_names = objectives_names(signobj(1:5));
 
 % objectives_names = benchmarks_table(any(benchmarks_table.fName == objectives',2),:).Name;
 
+objectives = objectives(signobj);
+objectives_names = objectives_names(signobj);
 
-fig = plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, acquisition_names, figure_folder,data_dir, figname, nreps, maxiter, rescaling, []);
+fig = plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, acquisition_names, figure_folder,data_dir, figname, nreps, maxiter, rescaling, [], [], 'max');
 
 figname  = 'optim_trajectories_PBO';
 figure_file = [folder,'/' figname];

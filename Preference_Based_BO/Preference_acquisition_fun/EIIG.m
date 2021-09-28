@@ -6,10 +6,15 @@ n = size(xtrain_norm,2);
 %% Find the maximum of the value function
 options.method = 'lbfgs';
 
-ncandidates= 5;
- 
+ncandidates =model.ncandidates;
+
 init_guess = [];
-xduel1_norm = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+
+if ~isnan(post.x_best_norm)
+    xduel1_norm = post.x_best_norm;
+else
+    xduel1_norm = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+end
 
 
 xduel2_norm = multistart_minConf(@(x)eiig(theta, xtrain_norm, x, ctrain, model, xduel1_norm, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
@@ -29,6 +34,6 @@ D = numel(x);
 eiig_val = k*log(mu_c) - I;
 deiig_val_dx = k*dmuc_dx./mu_c- dIdx;
 deiig_val_dx = deiig_val_dx(1:D);
-eiig_val_val = -eiig_val;
+eiig_val = -eiig_val;
 deiig_val_dx = -deiig_val_dx;
 end

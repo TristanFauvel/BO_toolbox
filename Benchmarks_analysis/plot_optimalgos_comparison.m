@@ -1,4 +1,4 @@
-function fig =  plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname, nreps, maxiter, rescaling, suffix, prefix)
+function fig =  plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname, nreps, maxiter, rescaling, suffix, prefix, optim)
 
 % data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data'];
 % figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
@@ -9,9 +9,9 @@ function fig =  plot_optimalgos_comparison(objectives, objectives_names, acquisi
 % acquisition_funs = {'random_acquisition_pref', 'new_DTS','active_sampling', 'MES', 'brochu_EI', 'bivariate_EI', 'random', 'decorrelatedsparring', 'kernelselfsparring'};
 % acquisition_funs = {'DTS','random_acquisition_pref','kernelselfsparring','maxvar_challenge', 'bivariate_EI', 'Brochu_EI', 'Thompson_challenge'};
 % names = {'DTS','Random', 'KSS', 'MVC', 'Bivariate EI (Nielsen 2015)', 'EI (Brochu 2010)', 'Thompson Challenge',};
-% names = {'Duel Thompson Sampling','Random', 'Kernel Self-Sparring', 'Maximum Variance Challenge', 'Bivariate Expected Improvement (Nielsen 2015)', 'Expected Improvement (Brochu 2010)', 'Thompson Challenge'};
-% 
- 
+% names = {'Duel Thompson Sampling','Random', 'Kernel Self-Sparring', 'Maximally Uncertain Challenge', 'Bivariate Expected Improvement (Nielsen 2015)', 'Expected Improvement (Brochu 2010)', 'Thompson Challenge'};
+%
+
 nobj = numel(objectives);
 
 nacq = numel(acquisition_funs);
@@ -19,7 +19,13 @@ graphics_style_paper;
 
 mr = ceil(nobj/2);
 mc = 2;
-fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
+
+if mr <4
+    fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
+else
+    fig=figure();
+end
+
 fig.Color =  [1 1 1];
 tiledlayout(mr, mc, 'TileSpacing', 'tight', 'padding','compact');
 options.handle = fig;
@@ -28,11 +34,11 @@ options.error= 'sem';
 options.line_width = linewidth/2;
 options.semilogy = false;
 options.cmap = C;
-
+options.xlim= [1,maxiter];
 rng(1);
 colors = colororder;
 options.colors = colors;
- 
+
 rescaling_table = load('benchmarks_rescaling.mat', 't');
 rescaling_table =rescaling_table.t;
 
@@ -40,7 +46,7 @@ for j = 1:nobj
     nexttile
     objective = char(objectives(j));
     
-    if rescaling == 0 && rescaling_table(rescaling_table.Names == objectives_names(j),:).TakeLog == 1 
+    if rescaling == 0 && rescaling_table(rescaling_table.Names == objectives_names(j),:).TakeLog == 1
         options.semilogy = true; %true;
     else
         options.semilogy = false;
@@ -49,32 +55,41 @@ for j = 1:nobj
     for a = 1:nacq
         acquisition = acquisition_funs{a};
         filename = [data_dir,'/',prefix, objective, '_',acquisition, suffix];
-        try
-        load(filename, 'experiment');
-        UNPACK_STRUCT(experiment, false)
-        
-        
-        legends{a}=char(names(a,:));
-        n=['a',num2str(a)];
-        
-        scores{a} = cell2mat(eval(['score_', acquisition])');
-        
-        if rescaling == 0 && any(reshape(scores{a},1,[])<0)
-             options.semilogy = false;
-        end
-        catch 
+%         try
+             load(filename, 'experiment');
+            UNPACK_STRUCT(experiment, false)
+            
            
-            scores{a} = NaN(nreps, maxiter);
-        end
+            
+            legends{a}=char(names(a,:));
+            n=['a',num2str(a)];
+            
+            score = cell2mat(eval(['score_', acquisition])'); %%%%%%%%
+            
+            %         score = cell2mat(eval(['score_c_', acquisition])'); %%%%%%%%
+            if strcmp(optim, 'min')
+                score= -score;
+            elseif strcmp(optim, 'max_proba')
+                score= normcdf(score);
+            end
+            
+            scores{a} = score;
+            
+            if rescaling == 0 && any(reshape(scores{a},1,[])<0)
+                options.semilogy = false;
+            end
+%         catch
+%             scores{a} = NaN(nreps, maxiter);
+%         end
     end
-%     benchmarks_results{j} = scores;
-%     [ranks, average_ranks]= compute_rank(scores, ninit);
+    %     benchmarks_results{j} = scores;
+    %     [ranks, average_ranks]= compute_rank(scores, ninit);
     plots =  plot_areaerrorbar_grouped(scores, options);
     box off
     ylabel('Value $g(x^*_t)$');
     title(objectives_names(j))
     set(gca, 'Fontsize', Fontsize)
-
+    
     if j == nobj || j ==nobj
         legend(plots, legends, 'Fontsize', Fontsize);
         legend boxoff
@@ -83,13 +98,16 @@ for j = 1:nobj
 end
 axes1 = gca;
 legend1 = legend(axes1,'show');
+legpos = legend1.Position;
+% set(legend1,...
+%     'Position',[0.53963583333902 0.062422587936693 0.444441641328221 0.17799635257443]);
 set(legend1,...
-    'Position',[0.53963583333902 0.062422587936693 0.444441641328221 0.17799635257443]);
+    'Position',[0.53963583333902 0.062422587936693 legpos(3) legpos(4)]);
 
 set(gca, 'Fontsize', Fontsize)
 
-
-if strcmp(objectives_names(1), 'refractive')
+name = objectives_names{1};
+if strcmp(name(1:10), 'refractive')
     ylabel('VA (in logMAR)')
     title('')
 end

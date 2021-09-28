@@ -5,13 +5,16 @@ if ~strcmp(func2str(model.link), 'normcdf')
 end
 
 init_guess = [];
-options.method = 'lbfgs';
+options.method = 'sd';
 options.verbose = 1;
 ncandidates = 10;
 [xbest, mu_c_best] = multistart_minConf(@(x)to_maximize_mu_c(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm,  model.ub_norm, ncandidates, init_guess, options);
 mu_c_best = - mu_c_best;
 ybest = norminv(mu_c_best);
 [new_x_norm,ei] = multistart_minConf(@(x)ExpImp(theta, xtrain_norm, ctrain, x, model, post,mu_c_best, ybest), model.lb_norm,  model.ub_norm, ncandidates, init_guess, options);
+
+% init_guess = rand_interval(model.lb_norm, model.ub_norm);
+% new_x_norm = patternsearch(@(x)ExpImp(theta, xtrain_norm, ctrain, x, model, post,mu_c_best, ybest),init_guess,[], [], [], [], model.lb_norm, model.ub_norm,[])
 new_x = new_x_norm.*(model.ub-model.lb) + model.lb;
 end
 
@@ -29,8 +32,16 @@ nsamps= 1e5;
 [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
 
 sigma_y = sqrt(sigma2_y);
-samples = mu_y + sigma_y.*randn(1,nsamps);
-samples(samples<ybest) = [];
+% samples = mu_y + sigma_y.*randn(1,nsamps);
+% samples(samples<ybest) = [];
+
+%%
+pd = makedist('Normal');
+pd.mu = mu_y;
+pd.sigma = sigma_y;
+t = truncate(pd,ybest,inf);
+samples= random(t,1,nsamps);
+%%
 
 arg = model.link(samples) - mu_c_best;
 ei = mean(arg);

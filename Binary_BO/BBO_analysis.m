@@ -1,11 +1,20 @@
 pathname = '/home/tfauvel/Documents/BO_toolbox';
+data_dir =  [pathname,'/Binary_BO/Data_rescaling_with_rescaling_of_the_hyps'];
+% data_dir =  [pathname,'/Binary_BO/Data_rescaling_wo_rescaling_hyps'];
 data_dir =  [pathname,'/Binary_BO/Data'];
+% data_dir =  [pathname,'/Binary_BO/Data_wo_rescaling'];
+
 figure_folder = [pathname,'/Binary_BO/Figures/'];
 figname =  'PBO_scores_benchmarks';
 
 load('benchmarks_table.mat')
 objectives = benchmarks_table.fName; 
 objectives_names = benchmarks_table.Name; 
+
+% objectives = objectives([11],:);
+% objectives_names = benchmarks_table([11],:).Name; 
+
+
 nobj =numel(objectives);
 
 
@@ -21,11 +30,14 @@ acquisition_names_citation = char(T(any(T.acq_funs == acq_funs,2),:).names_citat
 short_acq_names= char(T(any(T.acq_funs == acq_funs,2),:).short_names); 
 
  
-nreps = 20;
+nreps = 60;
 
-maxiter= 50;
-
-[t, Best_ranking, AUC_ranking,b, signobj] = ranking_analysis(data_dir, char(acquisition_names_citation), objectives, acquisition_funs, nreps,[],[], 'max');
+maxiter= 100;
+optim = 'max_proba';
+score_measure = 'score_c';
+% optim = 'max';
+[t, Best_ranking, AUC_ranking,b, signobj] = ranking_analysis(data_dir, ...
+    char(acquisition_names_citation), objectives, acquisition_funs, nreps,[],[], optim,score_measure);
 
 table2latex(t, [figure_folder,'BBO_benchmark_results'])
 
@@ -39,12 +51,19 @@ table2latex(t, [figure_folder,'BBO_benchmark_results'])
 % [~,~,~,~,signobj] = ranking_analysis(data_dir, acquisition_names_citation, objectives, acquisition_funs, nreps, maxiter, []);
 
 
-objectives = objectives(signobj(1:5));
-objectives_names = benchmarks_table(any(benchmarks_table.fName == objectives',2),:).Name; 
+% objectives = objectives(signobj(1:5));
+% objectives_names = benchmarks_table(signobj(1:5),:).Name; 
+objectives = benchmarks_table.fName; 
+objectives_names = benchmarks_table.Name; 
+
+objectives = objectives([11,16,31,32],:);
+objectives_names = benchmarks_table([11,16,31,32],:).Name; 
+
 rescaling = 1;
 figname  = 'optim_trajectories_BBO';
 
-plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, char(acquisition_names), figure_folder,data_dir, figname, nreps, maxiter,rescaling, [], [])
+plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, ...
+    char(acquisition_names), figure_folder,data_dir, figname, nreps, maxiter,rescaling, [], [], 'max')
 
 
 

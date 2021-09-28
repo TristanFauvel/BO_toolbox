@@ -16,9 +16,9 @@ rng(3)
 kernelname = 'linear';
 kernelfun = @linear_kernelfun;
 theta_true = [5;0.5;0];
-% kernelname = 'ARD';
-% kernelfun = @ARD_kernelfun;
-% theta_true = [5;1];
+kernelname = 'ARD';
+kernelfun = @ARD_kernelfun;
+theta_true = [5;1];
 
 theta= theta_true;
 
@@ -40,7 +40,7 @@ figure(); plot(x, c)
 
 xtest = x;
 
-maxiter=4;
+maxiter=25;
 nopt =0;
 
 xtrain = [];
@@ -68,17 +68,11 @@ theta_lb =-15*ones(size(theta));
 theta_ub = 15*ones(size(theta));
 
 
-for i =1:maxiter
-    xtrain = [xtrain, new_x];
-    %     ctrain = [ctrain, g(new_x)>0.5];
-    ctrain = [ctrain, c(idx)>rand];
-    
-    
-    
-    idx = randsample(n,1);
-    new_x = x(idx);
-    
-end
+idx = randsample(n,maxiter-6);
+idx = [n;n;n;1;1;1;idx]';
+ctrain = c(idx) >rand(1,maxiter);
+xtrain = x(idx);
+ 
 post = [];
  
 
@@ -87,8 +81,17 @@ D = 1;
 lb = zeros(D,1);
 ub = ones(D,1);
 
-[new_x, new_x_norm ,idx, L] = BALD_grid(x, theta, xtrain, ctrain,model, post);
-
+[new_x, new_x_norm ,idx, L] = BALD_grid(xtest, theta, xtrain, ctrain, model, post);
+% for a gaussian cdf link function:
+C = sqrt(pi*log(2)/2);
+h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps);
+I1 = h(mu_c);
+I2 =  log(2)*C.*exp(-0.5*mu_y.^2./(sigma2_y+C^2))./sqrt(sigma2_y+C^2);
+I = I1-I2;
+figure()
+plot(I1)
+figure()
+plot(I)
 
 maxiter = 30;
 
@@ -115,7 +118,7 @@ end
 
 Y = normcdf(mvnrnd(mu_y,Sigma2_y,5000));
  
-
+graphics_style_paper
 i=0;
 mr = 2;
 mc = 3;
@@ -132,8 +135,8 @@ i=i+1;
 %         p2 = plot(x,g(x),'LineWidth',linewidth,'Color', cmap(1,:)); hold on;
 p3 = plot(x,c,'color', C(2,:), 'LineWidth',linewidth); hold on;
 
-scatter(xtrain(ctrain == 1), ctrain(ctrain == 1), markersize, 'MarkerFaceColor', 'k', 'MarkerEdgeColor','k'); hold on;
-scatter(xtrain(ctrain == 0), ctrain(ctrain == 0), markersize, 'MarkerFaceColor', 'w', 'MarkerEdgeColor','k') ; hold off;
+scatter(xtrain(ctrain == 1), ctrain(ctrain == 1), 3*markersize, 'MarkerFaceColor', 'k', 'MarkerEdgeColor','k'); hold on;
+scatter(xtrain(ctrain == 0), ctrain(ctrain == 0), 3*markersize, 'MarkerFaceColor', 'w', 'MarkerEdgeColor','k') ; hold off;
 xticks([0,1])
 xticklabels({'0', '1'})
 yticks([0,1])
@@ -209,7 +212,7 @@ set(gca, 'Fontsize', Fontsize, 'Xlim', [0, maxiter])
 grid off
 box off
 legend boxoff
-text(legend_pos(1)-0.15, legend_pos(2),['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
+text(legend_pos(1), legend_pos(2),['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
 
 
 figname  = 'Active_learning';

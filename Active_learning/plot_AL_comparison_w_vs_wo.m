@@ -9,7 +9,7 @@ function plot_AL_comparison_w_vs_wo(objectives, objectives_names, acquisition_fu
 % acquisition_funs = {'random_acquisition_pref', 'new_DTS','active_sampling', 'MES', 'brochu_EI', 'bivariate_EI', 'random', 'decorrelatedsparring', 'kernelselfsparring'};
 % acquisition_funs = {'DTS','random_acquisition_pref','kernelselfsparring','maxvar_challenge', 'bivariate_EI', 'Brochu_EI', 'Thompson_challenge'};
 % names = {'DTS','Random', 'KSS', 'MVC', 'Bivariate EI (Nielsen 2015)', 'EI (Brochu 2010)', 'Thompson Challenge',};
-% names = {'Duel Thompson Sampling','Random', 'Kernel Self-Sparring', 'Maximum Variance Challenge', 'Bivariate Expected Improvement (Nielsen 2015)', 'Expected Improvement (Brochu 2010)', 'Thompson Challenge'};
+% names = {'Duel Thompson Sampling','Random', 'Kernel Self-Sparring', 'Maximally Uncertain Challenge', 'Bivariate Expected Improvement (Nielsen 2015)', 'Expected Improvement (Brochu 2010)', 'Thompson Challenge'};
 % 
  
 nobj = numel(objectives);

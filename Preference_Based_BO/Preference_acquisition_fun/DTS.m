@@ -7,7 +7,7 @@ init_guess = [];
 
 options.method = 'lbfgs';
 options.verbose = 1;
-ncandidates= 5;
+ncandidates =model.ncandidates;
  new = multistart_minConf(@(x)pref_var(theta, xtrain_norm, ctrain, x_duel1_norm , x, model, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
 
 x_duel2 =  new.*(model.ub(1:D)-model.lb(1:D)) + model.lb(1:D);

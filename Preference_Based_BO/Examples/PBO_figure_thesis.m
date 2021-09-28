@@ -188,3 +188,40 @@ savefig(fig, [folder,'/', figname, '.fig'])
 exportgraphics(fig, [folder,'/' , figname, '.pdf']);
 exportgraphics(fig, [folder,'/' , figname, '.png'], 'Resolution', 300);
 
+
+
+%%
+ maxiter = 50;%100; %total number of iterations : 200
+nreplicates = 20; %20;
+nacq = numel(acquisition_funs);
+
+rescaling = 1;
+if rescaling ==0
+    load('benchmarks_table.mat')
+    data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data_wo_rescaling/'];
+else
+    load('benchmarks_table_rescaled.mat')
+    data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data_rescaling/'];
+end
+objectives = benchmarks_table.fName;
+objectives = objectives(11);
+nobj =numel(objectives);
+seeds = 1:nreplicates;
+update_period = maxiter+2;
+more_repets = 0;
+
+objective = char(objectives);
+
+[g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling);
+model.link = @normcdf;
+
+model.max_x = [model.ub;model.ub];
+model.min_x = [model.lb;model.lb];
+model.type = 'preference';
+
+modeltype = 'exp_prop';
+model.modeltype = modeltype;
+acquisition_name = 'Brochu_EI';
+acquisition_fun = str2func(acquisition_name);
+seed = 1;
+PBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model);
