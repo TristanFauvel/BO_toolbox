@@ -11,7 +11,7 @@ ncandidates= 5;
 condition = model.condition;
 
 x = [xtrain_norm(1:D,:), xtrain_norm((D+1):end,:)];
-[g_mu_c,  g_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,2*n)], model, post);
+[g_mu_c,  g_mu_y] = model.prediction(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,2*n)], post);
 [max_mu_y,b]= max(g_mu_y);
 x_duel1 = x(:,b);
 
@@ -29,15 +29,15 @@ new_duel = [x_duel1;x_duel2];
 
 % if isequal(x_duel1, x_duel2)
 %     error('x_duel1 is the same as x_duel2')
-%     
+%
 %     x = linspace(0,1,100);
-%     [mu_c,  mu_g, sigma2_g] = prediction_bin(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,100)], model, post);
-%     
-%     [~,  ymax1] = prediction_bin(theta, xtrain_norm, ctrain, [x_duel1;condition.x0], model, post);
-%     
-%     x_duel2 = multistart_minConf(@(x)compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, model, x_duel1, post), model.lb_norm, model.ub_norm, 15,init_guess, options);   
-%         [~,  ymax2] = prediction_bin(theta, xtrain_norm, ctrain, [x_duel2;condition.x0], model, post);
-% 
+%     [mu_c,  mu_g, sigma2_g] = model.prediction(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,100)], post);
+%
+%     [~,  ymax1] = model.prediction(theta, xtrain_norm, ctrain, [x_duel1;condition.x0], post);
+%
+%     x_duel2 = multistart_minConf(@(x)compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, model, x_duel1, post), model.lb_norm, model.ub_norm, 15,init_guess, options);
+%         [~,  ymax2] = model.prediction(theta, xtrain_norm, ctrain, [x_duel2;condition.x0], post);
+%
 %      xx = sort(xtrain_norm,1);
 %      xx1 = xx(1,:);
 %      xx2 = xx(2,:);
@@ -48,7 +48,7 @@ new_duel = [x_duel1;x_duel2];
 %     fig.Color =  [1 1 1];
 %     i = 0;
 %     tiledlayout(mr,mc, 'TileSpacing' , 'tight', 'Padding', 'tight')
-%     
+%
 %     nexttile(1, [2,1])
 %     i=1;
 %     h1 = plot(1:size(xtrain_norm,2), xx1,'Color',  C(1,:),'linewidth',linewidth); hold on;
@@ -63,8 +63,8 @@ new_duel = [x_duel1;x_duel2];
 %     set(gca,'YTick', linspace(min(ytick), max(ytick), 3),  'Fontsize', Fontsize)
 %     text(-0.08,1,['$\bf{', letters(i), '}$'],'Units','normalized','Fontsize', letter_font)
 %     figure_path = '/home/tfauvel/Documents/PhD/Figures/Thesis_figures/Chapter_1/';
-%     
-%     
+%
+%
 %     nexttile(2, [1,2])
 %     i=i+1
 %     %     plot(x, g_mu_c, C(1,:), linewidth); hold on;
@@ -73,7 +73,7 @@ new_duel = [x_duel1;x_duel2];
 %         'Linewidth', 1, 'Color', C(1,:)); hold on;
 %     vline(x_duel2,'Linewidth',linewidth, 'ymax', ymax2,  'LineStyle', '--', ...
 %         'Linewidth', 1,'Color', C(2,:)); hold off;
-%     
+%
 %     %     plot(x,g, 'Color',  C(1,:),'linewidth',linewidth); hold on
 %     xlabel('$x$', 'Fontsize', Fontsize)
 %     ylabel('$g(x)$', 'Fontsize', Fontsize)
@@ -89,12 +89,12 @@ new_duel = [x_duel1;x_duel2];
 %     xticks(xt)
 %     lgs = {'0', '$x_1$', '$x_2$','1'};
 %     xticklabels(lgs(b))
-% 
+%
 %     nexttile(5, [1,2])
 %     L1 = expected_improvement_preference(theta, xtrain_norm, x, ctrain, max_mu_y, model, post)
 %     L1 = -L1;
 %     h1 = plot(x, L1, 'Color',  C(1,:),'linewidth',linewidth); hold on;
-%  
+%
 %     set(gca, 'Fontsize', Fontsize)
 %     box off
 %         vline(x_duel1,'Linewidth',linewidth, 'ymax', max(L1),  'LineStyle', '--', ...
@@ -107,7 +107,7 @@ new_duel = [x_duel1;x_duel2];
 %      box off
 %         vline(x_duel2,'Linewidth',linewidth, 'ymax', max(L2),  'LineStyle', '--', ...
 %         'Linewidth', 1,'Color', C(2,:)); hold off;
-% 
+%
 %     legend([h1, h2], 'EI', 'Bivariate EI')
 %     legend box off
 %     i=3
@@ -119,15 +119,15 @@ new_duel = [x_duel1;x_duel2];
 %     set(gca, 'ylim', [0, max([L1(:);L2(:)]')]);
 %          ytick = get(gca,'YTick');
 %     set(gca,'YTick', linspace(min(ytick), max(ytick), 3))
-% 
-%     
+%
+%
 %     figname  = 'Brochu_EI_pathology';
 %     folder = [figure_path,figname];
 %     savefig(fig, [folder,'/', figname, '.fig'])
 %     exportgraphics(fig, [folder,'/' , figname, '.pdf']);
 %     exportgraphics(fig, [folder,'/' , figname, '.png'], 'Resolution', 300);
-% 
-% 
+%
+%
 % end
 
 end
@@ -135,7 +135,7 @@ end
 function [EI, dEI_dx] = expected_improvement_preference(theta, xtrain_norm, x, ctrain, max_mu_y, model, post)
 
 [D,n]= size(x);
-[g_mu_c,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;model.condition.x0*ones(1,n)], model, post);
+[g_mu_c,  g_mu_y, g_sigma2_y, g_Sigma2_y, dmuc_dx, dmuy_dx, dsigma2_y_dx] = model.prediction(theta, xtrain_norm, ctrain, [x;model.condition.x0*ones(1,n)], post);
 
 dmuc_dx = dmuc_dx(1:D,:);
 dmuy_dx = dmuy_dx(1:D,:);

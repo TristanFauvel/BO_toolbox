@@ -1,7 +1,7 @@
 function [new_x, new_x_norm] = EI(theta, xtrain_norm, ytrain, model, post, approximation)
 
 options.method = 'lbfgs';
-mu_y =  prediction(theta, xtrain_norm, ytrain, xtrain_norm, model, post);
+mu_y =  prediction(theta, xtrain_norm, ytrain, xtrain_norm, post);
 y_best = max(mu_y);
 
 x_init = [];
@@ -13,7 +13,7 @@ end
 
 function [EI, dEI_dx] = expected_improvement(theta, xtrain_norm, x, ytrain, model, post, y_best)
  
-[mu_y, sigma2_y,dmu_dx, dsigma2_dx] =  prediction(theta, xtrain_norm, ytrain, x, model, post);
+[mu_y, sigma2_y,dmu_dx, dsigma2_dx] =  prediction(theta, xtrain_norm, ytrain, x, post);
 
 sigma_y = sqrt(sigma2_y);
 d = (mu_y - y_best)./sigma_y;

@@ -6,10 +6,10 @@ ncandidates =10;
 init_guess = [];
 options.verbose= 1;
 options.method = 'lbfgs';
-[mu_c,  ~, ~, ~, dmuc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, xt, model, post);
+[mu_c,  ~, ~, ~, dmuc_dx] =  model.prediction(theta, xtrain_norm, ctrain, xt, post);
 
-post0 =  prediction_bin(theta, [xtrain_norm,xt], c0, [], model, []);
-post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], model, []);
+post0 =  model.prediction(theta, [xtrain_norm,xt], c0, [], model, []);
+post1 =  model.prediction(theta, [xtrain_norm,xt], c1, [], model, []);
 if strcmp(model.type, 'preference')
     [xbest1, ybest1] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xt], c1, x, model, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
     [xbest0, ybest0] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xt], c0, x, model, post0), lb_norm, ub_norm, ncandidates, init_guess, options);

@@ -162,7 +162,7 @@ for i =1:maxiter
         %         else % eif i>nfit && mod(i-ninit,5)==-1
         %             %% Update the model hyperparameters
         %             options=[];
-        %             theta= minFunc(negloglike, theta(:), options, xtrain, ctrain, model, post);
+        %             theta= minFunc(negloglike, theta(:), options, xtrain, ctrain, post);
         %             if theta(2)>10
         %                 disp('stop')
         %             end
@@ -171,7 +171,7 @@ for i =1:maxiter
         %% Update the model hyperparameters
 %         options=[];
 %         if mod(i-ninit,5)==0
-%             theta= minFunc(negloglike, theta(:), options, xtrain, ctrain, model, post);
+%             theta= minFunc(negloglike, theta(:), options, xtrain, ctrain, post);
 %             
 %             if theta(2)>50
 %                 disp('stop')

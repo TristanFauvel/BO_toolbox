@@ -8,11 +8,11 @@ end
 
 xnorm = (x - model.lb)./(model.ub - model.lb);
 
-mu_c =   prediction_bin(theta, xtrain_norm, ctrain, xnorm, model, post);
+mu_c =   model.prediction(theta, xtrain_norm, ctrain, xnorm, post);
 
 n = size(x,2);
 L = zeros(1, n);
-bald = BALD(theta, xtrain_norm, ctrain, xnorm, model, post);
+bald = BALD(theta, xtrain_norm, ctrain, xnorm, post);
 for i = 1:n
     L(i) = MIgrad(x, theta, xtrain_norm, ctrain, xnorm(:,i),model, mu_c(i), bald(i));
 end
@@ -32,7 +32,7 @@ function MIgrad_x = MIgrad(x, theta, xtrain_norm, ctrain, xnorm,model, mu_c, L)
 c0 = [ctrain, 0];
 c1 = [ctrain, 1];
 post = [];
-L0 = BALD(theta, [xtrain_norm, xnorm], c0, xnorm, model, post);
-L1 = BALD(theta, [xtrain_norm, xnorm], c1, xnorm, model, post);
+L0 = BALD(theta, [xtrain_norm, xnorm], c0, xnorm, post);
+L1 = BALD(theta, [xtrain_norm, xnorm], c1, xnorm, post);
 MIgrad_x = L-(mu_c.*L1 + (1-mu_c).*L0);
 end

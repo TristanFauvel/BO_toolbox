@@ -26,10 +26,10 @@ options_theta.verbose = 1;
 ncov_hyp = numel(theta.cov);
 nmean_hyp = numel(theta.mean);
 
-theta_lb = -8*ones(ncov_hyp  + nmean_hyp ,1);
-theta_lb(end) = 0;
-theta_ub = 10*ones(ncov_hyp  + nmean_hyp ,1);
-theta_ub(end) = 0;
+hyp_lb = -8*ones(ncov_hyp  + nmean_hyp ,1);
+hyp_lb(end) = 0;
+hyp_ub = 10*ones(ncov_hyp  + nmean_hyp ,1);
+hyp_ub(end) = 0;
 regularization = 'nugget';
 for i =1:maxiter
     x_tr = [x_tr, new_x];
@@ -43,7 +43,7 @@ for i =1:maxiter
     if i > ninit
         update = 'cov';       
         init_guess = [theta.cov; theta.mean];
-        hyp = multistart_minConf(@(hyp)minimize_negloglike(hyp, x_tr, y_tr, kernelfun, meanfun, ncov_hyp, nmean_hyp, update), theta_lb, theta_ub,10, init_guess, options_theta); 
+        hyp = multistart_minConf(@(hyp)minimize_negloglike(hyp, x_tr, y_tr, kernelfun, meanfun, ncov_hyp, nmean_hyp, update), hyp_lb, hyp_ub,10, init_guess, options_theta); 
         theta.cov = hyp(1:ncov_hyp);
         theta.mean = hyp(ncov_hyp+1:ncov_hyp+nmean_hyp);
     end

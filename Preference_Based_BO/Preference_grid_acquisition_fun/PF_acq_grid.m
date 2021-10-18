@@ -25,18 +25,18 @@ end
 % new_duel =new_duel.*(max_x-min_x) + min_x(1:d);
 
 function output =  multiobjective(theta, xtrain, ctrain, xduel, kernelfun, base_name, modeltype)
-[mu_c,  ~, sigma2_y, Sigma2_y] =  prediction_bin(theta,xtrain, ctrain, xduel, kernelfun, base_name, 'modeltype',modeltype);
+[mu_c,  ~, sigma2_y, Sigma2_y] =  model.prediction(theta,xtrain, ctrain, xduel, kernelfun, base_name, 'modeltype',modeltype);
 
 d= size(xtrain,1)/2;
 x0 = 0.5*ones(d,size(xduel,2));
-[~, mu_y1] =  prediction_bin(theta,xtrain, ctrain, [xduel(1:d,:); x0], kernelfun, base_name, 'modeltype',modeltype);
-[~, mu_y2] =  prediction_bin(theta,xtrain, ctrain,  [xduel(d+1:end,:); x0], kernelfun, base_name, 'modeltype',modeltype);
+[~, mu_y1] =  model.prediction(theta,xtrain, ctrain, [xduel(1:d,:); x0], kernelfun, base_name, 'modeltype',modeltype);
+[~, mu_y2] =  model.prediction(theta,xtrain, ctrain,  [xduel(d+1:end,:); x0], kernelfun, base_name, 'modeltype',modeltype);
 
  output = [mu_c,-sigma2_y, -mu_y1, -mu_y2]; %minimize mu_c, maximize, sigma2_y, maximize
  
 end
 
-% [mu_c_acq,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq] = prediction_bin(theta, xtrain, ctrain, xduels, kernelfun, base_name, modeltype, post, regularization);
+% [mu_c_acq,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq] = model.prediction(theta, xtrain, ctrain, xduels, kernelfun, base_name, modeltype, post, regularization);
 % 
 % ntest = numel(x);
 % Fontsize=14;
@@ -51,7 +51,7 @@ end
 % pbaspect([1 1 1])
 % colorbar
 % 
-% [mu_c_acq,  mu_y_acq, sigma2_y_acq] = prediction_bin(theta, xtrain, ctrain, [x; 0.5*ones(size(x))], kernelfun, base_name, modeltype, post, regularization);
+% [mu_c_acq,  mu_y_acq, sigma2_y_acq] = model.prediction(theta, xtrain, ctrain, [x; 0.5*ones(size(x))], kernelfun, base_name, modeltype, post, regularization);
 % Fontsize=14;
 % fig=figure();
 % fig.Color =  [1 1 1];

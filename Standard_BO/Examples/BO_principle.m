@@ -33,10 +33,7 @@ c= othercolor('GnBu7');
 
 rng(5)
 regularization = 'nugget';
-model.meanfun = meanfun;
-model.kernelfun = kernelfun;
-model.regularization = regularization;
-
+model = 
 %generate a function
 y = mvnrnd(meanfun(x,0), kernelfun(theta_true, x,x, 'true', regularization));
 y = y - mean(y);

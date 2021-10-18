@@ -12,7 +12,7 @@ xnorm = (x - model.lb)./(model.ub - model.lb);
 % gaussian_entropy = @(Sigma) 0.5+log(det(Sigma)) + 0.5*size(Sigma,1)*log(2*pi*exp(1));
 gaussian_entropy = @(sigma2) real(0.5*log(2*pi*exp(1)*sigma2));
 regularization = 'nugget';
-[mu_y, sigma2_y] =  prediction(theta, xtrain_norm, ytrain, xnorm, model, post);
+[mu_y, sigma2_y] =  prediction(theta, xtrain_norm, ytrain, xnorm, post);
 H1 = sum(gaussian_entropy(sigma2_y));
 n= size(x,2);
 
@@ -20,7 +20,7 @@ n= size(x,2);
 H2 = zeros(n,1);
 
 for i =1:n      
-   [~,sigma2_y] = prediction(theta, [xtrain_norm, xnorm(:,i)], [ytrain, mu_y(i)], xnorm, model, post); %this computation is based on the fact that the posterior variance does not depend on the observed value.
+   [~,sigma2_y] = prediction(theta, [xtrain_norm, xnorm(:,i)], [ytrain, mu_y(i)], xnorm, post); %this computation is based on the fact that the posterior variance does not depend on the observed value.
   
     H2(i) = sum(gaussian_entropy(sigma2_y));
 end

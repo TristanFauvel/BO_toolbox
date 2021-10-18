@@ -74,10 +74,10 @@ for i =1:maxiter
         %Local optimization of hyperparameters
         if mod(i, update_period) ==0
             theta = theta_init(:);
-            theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm(:,1:i), ctrain(1:i), model), theta, model.theta_lb, model.theta_ub, options);
+            theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm(:,1:i), ctrain(1:i), model), theta, model.hyp_lb, model.hyp_ub, options);
         end
     end
-    post =  prediction_bin(theta, xtrain_norm(:,1:i), ctrain(1:i), [], model, []);
+    post =  model.prediction(theta, xtrain_norm(:,1:i), ctrain(1:i), [], model, []);
     
     if i>ninit
         new_duel = acquisition_fun(theta, xtrain_norm(:,1:i), ctrain(1:i), model, post, approximation);
@@ -94,7 +94,7 @@ for i =1:maxiter
         init_guess = x_best(:, end);
     end
     
-    [mu_c, mu_y, sigma2_y] = prediction_bin(theta, xtrain_norm(:,1:i), ctrain(1:i), xtest_norm, model, post);
+    [mu_c, mu_y, sigma2_y] = model.prediction(theta, xtrain_norm(:,1:i), ctrain(1:i), xtest_norm, post);
     
     gvals = g(xtest(1:model.D,:))';
     Err = sigma2_y+(gvals-mu_y).^2;

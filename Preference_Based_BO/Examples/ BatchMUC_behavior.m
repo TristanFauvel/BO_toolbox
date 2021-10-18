@@ -82,9 +82,9 @@ xtrain = xtrain(:,1:ntr);
 ctrain = ctrain(1:ntr);
 ytrain = ytrain(1:ntr);
 
-post = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [], model, post);
+post = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), [], post);
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x;x0*ones(1,n)], model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x;x0*ones(1,n)], post);
 
 [max_muy, idx1] = max(mu_y);
 x1 = x(idx1);

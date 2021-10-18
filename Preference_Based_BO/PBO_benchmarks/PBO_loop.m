@@ -79,11 +79,11 @@ for i =1:maxiter
         %Local optimization of hyperparameters
         if mod(i, update_period) ==0
             theta = theta_init(:);
-            theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm(:,1:i), ctrain(1:i), model), theta, model.theta_lb, model.theta_ub, options);
+            theta = minFuncBC(@(hyp)negloglike_bin(hyp, xtrain_norm(:,1:i), ctrain(1:i), model), theta, model.hyp_lb, model.hyp_ub, options);
             [approximation.phi_pref, approximation.dphi_pref_dx, approximation.phi, approximation.dphi_dx]= sample_features_preference_GP(theta, D, model, approximation);
         end
     end
-        post =  prediction_bin(theta, xtrain_norm(:,1:i), ctrain(1:i), [], model, post);
+        post =  model.prediction(theta, xtrain_norm(:,1:i), ctrain(1:i), [], post);
 
         %%
         if i == 1

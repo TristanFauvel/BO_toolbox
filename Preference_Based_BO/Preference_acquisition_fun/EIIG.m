@@ -28,7 +28,7 @@ end
 
 function [eiig_val, deiig_val_dx]= eiig(theta, xtrain_norm, x, ctrain, model, xduel1_norm, post)
 [I, dIdx]= BALD(theta, xtrain_norm, ctrain, [x;xduel1_norm],model, post);
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;xduel1_norm], model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx] = model.prediction(theta, xtrain_norm, ctrain, [x;xduel1_norm], post);
 k= 0.5;
 D = numel(x);
 eiig_val = k*log(mu_c) - I;

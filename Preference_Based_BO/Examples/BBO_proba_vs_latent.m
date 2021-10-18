@@ -63,9 +63,9 @@ xtrain = x(:,rd_idx);
  ytrain = g(rd_idx);
  ctrain = link(ytrain)>rand(1,ntr);
 
-post = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [], model, post);
+post = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), [], post);
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain, ctrain, x, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain, ctrain, x, post);
 
 sample_g = sample_GP(theta, x, g(:), model, approximation);
 legend_pos = [-0.15,1];
@@ -77,7 +77,7 @@ Y = normcdf(mvnrnd(mu_y,Sigma2_y,5000));
 [new_UCBf, UCBf] = UCB_binary_latent(theta, xtrain, ctrain,model, post, approximation);
 
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain, ctrain, x, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain, ctrain, x, post);
 
 
 
@@ -126,32 +126,8 @@ text(legend_pos(1), legend_pos(2),['$\bf{', letters(2), '}$'],'Units','normalize
 legend([p3, p1], '$f(x)$', '$p(f(x)|\mathcal{D})$')
 legend box off
 
-nexttile();
-sigma_y = sqrt(sigma2_y);
-e = 1; % 1 is used in the original paper by Tesch et al (2013). norminv(0.975);
-e = norminv(0.99);
-ucb_val = mu_y + e*sigma_y;
-
-h2 = plot(x, ucb_val, 'Color',  C(1,:),'LineWidth', linewidth); hold on;
- ylabel('$\alpha$')
-box off
-xlabel('$x$')
-% set(gca, 'Xlim', [0,1], 'Xtick', [0,0.5,1], 'Ylim', yl, 'Ytick', floor([yl(1), 0, yl(2)]), 'Fontsize', Fontsize');
-text(legend_pos(1), legend_pos(2),['$\bf{', letters(3), '}$'],'Units','normalized','Fontsize', letter_font)
-% legend(h2, 'UCB$_f$')
-% legend box off
-xlabel('$x$', 'Fontsize', Fontsize)
-ylabel('UCB$_f(x)$', 'Fontsize', Fontsize)
-set(gca,'XTick',[0 0.5 1],'Fontsize', Fontsize)
-ytick = get(gca,'YTick');
-set(gca,'YTick', linspace(min(ytick), max(ytick), 3), 'Fontsize', Fontsize)
-[max_y, b] = max(ucb_val);
-max_x = x(b);
-vline(max_x,'Linewidth',linewidth, 'ymax', max_y,  'LineStyle', '--', ...
-    'Linewidth', 1); hold off;
 
 nexttile();
-
 e = norminv(0.99);
 sigma_c = sqrt(var_muc);
 ucb_val = mu_c + e*sigma_c;
@@ -172,6 +148,29 @@ max_x = x(b);
 vline(max_x,'Linewidth',linewidth, 'ymax', max_y,  'LineStyle', '--', ...
     'Linewidth', 1); hold off;
 
+
+nexttile();
+sigma_y = sqrt(sigma2_y);
+e = 1; % 1 is used in the original paper by Tesch et al (2013). norminv(0.975);
+e = norminv(0.99);
+ucb_val = mu_y + e*sigma_y;
+
+h2 = plot(x, ucb_val, 'Color',  C(1,:),'LineWidth', linewidth); hold on;
+ ylabel('$\alpha$')
+box off
+xlabel('$x$')
+ text(legend_pos(1), legend_pos(2),['$\bf{', letters(3), '}$'],'Units','normalized','Fontsize', letter_font)
+ xlabel('$x$', 'Fontsize', Fontsize)
+ylabel('UCB$_f(x)$', 'Fontsize', Fontsize)
+set(gca,'XTick',[0 0.5 1],'Fontsize', Fontsize)
+ytick = get(gca,'YTick');
+set(gca,'YTick', linspace(min(ytick), max(ytick), 3), 'Fontsize', Fontsize)
+[max_y, b] = max(ucb_val);
+max_x = x(b);
+vline(max_x,'Linewidth',linewidth, 'ymax', max_y,  'LineStyle', '--', ...
+    'Linewidth', 1); hold off;
+
+ 
 
 figname  = 'BBO_proba_vs_latent';
 folder = [figure_path,figname];
@@ -269,18 +268,6 @@ set(gca,'ytick',[])
 
 
 nexttile(3);
-imagesc(mu_y_range, sigma2_y_range, reshape(minmax_normalize(ucb_f),N,N)); hold on;
-xlabel('$\mu_f(x)$','Fontsize',Fontsize)
-% ylabel('$\sigma^2_f(x)$','Fontsize',Fontsize)
-set(gca,'YDir','normal')
-pbaspect([1 1 1])
-% cb = colorbar;
-title('UCB$_f$')
-set(gca, 'fontsize', Fontsize)
-% set(get(cb,'Title'),'String','(nats)', 'Interpreter', 'latex')
-set(gca,'ytick',[])
-
-nexttile(4);
 imagesc(mu_y_range, sigma2_y_range, reshape(minmax_normalize(ucb_Phi),N,N)); hold on;
 xlabel('$\mu_f(x)$','Fontsize',Fontsize)
 % ylabel('$\sigma^2_f(x)$','Fontsize',Fontsize)
@@ -293,6 +280,20 @@ cb.FontSize = Fontsize;
 title('UCB$_\Phi$')
 set(gca, 'fontsize', Fontsize)
 set(gca,'ytick',[])
+
+
+nexttile(4);
+imagesc(mu_y_range, sigma2_y_range, reshape(minmax_normalize(ucb_f),N,N)); hold on;
+xlabel('$\mu_f(x)$','Fontsize',Fontsize)
+% ylabel('$\sigma^2_f(x)$','Fontsize',Fontsize)
+set(gca,'YDir','normal')
+pbaspect([1 1 1])
+% cb = colorbar;
+title('UCB$_f$')
+set(gca, 'fontsize', Fontsize)
+% set(get(cb,'Title'),'String','(nats)', 'Interpreter', 'latex')
+set(gca,'ytick',[])
+
 
 colormap(cmap)
 figname  = 'BBO_acq_funs_comparison';

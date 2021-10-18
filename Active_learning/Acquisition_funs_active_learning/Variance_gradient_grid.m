@@ -8,7 +8,7 @@ end
 
 xnorm = (x - model.lb)./(model.ub - model.lb);
 
-[mu_c,  ~, ~, ~, ~,~,~,~, var_muc] =   prediction_bin(theta, xtrain_norm, ctrain, xnorm, model, post);
+[mu_c,  ~, ~, ~, ~,~,~,~, var_muc] =   model.prediction(theta, xtrain_norm, ctrain, xnorm, post);
 
 n = size(x,2);
 L = zeros(1, n);
@@ -31,8 +31,8 @@ function vargrad_x = vargrad(x,theta, xtrain_norm, ctrain, xnorm,model, mu_c, va
 c0 = [ctrain, 0];
 c1 = [ctrain, 1];
 post = [];
-[~,  ~, ~, ~, ~,~,~,~, var_muc0] =  prediction_bin(theta, [xtrain_norm, xnorm], c0, xnorm, model, post);
-[~,  ~, ~, ~, ~,~,~,~, var_muc1] =  prediction_bin(theta, [xtrain_norm, xnorm], c1, xnorm, model, post);
+[~,  ~, ~, ~, ~,~,~,~, var_muc0] =  model.prediction(theta, [xtrain_norm, xnorm], c0, xnorm, post);
+[~,  ~, ~, ~, ~,~,~,~, var_muc1] =  model.prediction(theta, [xtrain_norm, xnorm], c1, xnorm, post);
 vargrad_x = var_muc-(mu_c.*var_muc1 + (1-mu_c).*var_muc0);
 end
 
@@ -41,8 +41,8 @@ end
 % function vargrad_x = vargrad(x,theta, xtrain_norm, ctrain, xnorm,model, mu_c, regularization, var_muc)
 % c0 = [ctrain, 0];
 % c1 = [ctrain, 1];
-% [~,  ~, ~, ~, ~,~,~,~, var_muc0] =  prediction_bin(theta, [xtrain_norm, xnorm], c0, x, model, post);
-% [~,  ~, ~, ~, ~,~,~,~, var_muc1] =  prediction_bin(theta, [xtrain_norm, xnorm], c1, x, model, post);
+% [~,  ~, ~, ~, ~,~,~,~, var_muc0] =  model.prediction(theta, [xtrain_norm, xnorm], c0, x, post);
+% [~,  ~, ~, ~, ~,~,~,~, var_muc1] =  model.prediction(theta, [xtrain_norm, xnorm], c1, x, post);
 % 
 % 
 % 
@@ -71,8 +71,8 @@ end
 % E_gradvar_muc = zeros(n);
 % 
 % for i = 1:n
-% [~,  ~, ~, ~, ~,~,~,~, var_muc0(i,:)] =  prediction_bin(theta, [xtrain_norm, xnorm(i)], c0, x, model, post);
-% [~,  ~, ~, ~, ~,~,~,~, var_muc1(i,:)] =  prediction_bin(theta, [xtrain_norm, xnorm(i)], c1, x, model, post);
+% [~,  ~, ~, ~, ~,~,~,~, var_muc0(i,:)] =  model.prediction(theta, [xtrain_norm, xnorm(i)], c0, x, post);
+% [~,  ~, ~, ~, ~,~,~,~, var_muc1(i,:)] =  model.prediction(theta, [xtrain_norm, xnorm(i)], c1, x, post);
 % E_var_muc(i,:) = (1-mu_c(i))*var_muc0(i,:) + mu_c(i)*var_muc1(i,:) ;
 % E_gradvar_muc(i,:) = E_var_muc(i,:) -  var_muc';
 % end

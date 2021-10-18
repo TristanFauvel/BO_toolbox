@@ -59,13 +59,13 @@ options_theta.method= 'lbfgs';
 for j = 2:nobj
     bias = 0;
     objective = [objectives{j}, '_', kernelnames{j}, '_',lengthscales{j}];
-    [x, y, theta.cov, lb, ub, theta_lb, theta_ub, kernelfun] = load_benchmarks_active_learning_grid(objectives{j}, kernelnames{j}, lengthscales{j});
+    [x, y, theta.cov, lb, ub, hyp_lb, hyp_ub, kernelfun] = load_benchmarks_active_learning_grid(objectives{j}, kernelnames{j}, lengthscales{j});
     update = 'cov';
     theta.mean = 0;
     theta.cov = theta.cov';
     init_guess = [theta.cov;theta.mean];
     ncov_hyp = numel(theta.cov);
-    hyp = multistart_minConf(@(hyp)minimize_negloglike(hyp, x, y, kernelfun, meanfun, ncov_hyp, nmean_hyp, update), [theta_lb';0], [theta_ub';0],10, init_guess, options_theta);
+    hyp = multistart_minConf(@(hyp)minimize_negloglike(hyp, x, y, kernelfun, meanfun, ncov_hyp, nmean_hyp, update), [hyp_lb';0], [hyp_ub';0],10, init_guess, options_theta);
     theta.cov = hyp(1:ncov_hyp);
     theta.mean = hyp(ncov_hyp+1:ncov_hyp+nmean_hyp);
     

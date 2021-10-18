@@ -11,7 +11,7 @@ new_x = new_x_norm.*(model.max_x-model.min_x) + model.min_x;
 end
 
 function [vargrad_x, dvargrad_x_dx] = vargrad(theta, xtrain_norm, ctrain, x_duel1, x, model, post)
-[mu_c,  ~, ~, ~, dmuc_dx,~,~,~, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
+[mu_c,  ~, ~, ~, dmuc_dx,~,~,~, var_muc, dvar_muc_dx] =  model.prediction(theta, xtrain_norm, ctrain, x, post);
 
 var_muc = -var_muc;
 dvar_muc_dx = -dvar_muc_dx;
@@ -19,8 +19,8 @@ dvar_muc_dx = -dvar_muc_dx;
 c0 = [ctrain, 0];
 c1 = [ctrain,1];
 
-[~,  ~, ~, ~, ~,~,~,~, var_muc0, dvar_muc0_dx, post0] =  prediction_bin(theta, [xtrain_norm,x], c0, x, model, post);
-[~,  ~, ~, ~, ~,~,~,~, var_muc1, dvar_muc1_dx, post1] =  prediction_bin(theta, [xtrain_norm,x], c1, x, model, post);
+[~,  ~, ~, ~, ~,~,~,~, var_muc0, dvar_muc0_dx, post0] =  model.prediction(theta, [xtrain_norm,x], c0, x, post);
+[~,  ~, ~, ~, ~,~,~,~, var_muc1, dvar_muc1_dx, post1] =  model.prediction(theta, [xtrain_norm,x], c1, x, post);
 
 U = var_muc -  mu_c.*var_muc1 + (1-mu_c).*var_muc0
 

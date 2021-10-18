@@ -58,12 +58,12 @@ for i =1:maxiter
         %Local optimization of hyperparameters
         if mod(i, update_period) ==0
             init_guess = theta;
-            theta = multistart_minConf(@(hyp)minimize_negloglike_bin(hyp, xtrain_norm, ctrain, kernelfun, meanfun, update, post), theta_lb, theta_ub,10, init_guess, options_theta);
+            theta = multistart_minConf(@(hyp)minimize_negloglike_bin(hyp, xtrain_norm, ctrain, kernelfun, meanfun, update, post), hyp_lb, hyp_ub,10, init_guess, options_theta);
             [approximation.phi, approximation.dphi_dx] = sample_features_GP(theta(:), model, approximation);
             
         end
     end
-    post =  prediction_bin(theta, xtrain_norm, ctrain, [], model, []);
+    post =  model.prediction(theta, xtrain_norm, ctrain, [], model, []);
     
     if i> nopt
         [new_x, new_x_norm] = acquisition_fun(theta, xtrain_norm, ctrain,model, post, approximation);
@@ -98,7 +98,7 @@ return
 graphics_style_paper
 xx = linspace(ub, lb, 100);
 xx_norm = linspace(ub_norm, lb_norm, 100);
-[mu_c,  mu_y, sigma2_y, Sigma2_y] =  prediction_bin(theta, xtrain_norm, ctrain, xx_norm, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y] =  model.prediction(theta, xtrain_norm, ctrain, xx_norm, post);
 figure()
 plot_gp(xx, mu_y, sigma2_y, C(1,:), 2); hold on;
 plot(xx, g(xx));
@@ -116,8 +116,8 @@ figure()
 plot(samples_prior')
 %%
 init_guess = theta;
-theta = multistart_minConf(@(hyp)negloglike_bin(hyp, xtrain_norm, ctrain, model), model.theta_lb, model.theta_ub,10, init_guess, options_theta);
-[mu_c,  mu_y, sigma2_y, Sigma2_y] =  prediction_bin(theta, xtrain_norm, ctrain, xx_norm, model, post);
+theta = multistart_minConf(@(hyp)negloglike_bin(hyp, xtrain_norm, ctrain, model), model.hyp_lb, model.hyp_ub,10, init_guess, options_theta);
+[mu_c,  mu_y, sigma2_y, Sigma2_y] =  model.prediction(theta, xtrain_norm, ctrain, xx_norm, post);
 
 figure()
 plot_gp(xx, mu_y, sigma2_y, C(1,:), 2); hold on;

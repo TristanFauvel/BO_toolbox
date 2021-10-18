@@ -26,7 +26,7 @@ end
 
 function output =  multiobjective(theta, xtrain, ctrain, x,model, post)
 regularization = 'nugget';
-[mu_c, mu_y, sigma2_y] =  prediction_bin(theta,xtrain, ctrain, x, model, post);
+[mu_c, mu_y, sigma2_y] =  model.prediction(theta,xtrain, ctrain, x, post);
 
 output = [-mu_y, -sigma2_y];
 end
@@ -35,7 +35,7 @@ end
 % x0 = 0.5;
 % x = linspace(0,1,N);
 % xduels = [x;x0*ones(1,N)];
-% [mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, xduels, kernelfun, base_name, modeltype, post, regularization);
+% [mu_c,  mu_y, sigma2_y, Sigma2_y] = model.prediction(theta, xtrain_norm, ctrain, xduels, kernelfun, base_name, modeltype, post, regularization);
 % 
 % Fontsize=14;
 % fig=figure();
@@ -49,7 +49,7 @@ end
 % pbaspect([1 1 1])
 % colorbar
 % 
-% [mu_c_acq,  mu_y_acq, sigma2_y_acq] = prediction_bin(theta, xtrain, ctrain, [x; 0.5*ones(size(x))], kernelfun, base_name, modeltype, post, regularization);
+% [mu_c_acq,  mu_y_acq, sigma2_y_acq] = model.prediction(theta, xtrain, ctrain, [x; 0.5*ones(size(x))], kernelfun, base_name, modeltype, post, regularization);
 % Fontsize=14;
 % fig=figure();
 % fig.Color =  [1 1 1];

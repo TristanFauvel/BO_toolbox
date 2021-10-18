@@ -22,22 +22,31 @@ nreps = 30;
 maxiter = 30;
 feedback ='all';  %'all' 
 suffix = ['_',feedback];
-[t, Best_ranking, AUC_ranking,b, signobj, ranking, final_values, AUCs] = ranking_analysis(data_dir, char(acquisition_names_citation), objectives, acquisition_funs, nreps, maxiter,suffix);
+score_measure = 'score';
+optim = 'max';
+
+[t, Best_ranking, AUC_ranking,b, signobj, ranking, final_values, AUCs] = ranking_analysis(data_dir, char(acquisition_names_citation), objectives, acquisition_funs, nreps, suffix, prefix, optim, score_measure);
 
 table2latex(t, [figure_folder, '/TBO_benchmark_results', suffix])
 
-rescaling = 0;
-objectives = categorical({'Ursem_waves';'forretal08'; 'camel6';'goldpr'; 'grlee12'}); 
-
-objectives_names = benchmarks_table(any(benchmarks_table.fName == objectives',2),:).Name; 
+s = [18,28,34];
+objectives = benchmarks_table.fName; 
+objectives_names = benchmarks_table.Name; 30
+objectives = objectives(s);
+objectives_names = objectives_names(s);
 rescaling= 0;
 % plot_optimalgos_comparison_TBO(objectives, objectives_names, acquisition_funs, acquisition_names, figure_folder,data_dir, [figname,suffix],  nreps, maxiter,rescaling, feedback)
 
-plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, acquisition_names, figure_folder,data_dir, [figname,suffix],  nreps, maxiter,rescaling,suffix)
+lines = {'-', ':', ':'};
+fig =  plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, acquisition_names, figure_folder,data_dir, figname, nreps, maxiter, rescaling, suffix, prefix, optim, score_measure, lines)
+figname  = 'optim_trajectory_batch_PBO';
+savefig(fig, [figure_folder, figname, '.fig'])
+exportgraphics(fig, [figure_folder, figname, '.pdf']);
+exportgraphics(fig, [figure_folder, figname, '.png'], 'Resolution', 300);
 
 
 mr = 1;
-mc= 4;
+mc= 2;
 legend_pos = [-0.1,1];
 i=0;
 graphics_style_paper;
@@ -59,10 +68,10 @@ text(legend_pos(1), legend_pos(2),['$\bf{', letters(i), '}$'],'Units','normalize
 
 % colormap(cmap)
 
-% figname  = 'Matrices';
-% savefig(fig, [figure_folder, figname, '.fig'])
-% exportgraphics(fig, [figure_folder, figname, '.pdf']);
-% exportgraphics(fig, [figure_folder, figname, '.png'], 'Resolution', 300);
+figname  = 'batch_PBO_Matrices';
+savefig(fig, [figure_folder, figname, '.fig'])
+exportgraphics(fig, [figure_folder, figname, '.pdf']);
+exportgraphics(fig, [figure_folder, figname, '.png'], 'Resolution', 300);
 % 
 % 
 

@@ -5,7 +5,7 @@ function new_duel = UCB_LWB_grid(x, theta, xtrain, ctrain, kernelfun,modeltype, 
 d = size(x,1);
 x0 = x(:,1);
 n= size(x,2);
-[~,  g_mu_y, g_sigma2_y, ~] = prediction_bin(theta, xtrain, ctrain, [x;x0*ones(1,n)], kernelfun, kernelname, modeltype, post, regularization);
+[~,  g_mu_y, g_sigma2_y, ~] = model.prediction(theta, xtrain, ctrain, [x;x0*ones(1,n)], kernelfun, kernelname, modeltype, post, regularization);
 
 
 kappa = 1;

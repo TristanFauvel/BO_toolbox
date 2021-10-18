@@ -104,7 +104,7 @@ xtrain = xtrain(:,1:ntr);
 ctrain = ctrain(1:ntr);
 ytrain = ytrain(1:ntr);
 
-post = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [], model, post);
+post = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), [], post);
 
 rng(1)
 model.nsamples = 4;
@@ -113,7 +113,7 @@ MVTx = MVT(theta, xtrain(:,1:ntr), ctrain(1:ntr), model, post, approximation);
 x1 = MVTx(1);
 
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x;x0*ones(1,n)], model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x;x0*ones(1,n)], post);
 figure()
 plot(mu_c); hold on;
 plot(normcdf(g-sample_g(x0))); hold off;
@@ -121,7 +121,7 @@ plot(normcdf(g-sample_g(x0))); hold off;
 
 
 %%
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x;x1*ones(1,n)], model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), [x;x1*ones(1,n)], post);
 
 mr = 1;
 mc = 2;

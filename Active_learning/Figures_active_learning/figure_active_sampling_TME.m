@@ -57,8 +57,8 @@ modeltype = 'exp_prop';
 % new_x = random_acquisition_binary(theta, xtrain, ctrain, kernelfun, kernelname, modeltype,max_x, min_x, lb_norm, ub_norm);
 idx = randsample(n,1);
 new_x = x(idx);
-theta_lb =-15*ones(size(theta));
-theta_ub = 15*ones(size(theta));
+hyp_lb =-15*ones(size(theta));
+hyp_ub = 15*ones(size(theta));
 lb = min_x;
 ub = max_x;
 
@@ -71,7 +71,7 @@ for i =1:maxiter
     
 end
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc]= prediction_bin(theta, xtrain, ctrain, xtest, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc]= model.prediction(theta, xtrain, ctrain, xtest, post);
 [new_x, ~, idx, L] = BALD_grid(x, theta, xtrain, ctrain,model, post);
 [new_x, ~, idx, TME] = TME_sampling_binary(x, theta, xtrain, ctrain,model, post);
 
@@ -90,10 +90,10 @@ score_TME= NaN(nreps,maxiter);
 ninit = maxiter+2;
 for s = 1:nreps
 seed = s;
-[~,~, cum_regret_TME(s,:), score_TME(s,:)]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @TME_sampling_binary, ninit, theta_lb, theta_ub, lb, ub, seed);
-[~,~, cum_regret_maxvar(s,:),score_maxvar(s,:)]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @maxvar_binary_grid, ninit, theta_lb, theta_ub, lb, ub, seed);
-[~,~, cum_regret_rand(s,:),score_rand(s,:)]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @random, ninit, theta_lb, theta_ub, lb, ub, seed);
-[~,~, cum_regret_BALD(s,:), score_BALD(s,:)]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @BALD_grid, ninit, theta_lb, theta_ub, lb, ub, seed);
+[~,~, cum_regret_TME(s,:), score_TME(s,:)]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @TME_sampling_binary, ninit, hyp_lb, hyp_ub, lb, ub, seed);
+[~,~, cum_regret_maxvar(s,:),score_maxvar(s,:)]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @maxvar_binary_grid, ninit, hyp_lb, hyp_ub, lb, ub, seed);
+[~,~, cum_regret_rand(s,:),score_rand(s,:)]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @random, ninit, hyp_lb, hyp_ub, lb, ub, seed);
+[~,~, cum_regret_BALD(s,:), score_BALD(s,:)]= AL_loop_binary_grid(x, y, maxiter, nopt, kernelfun, theta, @BALD_grid, ninit, hyp_lb, hyp_ub, lb, ub, seed);
 end
 
 

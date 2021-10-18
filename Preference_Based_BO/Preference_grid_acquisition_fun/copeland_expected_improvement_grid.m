@@ -8,8 +8,8 @@ end
 n= size(x,2);
 CEI = zeros(1, size(xduels, 2));
 for i = 1:size(xduels,2)
-    [mu_c_1, ~, ~] = prediction_bin(theta, [xtrain, xduels(:,i)], [ctrain, 1], xduels, kernelfun,kernelname, modeltype, post, regularization);
-    [mu_c_0, ~, ~] = prediction_bin(theta, [xtrain, xduels(:,i)], [ctrain, 0], xduels, kernelfun, kernelname,modeltype, post, regularization);
+    [mu_c_1, ~, ~] = model.prediction(theta, [xtrain, xduels(:,i)], [ctrain, 1], xduels, kernelfun,kernelname, modeltype, post, regularization);
+    [mu_c_0, ~, ~] = model.prediction(theta, [xtrain, xduels(:,i)], [ctrain, 0], xduels, kernelfun, kernelname,modeltype, post, regularization);
 
     C1= soft_copeland_score(reshape(mu_c_1, n, n));
     [maxC1, ~]= max(C1); %value of the condorcet winner in case 1 is returned with the new duel

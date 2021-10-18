@@ -24,7 +24,7 @@ new_duel = [x_duel1;x_duel2];
 end
 
 function [ucb_val, ducb_dx]= dUCB(theta, xtrain_norm, x, ctrain, x_duel1, model, post)
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain_norm, ctrain, [x; x_duel1], model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  model.prediction(theta, xtrain_norm, ctrain, [x; x_duel1], post);
 sigma_y = sqrt(sigma2_y);
 dsigma_y_dx = dsigma2y_dx./(2*sigma_y);
 D = model.D;

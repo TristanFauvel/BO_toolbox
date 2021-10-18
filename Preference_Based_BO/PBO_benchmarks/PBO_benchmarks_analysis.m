@@ -8,6 +8,7 @@ if rescaling ==0
 else
     data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data_rescaling/'];
 end
+% data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data'];
 
 figname =  'PBO_scores_benchmarks';
 
@@ -28,6 +29,9 @@ nobj =numel(objectives);
 
 nreps = 20;
 maxiter = 50;
+% nreps = 40;
+% maxiter = 80;
+% 
 [t, Best_ranking, AUC_ranking,b,signobj,ranking, final_values, AUCs] = ranking_analysis(data_dir,...
     acquisition_names_citation, objectives, acquisition_funs , nreps, [], [], 'max', 'score');
 
@@ -65,25 +69,32 @@ exportgraphics(fig, [figure_file, '.png'], 'Resolution', 300);
 
 
 %%
-acq_funs = all_acq_funs;
-acq_funs = acq_funs(b); %plot only the n best acquisition functions
-acq_funs = acq_funs(1:5);
+% acquisition_funs = acquisition_funs(s); 
+% acquisition_names = acquisition_names(s,:); 
+% acquisition_names_citation = acquisition_names_citation(s,:); 
+% short_acq_names = short_acq_names(s,:);
+acq_funs = {'Dueling_UCB', 'maxvar_challenge', 'bivariate_EI', 'DTS', 'Thompson_challenge'};
 acquisition_funs = cellstr(char(T(any(T.acq_funs == acq_funs,2),:).acq_funs)); 
 acquisition_names = char(T(any(T.acq_funs == acq_funs,2),:).names); 
 acquisition_names_citation = char(T(any(T.acq_funs == acq_funs,2),:).names_citations); 
 short_acq_names= char(T(any(T.acq_funs == acq_funs,2),:).short_names); 
 
-[~,~,~,~,signobj] = ranking_analysis(data_dir, acquisition_names_citation, objectives, acquisition_funs, nreps, maxiter, []);
+[~,~,~,~,signobj] = ranking_analysis(data_dir, acquisition_names_citation, objectives, acquisition_funs, nreps, [], [], 'max', 'score');
+% s = [14, 18, 34, 30, 28];
+s =[1,14,34];
 
-objectives = objectives(signobj(1:5));
-objectives_names = objectives_names(signobj(1:5));
+objectives = benchmarks_table.fName; 
+objectives_names = benchmarks_table.Name; 
+objectives = objectives(s);
+objectives_names = objectives_names(s);
 
 % objectives_names = benchmarks_table(any(benchmarks_table.fName == objectives',2),:).Name;
+clear('lines')
+% lines = cell(size(acquisition_funs'));
+% lines(:) = {'-'};
+lines(:) = {'-',':',':',':',':'};
 
-objectives = objectives(signobj);
-objectives_names = objectives_names(signobj);
-
-fig = plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, acquisition_names, figure_folder,data_dir, figname, nreps, maxiter, rescaling, [], [], 'max');
+fig = plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, char(acquisition_names), figure_folder,data_dir, figname, nreps, maxiter, rescaling, [], [], 'max', 'score',lines);
 
 figname  = 'optim_trajectories_PBO';
 figure_file = [folder,'/' figname];

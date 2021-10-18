@@ -20,7 +20,7 @@ end
 
 
 function [ucb_val, ducb_dx]= ucb(theta, xtrain_norm, x, ctrain, model, post, e)
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  model.prediction(theta, xtrain_norm, ctrain, x, post);
 sigma_y = sqrt(sigma2_y);
 dsigma_y_dx = dsigma2y_dx./(2*sigma_y);
  ucb_val = mu_y + e*sigma_y;

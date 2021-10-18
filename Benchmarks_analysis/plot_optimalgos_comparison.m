@@ -1,4 +1,5 @@
-function fig =  plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, names, figure_folder,data_dir, figname, nreps, maxiter, rescaling, suffix, prefix, optim)
+function fig =  plot_optimalgos_comparison(objectives, objectives_names, acquisition_funs, names,...
+    figure_folder,data_dir, figname, nreps, maxiter, rescaling, suffix, prefix, optim, score_measure, lines, figsize)
 
 % data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data'];
 % figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
@@ -20,11 +21,20 @@ graphics_style_paper;
 mr = ceil(nobj/2);
 mc = 2;
 
+if ~isempty(figsize)
+    fheight = figsize(1);
+    fwidth = figsize(2);
+    mr = 1;
+else
+    fheight(2) = 0.7*fheight(2);  
+end
+
 if mr <4
     fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
 else
     fig=figure();
 end
+mc = 1
 
 fig.Color =  [1 1 1];
 tiledlayout(mr, mc, 'TileSpacing', 'tight', 'padding','compact');
@@ -35,22 +45,30 @@ options.line_width = linewidth/2;
 options.semilogy = false;
 options.cmap = C;
 options.xlim= [1,maxiter];
+    options.x_axis = 1:maxiter;
+options.lines = lines;
 rng(1);
 colors = colororder;
 options.colors = colors;
-
+options.lines = lines;
 rescaling_table = load('benchmarks_rescaling.mat', 't');
 rescaling_table =rescaling_table.t;
 
+options.semilogy = false;
 for j = 1:nobj
     nexttile
     objective = char(objectives(j));
     
-    if rescaling == 0 && rescaling_table(rescaling_table.Names == objectives_names(j),:).TakeLog == 1
-        options.semilogy = true; %true;
-    else
-        options.semilogy = false;
-    end
+%     if rescaling_table(rescaling_table.Names == objectives_names(j),:).TakeLog == 1
+%         options.semilogy = true; %true;
+%     else
+%         options.semilogy = false;
+%     end
+%     
+%     if strcmp(score_measure, 'score_c') || strcmp(optim, 'max_proba') 
+%         options.semilogy = false;
+%     end
+    
     clear('score')
     for a = 1:nacq
         acquisition = acquisition_funs{a};
@@ -64,12 +82,29 @@ for j = 1:nobj
             legends{a}=char(names(a,:));
             n=['a',num2str(a)];
             
-            score = cell2mat(eval(['score_', acquisition])'); %%%%%%%%
+            score = cell2mat(eval([score_measure, '_', acquisition])'); %%%%%%%%
+            
+%             xbest = cell2mat(eval(['xbest_', acquisition])');
+%             Sbest =  mean(xbest(1:2:end,:));
+%             Cbest =  mean(xbest(1+1:2:end,:));
+%             Cbest(end)
+%             Sbest(end)
+%             
+%             
+%             xbest = xbest(1:2:end,:);
+%             figure()
+%             plot(mean(xbest))         
+
+%             xtrain = cell2mat(eval(['xtrain_', acquisition])');
+%             xtrain = xtrain(2+1:3:end, :);
+%             
+%             figure()
+%             plot(mean(xtrain))
             
             %         score = cell2mat(eval(['score_c_', acquisition])'); %%%%%%%%
             if strcmp(optim, 'min')
                 score= -score;
-            elseif strcmp(optim, 'max_proba')
+            elseif strcmp(optim, 'max_proba') && ~strcmp(score_measure, 'score_c')
                 score= normcdf(score);
             end
             
@@ -84,15 +119,27 @@ for j = 1:nobj
     end
     %     benchmarks_results{j} = scores;
     %     [ranks, average_ranks]= compute_rank(scores, ninit);
-    plots =  plot_areaerrorbar_grouped(scores, options);
+     plots =  plot_areaerrorbar_grouped(scores, options);
     box off
-    ylabel('Value $g(x^*_t)$');
+    
+    if mod(j,2)==1
+        if strcmp(score_measure, 'score_c')
+            ylabel('$P(c = 1|x^*_t)$');
+%             set(gca, 'YLim', [0,1])
+        elseif strcmp(score_measure, 'score_g') || strcmp(score_measure, 'score')
+            ylabel('Value $g(x^*_t)$');
+        end
+    end
+    
     title(objectives_names(j))
     set(gca, 'Fontsize', Fontsize)
     
-    if j == nobj || j ==nobj
+    if j == nobj 
         legend(plots, legends, 'Fontsize', Fontsize);
         legend boxoff
+    end
+    
+    if j == nobj || j ==nobj-1
         xlabel('Iteration \#')
     end
 end
@@ -106,14 +153,18 @@ set(legend1,...
 
 set(gca, 'Fontsize', Fontsize)
 
-name = objectives_names{1};
-if strcmp(name(1:10), 'refractive')
-    ylabel('VA (in logMAR)')
-    title('')
-end
+% name = objectives_names{1};
+% if strcmp(name(1:10), 'refractive')
+%     ylabel('VA (in logMAR)')
+%     title('')
+% end
 savefig(fig, [figure_folder,'/', figname, '.fig'])
 exportgraphics(fig, [figure_folder,'/' , figname, '.pdf']);
 exportgraphics(fig, [figure_folder,'/' , figname, '.png'], 'Resolution', 300);
 
 
+
+% figure()
+% scatter(1:maxiter, mean(scores{1})); hold on;
+% scatter(1:maxiter, mean(scores{2})); hold on;
 

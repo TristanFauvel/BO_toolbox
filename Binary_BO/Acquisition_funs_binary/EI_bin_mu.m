@@ -10,7 +10,7 @@ s_range = linspace(0,1,ns);
 
 xtest = [p(:),q(:)]';
 
-[mu_c,  mu_y, sigma2_y,Sigma2_y] =  prediction_bin(theta, xtrain_norm, ctrain, xtest, model, post);
+[mu_c,  mu_y, sigma2_y,Sigma2_y] =  model.prediction(theta, xtrain_norm, ctrain, xtest, post);
 mu_c = reshape(mu_c, ns,nx);
 mu_y = reshape(mu_y, ns,nx);
 sigma2_y = reshape(sigma2_y, ns,nx);

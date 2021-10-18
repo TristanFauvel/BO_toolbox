@@ -6,7 +6,7 @@ end
 %(x, theta, xtrain, ctrain, kernelfun, link, xduels,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq, modeltype, maxC, mu_c_acq);
 
 %sample a preference function f according to the predicted mean and covaraince
-[mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin(theta, xtrain, ctrain, xtrain, kernelfun,kernelname, modeltype, post, regularization);
+[mu_c,  mu_y, sigma2_y, Sigma2_y] = model.prediction(theta, xtrain, ctrain, xtrain, kernelfun,kernelname, modeltype, post, regularization);
 
 fsamples = mvnrnd(mu_y,  nearestSPD(Sigma2_y))'; %sample from the posterior at training points
 Sigma2 = exp(-15); % To regularize

@@ -15,7 +15,7 @@ x_duel1 =  x_best_norm.*(model.ub(1:D)-model.lb(1:D)) + model.lb(1:D);
 loop = 1;
 while loop
     loop = 0;
-    [~, new] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, post);
+    [~, new] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, post);
 
     if all(x_duel1 == new)
         loop =1;
@@ -45,7 +45,7 @@ end
 %     new(:,k) = minFuncBC(@(x)deriv(x,sample_g, dsample_g_dx), x_init, lb_norm, ub_norm, options); %bounds constraints.
 % end
 %
-% [~,  test_value, test_variance, ~] = prediction_bin(theta, xtrain_norm, ctrain, [xtest_norm; x0.*ones(d,size(xtest_norm,2))], kernelfun, kernelname, modeltype, post, regularization);
+% [~,  test_value, test_variance, ~] = model.prediction(theta, xtrain_norm, ctrain, [xtest_norm; x0.*ones(d,size(xtest_norm,2))], kernelfun, kernelname, modeltype, post, regularization);
 %
 % if d==1
 %     figure()
@@ -86,7 +86,7 @@ end
 % [p,q] = meshgrid(xrange1,xrange2);
 % x_array = [p(:),q(:)]';
 %
-% [~,  test_value_array, test_variance_array, ~] = prediction_bin(theta, xtrain_norm, ctrain, [x_array; x0.*ones(1,size(x_array,2))], kernelfun, kernelname, modeltype, post, regularization);
+% [~,  test_value_array, test_variance_array, ~] = model.prediction(theta, xtrain_norm, ctrain, [x_array; x0.*ones(1,size(x_array,2))], kernelfun, kernelname, modeltype, post, regularization);
 %
 %
 % test= zeros(nsamples,size(x_array,2));

@@ -35,7 +35,7 @@ nobj = numel(objectives);
 nacq = numel(acquisition_funs);
 for j = 1:nobj
     objective = [objectives{j}, '_', kernelnames{j}, '_',lengthscales{j}];
-    [x, y, theta.cov, lb, ub, theta_lb, theta_ub, kernelfun] = load_benchmarks_active_learning_grid(objectives{j}, kernelnames{j}, lengthscales{j});
+    [x, y, theta.cov, lb, ub, hyp_lb, hyp_ub, kernelfun] = load_benchmarks_active_learning_grid(objectives{j}, kernelnames{j}, lengthscales{j});
     for ji = 1:nacq
         acquisition_name = acquisition_funs{ji};
         acquisition_fun = str2func(acquisition_name);
@@ -44,7 +44,7 @@ for j = 1:nobj
             disp(['Repetition ', num2str(k)])
             seed = seeds(k);
             [xtrain{k}, ytrain{k}, cum_regret{k}, score{k}]= AL_loop_grid(x, ...
-                y, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, theta_lb, theta_ub, lb, ub, seed);            
+                y, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, hyp_lb, hyp_ub, lb, ub, seed);            
         end
         clear('experiment')
         fi = ['xtrain_',acquisition_name];

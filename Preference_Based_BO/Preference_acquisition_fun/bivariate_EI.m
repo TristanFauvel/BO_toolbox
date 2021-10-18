@@ -13,7 +13,7 @@ init_guess = [];
 % x_duel1 = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
 x = [xtrain_norm(1:D,:), xtrain_norm((D+1):end,:)];
 
-[g_mu_c,  g_mu_y] = prediction_bin(theta, xtrain_norm, ctrain, [x;model.condition.x0*ones(1,2*n)], model, post);
+[g_mu_c,  g_mu_y] = model.prediction(theta, xtrain_norm, ctrain, [x;model.condition.x0*ones(1,2*n)], post);
 [a,b]= max(g_mu_y);
 x_duel1 = x(:,b);
 

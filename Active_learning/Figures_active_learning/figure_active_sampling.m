@@ -64,8 +64,8 @@ model.ub = ub;
 % new_x = random_acquisition_binary(theta, xtrain, ctrain, kernelfun, kernelname, modeltype,ub, lb, lb_norm, ub_norm);
 idx = randsample(n,1);
 new_x = x(idx);
-theta_lb =-15*ones(size(theta));
-theta_ub = 15*ones(size(theta));
+hyp_lb =-15*ones(size(theta));
+hyp_ub = 15*ones(size(theta));
 
 
 idx = randsample(n,maxiter-6);
@@ -76,12 +76,12 @@ xtrain = x(idx);
 post = [];
  
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc]= prediction_bin(theta, xtrain, ctrain, xtest, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc]= model.prediction(theta, xtrain, ctrain, xtest, post);
 D = 1;
 lb = zeros(D,1);
 ub = ones(D,1);
 
-[new_x, new_x_norm ,idx, L] = BALD_grid(xtest, theta, xtrain, ctrain, model, post);
+[new_x, new_x_norm ,idx, L] = BALD_grid(xtest, theta, xtrain, ctrain, post);
 % for a gaussian cdf link function:
 C = sqrt(pi*log(2)/2);
 h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps);

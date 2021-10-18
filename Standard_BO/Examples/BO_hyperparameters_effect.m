@@ -36,6 +36,17 @@ wrong_theta.cov =[10;7;6;3;-9;-4;0]; %[10,7];
 
 
 
+regularization = 'nugget';
+hyps.ncov_hyp =2; % number of hyperparameters for the covariance function
+hyps.nmean_hyp =0; % number of hyperparameters for the mean function
+hyps.hyp_lb = -10*ones(hyps.ncov_hyp  + hyps.nmean_hyp,1);
+hyps.hyp_ub = 10*ones(hyps.ncov_hyp  + hyps.nmean_hyp,1);
+D = 1;
+link = @normcdf;
+model = gp_regression_model(D, meanfun, kernelfun, regularization, hyps);
+
+
+
 nopt =3; %set nopt to maxiter +1 to get random acquisition
 maxiter = 50;
 
@@ -44,8 +55,8 @@ cum_regret_true_hyp= NaN(nreps,maxiter+1);
 cum_regret_wrong_hyp = NaN(nreps,maxiter+1);
 cum_regret_learned_hyp = NaN(nreps,maxiter+1);
 
- theta_lb = -10*ones(ncov_hyp+nmean_hyp,1);
- theta_ub = 10*ones(ncov_hyp+nmean_hyp,1);
+ hyp_lb = -10*ones(ncov_hyp+nmean_hyp,1);
+ hyp_ub = 10*ones(ncov_hyp+nmean_hyp,1);
  max_g = 0;
  lb_norm = zeros(D,1);
  ub_norm = ones(D,1);
@@ -62,7 +73,7 @@ for k = 1:nreps
     ninit = nopt;
     [~, ~, ~, learned_theta_score{k}, theta_evo]= BO_loop(g, maxiter, nopt, model, theta, acquisition_fun, ninit, max_g, seed);
 end
-%[xtrain, xtrain_norm, ytrain, score, cum_regret]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, max_x, min_x, theta_lb, theta_ub, max_g, kernelname, lb_norm, ub_norm, seed)
+%[xtrain, xtrain_norm, ytrain, score, cum_regret]= BO_loop(g, maxiter, nopt, kernelfun, meanfun, theta, acquisition_fun, ninit, max_x, min_x, hyp_lb, hyp_ub, max_g, kernelname, lb_norm, ub_norm, seed)
 
 
 mr = 1;

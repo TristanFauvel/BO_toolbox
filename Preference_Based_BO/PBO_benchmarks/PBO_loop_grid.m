@@ -97,7 +97,7 @@ for i =1:maxiter
     
     
     % Compute the Condorcet Winner
-%     [mu_c_acq,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq] = prediction(theta, xtrain, ctrain, xduels, model, post);
+%     [mu_c_acq,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq] = prediction(theta, xtrain, ctrain, xduels, post);
     [mu_c_acq,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq] = prediction(theta, xtrain, ctrain, xduels, kernelfun, base_kernelname, modeltype, post, regularization);
 
     CS= soft_copeland_score(reshape(mu_c_acq, ntest^d, ntest^d));
@@ -140,7 +140,7 @@ for i =1:maxiter
         %             theta = run(ms,problem,100);
         %         elseif i>nfit && mod(i-ninit,5)==-1
         %             %% Update the model hyperparameters
-        %             theta= minFunc(negloglike, theta, options, xtrain, ctrain, model, post);
+        %             theta= minFunc(negloglike, theta, options, xtrain, ctrain, post);
         %         end
         
         

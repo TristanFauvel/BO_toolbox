@@ -20,7 +20,7 @@ end
 
 function [mu_c,  dmuc_dx] = to_maximize_mu_c(theta, xtrain_norm, ctrain, x,model, post)
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx] =  model.prediction(theta, xtrain_norm, ctrain, x, post);
 mu_c = -mu_c;
 dmuc_dx= -squeeze(dmuc_dx);
 
@@ -29,7 +29,7 @@ end
 
 function [ei,deidx] = ExpImp(theta, xtrain_norm, ctrain, x, model, post, mu_c_best, ybest)
 nsamps= 1e5;
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  model.prediction(theta, xtrain_norm, ctrain, x, post);
 
 sigma_y = sqrt(sigma2_y);
 % samples = mu_y + sigma_y.*randn(1,nsamps);

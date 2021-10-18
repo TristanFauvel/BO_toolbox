@@ -66,9 +66,9 @@ xtrain = xtrain(:,1:ntr);
 ctrain = ctrain(1:ntr);
 ytrain = ytrain(1:ntr);
 
-post = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), [], model, post);
+post = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), [], post);
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), x, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), x, post);
 
 sample_g = sample_GP(theta, x, g(:), model, approximation);
 legend_pos = [-0.15,1];
@@ -166,19 +166,19 @@ model2.modeltype = 'laplace';
 % set(gca, 'Fontsize', Fontsize);
 % 
 % %%
-% [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_EI, model, post);
+% [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_EI, post);
 % h2 = scatter(mu_y, sqrt(var_muc), 10*markersize,'b', 'x'); hold on;
 % %%
 % rng(1)
-% [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_TS, model, post);
+% [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_TS, post);
 % h3 = scatter(mu_y, sqrt(var_muc), 10*markersize, 'm','x'); hold on;
 % 
-% [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCB, model, post);
+% [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCB, post);
 % h4 = scatter(mu_y, sqrt(var_muc), 10*markersize,'g', 'x'); hold on;
 % 
-% % [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_bivariateEI, model, post);
+% % [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_bivariateEI, post);
 % % h5 = scatter(mu_y, sqrt(var_muc), 10*markersize, 'x'); hold on;
-% [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCBf, model, post);
+% [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCBf, post);
 % h5 = scatter(mu_y, sqrt(var_muc), 10*markersize,'c', 'x'); hold on;
 % 
 % legend([h1 h2 h3 h4 h5], 'Pareto front', 'EI (Tesch et al, 2013)', 'Thompson sampling', 'UCB$_{\Phi}$','UCB$_f$');%, 'Bivariate EI')
@@ -195,7 +195,7 @@ model2.modeltype = 'laplace';
 
 %%
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), x, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), x, post);
 
 xx = mu_c;
 yy = sqrt(var_muc);
@@ -276,20 +276,20 @@ set(gca, 'Fontsize', Fontsize);
 
 %%
  
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_EI, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_EI, post);
 h2 = scatter(mu_c, sqrt(var_muc), 10*markersize,'b', 'x','LineWidth',1.5); hold on;
 
 rng(1)
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_TS, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_TS, post);
 h3 = scatter(mu_c, sqrt(var_muc), 10*markersize, 'm','x','LineWidth',1.5); hold on;
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCB, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCB, post);
 h4 = scatter(mu_c, sqrt(var_muc), 10*markersize,'g', 'x','LineWidth',1.5); hold on;
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCBf, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCBf, post);
 h5 = scatter(mu_c, sqrt(var_muc), 10*markersize,'c', 'x','LineWidth',1.5); hold on;
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_BKG, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_BKG, post);
 h6 = scatter(mu_c, sqrt(var_muc), 10*markersize,'b', 'o','LineWidth',1.5); hold on;
 
 s.AlphaData = 0.5;
@@ -327,9 +327,9 @@ box off
 xlabel('E$[\Phi(f(x))|\mathcal{D}]$')
 ylabel('$\sqrt{V[\Phi(f(x))|\mathcal{D}]}$')
 set(gca, 'Fontsize', Fontsize);
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCB, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCB, post);
 h4 = scatter(mu_c, sqrt(var_muc), 10*markersize,'g', 'x','LineWidth',1.5); hold on;
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = prediction_bin(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCBf, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), new_UCBf, post);
 h5 = scatter(mu_c, sqrt(var_muc), 10*markersize,'c', 'x','LineWidth',1.5); hold on;
 legend([h4, h5], 'UCB$_\Phi$', 'UCB$_f$')
 

@@ -25,7 +25,7 @@ end
 function [ucb_val, ducb_dx]= ucb(theta, xtrain_norm, x, ctrain, model, post, task, e)
 
 if strcmp(task, 'max')
-    [mu_c, sigma_c, dmuc_dx, dsigma_c_dx] =  gpbin(theta, xtrain_norm, ctrain, x, model, post);
+    [mu_c, sigma_c, dmuc_dx, dsigma_c_dx] =  gpbin(theta, xtrain_norm, ctrain, x, post);
 elseif strcmp(task, 'average')
     mu_c = integral(@(s) fmu_c(theta, xtrain_norm, ctrain, [s;x*ones(1,size(s,2))], model, post), zeros(1,model.ns), ones(1,model.ns), 'ArrayValued', true);
     sigma_c = integral(@(s) fsigma_c(theta, xtrain_norm, ctrain, [s;x*ones(1,size(s,2))], model, post), zeros(1,model.ns), ones(1,model.ns), 'ArrayValued', true);
@@ -38,28 +38,28 @@ ducb_dx = -(dmuc_dx(:) + e*dsigma_c_dx(:));
 end
 
 function mu_c = fmu_c(theta, xtrain_norm, ctrain, x, model, post)
-mu_c  =  prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
+mu_c  =  model.prediction(theta, xtrain_norm, ctrain, x, post);
 end
 
 function sigma_c =  fsigma_c(theta, xtrain_norm, ctrain, x, model, post)
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] =  prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc] =  model.prediction(theta, xtrain_norm, ctrain, x, post);
 sigma_c = sqrt(var_muc);
 end
 
 function dmuc_dx = fdmuc_dx(theta, xtrain_norm, ctrain, x, model, post)
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx] =  model.prediction(theta, xtrain_norm, ctrain, x, post);
 dmuc_dx = dmuc_dx((model.ns+1):end);
 end
 
 function dsigma_c_dx  =  fdsigma_c_dx(theta, xtrain_norm, ctrain, x, model, post)
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc, dvar_muc_dx] =  model.prediction(theta, xtrain_norm, ctrain, x, post);
 sigma_c = sqrt(var_muc);
 dsigma_c_dx = dvar_muc_dx./(2*sigma_c);
 dsigma_c_dx = dsigma_c_dx((model.ns+1):end);
 end
 
 function [mu_c, sigma_c, dmuc_dx, dsigma_c_dx]  = gpbin(theta, xtrain_norm, ctrain, x, model, post)
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, var_muc, dvar_muc_dx] =  model.prediction(theta, xtrain_norm, ctrain, x, post);
 sigma_c = sqrt(var_muc);
 dsigma_c_dx = dvar_muc_dx./(2*sigma_c);
 % dsigma_c_dx = dsigma_c_dx((model.ns+1):end);

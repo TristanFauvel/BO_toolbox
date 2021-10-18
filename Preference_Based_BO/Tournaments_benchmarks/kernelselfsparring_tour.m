@@ -3,7 +3,7 @@ function new_x = kernelselfsparring_tour(theta, xtrain_norm, ctrain, model, post
 D = model.D;
 xnorm = zeros(D,model.nsamples);
 for k =1:model.nsamples %sample g* from p(g*|D)
-        [xnorm(:,k), new] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, post);
+        [xnorm(:,k), new] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, post);
 end
 new_x = xnorm.*(model.ub-model.lb) + model.lb;
 

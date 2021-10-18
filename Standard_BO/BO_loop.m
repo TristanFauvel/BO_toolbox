@@ -22,10 +22,10 @@ options_theta.method = 'lbfgs';
 options_theta.verbose = 1;
 ncov_hyp = numel(theta.cov);
 nmean_hyp = numel(theta.mean);
-% theta_lb = -8*ones(ncov_hyp  + nmean_hyp ,1);
-% theta_lb(end) = 0;
-% theta_ub = 10*ones(ncov_hyp  + nmean_hyp ,1);
-% theta_ub(end) = 0;
+% hyp_lb = -8*ones(ncov_hyp  + nmean_hyp ,1);
+% hyp_lb(end) = 0;
+% hyp_ub = 10*ones(ncov_hyp  + nmean_hyp ,1);
+% hyp_ub(end) = 0;
 rng(seed)
 
 
@@ -54,7 +54,7 @@ for i =1:maxiter
     xtrain_norm = [xtrain_norm, new_x_norm];
     ytrain = [ytrain, new_y];
     
-    mu_ytrain =  prediction(theta, xtrain_norm, ytrain, xtrain_norm, model, post);
+    mu_ytrain =  prediction(theta, xtrain_norm, ytrain, xtrain_norm, post);
     [max_ytrain,b]= max(mu_ytrain);
     
     cum_regret_i  =cum_regret_i + max_g-max_ytrain;
@@ -64,7 +64,7 @@ for i =1:maxiter
     if i > ninit
         update = 'cov';       
         init_guess = [theta.cov; theta.mean];
-        hyp = multistart_minConf(@(hyp)minimize_negloglike(hyp, xtrain_norm, ytrain, model.kernelfun, model.meanfun, ncov_hyp, nmean_hyp, update), theta_lb, theta_ub,10, init_guess, options_theta); 
+        hyp = multistart_minConf(@(hyp)minimize_negloglike(hyp, xtrain_norm, ytrain, model.kernelfun, model.meanfun, ncov_hyp, nmean_hyp, update), hyp_lb, hyp_ub,10, init_guess, options_theta); 
         theta.cov = hyp(1:ncov_hyp);
         theta.mean = hyp(ncov_hyp+1:ncov_hyp+nmean_hyp);
         [approximation.phi, approximation.dphi_dx]= sample_features_GP(theta.cov, D, model, approximation);

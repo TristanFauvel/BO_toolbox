@@ -33,7 +33,7 @@ nobj =numel(objectives);
 
 
 link = @normcdf;
- for j = 1:nobj %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ for j = 26:nobj %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     objective = char(objectives(j));
     [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling);
     close all

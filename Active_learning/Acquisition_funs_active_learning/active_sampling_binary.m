@@ -4,7 +4,7 @@ init_guess = [];
 options.method = 'lbfgs';
 options.verbose = 1;
 
-if strcmp(model.type, 'preference') && numel(model.lb_norm)<2*model.D
+if strcmp(model.type, 'preference') && numel(model.ns)>0
         model.lb_norm = [model.lb_norm;model.lb_norm((end-model.D+1):end)];
         model.ub_norm = [model.ub_norm;model.ub_norm((end-model.D+1):end)];
 end
@@ -14,7 +14,7 @@ end
 
 function [I, dIdx]= adaptive_sampling_binary(x, theta, xtrain, ctrain,model, post)
 
-[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  prediction_bin(theta, xtrain, ctrain, x, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx] =  model.prediction(theta, xtrain, ctrain, x, post);
 
 h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps);
 

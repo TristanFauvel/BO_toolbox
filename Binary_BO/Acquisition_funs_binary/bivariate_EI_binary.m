@@ -24,11 +24,11 @@ end
 function [BEI, dBEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, model, xbest, post)
 
 [D,n]= size(x);
-[~, ~, g_sigma2_y,  ~, ~, dmuy_dx] = prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
+[~, ~, g_sigma2_y,  ~, ~, dmuy_dx] = model.prediction(theta, xtrain_norm, ctrain, x, post);
 
 g_sigma_y = sqrt(g_sigma2_y);
  
-[~, g_mu_y, g_sigma2_y, g_Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [xbest, x], model, post);
+[~, g_mu_y, g_sigma2_y, g_Sigma2_y] = model.prediction(theta, xtrain_norm, ctrain, [xbest, x], post);
 
 g_sigma2_y = g_sigma2_y(1);
 max_mu_y = g_mu_y(1);
@@ -49,7 +49,7 @@ BEI = (g_mu_y - max_mu_y).*normcdf_d+ sigma_I.*normpdf_d;%Brochu
 BEI(sigma_y==0) = 0;
 
 if nargout>1   
-    [~, ~, ~, g_Sigma2_y, ~, ~, ~, dSigma2_y_dx] = prediction_bin(theta, xtrain_norm, ctrain, [xbest, x], model, post);
+    [~, ~, ~, g_Sigma2_y, ~, ~, ~, dSigma2_y_dx] = model.prediction(theta, xtrain_norm, ctrain, [xbest, x], post);
 
     gaussder_d = -d.*normpdf_d; %derivative of the gaussian
     

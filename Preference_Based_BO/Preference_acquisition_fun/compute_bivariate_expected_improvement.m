@@ -2,7 +2,7 @@ function [BEI, dBEI_dx] = compute_bivariate_expected_improvement(theta, xtrain_n
 
 [D,n]= size(x);
 x0 = model.condition.x0;
-[~, ~, g_sigma2_y,  ~, ~, dmuy_dx] = prediction_bin(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], model, post);
+[~, ~, g_sigma2_y,  ~, ~, dmuy_dx] = model.prediction(theta, xtrain_norm, ctrain, [x;x0*ones(1,n)], post);
 
 dmuy_dx = dmuy_dx(1:D,:);
 
@@ -13,7 +13,7 @@ g_sigma_y = sqrt(g_sigma2_y);
 BEI = NaN(1,n);
 for i = 1:n
     [~, g_mu_y, g_sigma2_y, g_Sigma2_y, ~, ~, ~, dSigma2_y_dx] = ...
-        prediction_bin(theta, xtrain_norm, ctrain, [x_duel1, x(:,i);x0,x0], model, post);
+        model.prediction(theta, xtrain_norm, ctrain, [x_duel1, x(:,i);x0,x0], post);
     
     g_sigma2_y = g_sigma2_y(1);
     max_mu_y = g_mu_y(1);

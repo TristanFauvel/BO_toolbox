@@ -26,10 +26,10 @@ xduels = reshape(x(:,iduels(:)), 2*D, nduels);
 var_muc = zeros(1,nduels);
 dvar_muc_dx = zeros(2*D,nduels);
 for i = 1:nduels
-[~,~,~,~,~,~,~,~, var_muc(i), dvar_muc_dx(:,i)] =  prediction_bin(theta, xtrain_norm, ctrain,xduels(:,i), model, post);
+[~,~,~,~,~,~,~,~, var_muc(i), dvar_muc_dx(:,i)] =  model.prediction(theta, xtrain_norm, ctrain,xduels(:,i), post);
 
 end
-% [~,~,~,~,~,~,~,~, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain_norm, ctrain,xduels, model, post);
+% [~,~,~,~,~,~,~,~, var_muc, dvar_muc_dx] =  model.prediction(theta, xtrain_norm, ctrain,xduels, post);
 
 
 dpref_var_dx = zeros(1,D*model.nsamples); 

@@ -6,7 +6,7 @@ for k =1:model.nsamples %sample g* from p(g*|D)
     loop = 1;
     while loop
         loop = 0;
-        [x_duel1_norm, new] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, post);
+        [x_duel1_norm, new] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, post);
         
         if k == 2  && all(x_duel1 == new)
             loop =1;
@@ -41,7 +41,7 @@ end
 %     new(:,k) = minFuncBC(@(x)deriv(x,sample_g, dsample_g_dx), x_init, lb_norm, ub_norm, options); %bounds constraints.
 % end
 % 
-% [~,  test_value, test_variance, ~] = prediction_bin(theta, xtrain_norm, ctrain, [xtest_norm; x0.*ones(d,size(xtest_norm,2))], model, post);
+% [~,  test_value, test_variance, ~] = model.prediction(theta, xtrain_norm, ctrain, [xtest_norm; x0.*ones(d,size(xtest_norm,2))], post);
 % 
 % if d==1
 %     figure()
@@ -82,7 +82,7 @@ end
 % [p,q] = meshgrid(xrange1,xrange2);
 % x_array = [p(:),q(:)]';
 % 
-% [~,  test_value_array, test_variance_array, ~] = prediction_bin(theta, xtrain_norm, ctrain, [x_array; x0.*ones(1,size(x_array,2))], model, post);
+% [~,  test_value_array, test_variance_array, ~] = model.prediction(theta, xtrain_norm, ctrain, [x_array; x0.*ones(1,size(x_array,2))], post);
 % 
 % 
 % test= zeros(nsamples,size(x_array,2));
@@ -147,11 +147,11 @@ end
 %         catch
 %             y = mvnrnd(mu_y, nearestSPD(Sigma2_y))';
 %         end
-%         [sample_g, dsample_g_dx] = sample_value_GP_precomputed_features(approximation, theta, xtrain_norm, ctrain, model, post);(phi_pref, dphi_pref_dx, xtrain_norm, y, x0);
+%         [sample_g, dsample_g_dx] = sample_value_GP_precomputed_features(approximation, theta, xtrain_norm, ctrain, post);(phi_pref, dphi_pref_dx, xtrain_norm, y, x0);
 %         val(i,:) = sample_g(x);
 % end
 % 
-% [~,  mu_y, sigma2y, Sigma2_y] = prediction_bin(theta, xtrain_norm, ctrain, [x; x0*ones(1,n)], model, post);
+% [~,  mu_y, sigma2y, Sigma2_y] = model.prediction(theta, xtrain_norm, ctrain, [x; x0*ones(1,n)], post);
 % 
 % figure()
 % errorshaded(x, mu_y, sqrt(sigma2y));

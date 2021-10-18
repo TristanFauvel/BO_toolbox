@@ -10,7 +10,7 @@ new_x = new_x_norm.*(model.ub-model.lb) + model.lb;
 end
 
 function [ucb_val, ducb_dx]= UCB(theta, xtrain_norm, ytrain, x, model,e, post)
-[mu_y, sigma2_y,dmu_dx, dsigma2_dx] =  prediction(theta, xtrain_norm, ytrain, x, model, post);
+[mu_y, sigma2_y,dmu_dx, dsigma2_dx] =  prediction(theta, xtrain_norm, ytrain, x, post);
 sigma_y = sqrt(sigma2_y);
 dsigma_y_dx = dsigma2_dx./(2*sigma_y);
 

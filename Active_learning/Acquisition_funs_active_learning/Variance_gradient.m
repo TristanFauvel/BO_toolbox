@@ -16,7 +16,7 @@ init_guess = xbest;
 options.verbose= 1;
 options.method = 'lbfgs';
 
-[mu_c,  ~, ~, ~, dmuc_dx,~,~,~, var_muc, dvar_muc_dx] =  prediction_bin(theta, xtrain_norm, ctrain, x, model, post);
+[mu_c,  ~, ~, ~, dmuc_dx,~,~,~, var_muc, dvar_muc_dx] =  model.prediction(theta, xtrain_norm, ctrain, x, post);
 
 var_muc = -var_muc;
 dvar_muc_dx = -dvar_muc_dx;
@@ -25,8 +25,8 @@ c0 = [ctrain, 0];
 c1 = [ctrain,1];
 
 
-post0 =  prediction_bin(theta, [xtrain_norm,xt], c0, [], model, post);
-post1 =  prediction_bin(theta, [xtrain_norm,xt], c1, [], model, post);
+post0 =  model.prediction(theta, [xtrain_norm,xt], c0, [], post);
+post1 =  model.prediction(theta, [xtrain_norm,xt], c1, [], post);
 
 [xmaxvar1, maxvar1] = multistart_minConf(@(x)to_maximize_var_bin_GP(theta, [xtrain_norm, xt], c1, x, model, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
 [xmaxvar0, maxvar0] = multistart_minConf(@(x)to_maximize_var_bin_GP(theta, [xtrain_norm, xt], c0, x, model, post0), lb_norm, ub_norm, ncandidates, init_guess, options);

@@ -11,6 +11,7 @@ scores = cell(1,nacq);
 final_values = zeros(nacq,nobj, nreps);
 AUCs = zeros(nacq,nobj, nreps);
 
+
 for j = 1:nobj
     %     objective = objectives{j};
     objective = char(objectives(j));
@@ -107,8 +108,13 @@ AUC_ranking =  AUC_ranking(b,b);
 
 
 % objectives with the most significant difference between algos
-[s,a] = sort(sum(borda_scores, 2));
+% [s,a] = sort(sum(borda_scores, 2));
+% signobj = flipud(a(s>0));
+
+% 
+[s,a] = sort(borda_scores(:,1));
 signobj = flipud(a(s>0));
+
 
 %   signobj = sum(borda_scores,2)>0;
 

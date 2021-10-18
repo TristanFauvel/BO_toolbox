@@ -2,7 +2,7 @@ function new_duel = MPES_grid(x, theta, xtrain, ctrain, kernelfun,modeltype, m, 
 
 %(x, theta, xtrain, ctrain, kernelfun, link, xduels,  mu_y_acq, sigma2_y_acq, Sigma2_y_acq, modeltype, C, mu_c_acq)
 %Max-preference entropy search
-[mu_c,  mu_y, sigma2_y, Sigma2_y] = prediction_bin(theta, xtrain, ctrain, xtrain, model, post);
+[mu_c,  mu_y, sigma2_y, Sigma2_y] = model.prediction(theta, xtrain, ctrain, xtrain, post);
 h = @(p) -p.*log(p+eps) - (1-p).*log(1-p+eps); %entropy of a binary variable
 
 nsamples=100;

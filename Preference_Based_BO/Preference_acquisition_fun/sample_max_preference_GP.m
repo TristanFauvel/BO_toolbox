@@ -5,7 +5,7 @@ options.method = 'lbfgs';
 options.verbose = 1;
 ncandidates =model.ncandidates;
 
-[sample_g, dsample_g_dx] = sample_value_GP_precomputed_features(approximation, theta, xtrain_norm, ctrain, model, post);
+[sample_g, dsample_g_dx] = sample_value_GP_precomputed_features(approximation, theta, xtrain_norm, ctrain, post);
 
 init_guess = [];
 new = multistart_minConf(@(x)deriv(x,sample_g, dsample_g_dx), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
