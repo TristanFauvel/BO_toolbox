@@ -10,24 +10,24 @@ rng(9)
 
 update = 'none';
 mean_name = 'constant';
-kernel_name = 'Gaussian';
+kernelname = 'Gaussian';
 
-if strcmp(kernel_name, 'ARD_wnoise')
+if strcmp(kernelname, 'ARD_wnoise')
     %ARD kernel with noise
     ncov_hyp=3;
     kernelfun = @ARD_kernelfun_wnoise;
     theta_true = [1;2;0];
     
-elseif strcmp(kernel_name, 'ARD')
+elseif strcmp(kernelname, 'ARD')
     %ARD kernel
     ncov_hyp=2;
     kernelfun = @ARD_kernelfun;
     theta_true = [1;2];
-elseif strcmp(kernel_name, 'Gaussian')
+elseif strcmp(kernelname, 'Gaussian')
     ncov_hyp=2;
     kernelfun = @Gaussian_kernelfun;
     theta_true = [1;2];
-elseif strcmp(kernel_name, 'Gaussian_wnoise')
+elseif strcmp(kernelname, 'Gaussian_wnoise')
     ncov_hyp=3;
     nmean_hyp=1;
     kernelfun= @Gaussian_kernelfun_wnoise;
@@ -71,7 +71,7 @@ end
 c= othercolor('GnBu7');
 
 x = linspace(0,5,n);
-y = mvnrnd(constant_mean(x,0), kernelfun(theta_truex,x, true, 'nugget')); %generate a function
+y = mvnrnd(constant_mean(x,0), kernelfun(theta_true, x,x, true, 'nugget')); %generate a function
 
 x_test = x;
 y_test = y;
@@ -120,37 +120,38 @@ end
 new_x = x(:,i_tr);
 new_y = y(:,i_tr);
 
-x_tr = [];
-y_tr = [];
+xtrain = [];
+ytrain = [];
 
+regularization = 'nugget';
+hyps.ncov_hyp = numel(theta.cov); % number of hyperparameters for the covariance function
+hyps.nmean_hyp =0; % number of hyperparameters for the mean function
+hyps.hyp_lb = -10*ones(hyps.ncov_hyp  + hyps.nmean_hyp,1);
+hyps.hyp_ub = 10*ones(hyps.ncov_hyp  + hyps.nmean_hyp,1);
+D = 1;
+model = gp_regression_model(D, meanfun, kernelfun, regularization, hyps, lb, ub, kernelname);
 
 for i =1:maxiter
-    x_tr = [x_tr, new_x];
-    y_tr = [y_tr, new_y];
+    xtrain = [xtrain, new_x];
+    ytrain = [ytrain, new_y];
     
     %cum_regret_i  =cum_regret_i + max(y)-new_y;
-    cum_regret_i  =cum_regret_i + max(y)-max(y_tr);
+    cum_regret_i  =cum_regret_i + max(y)-max(ytrain);
     cum_regret(i+1) = cum_regret_i;
     
-    [mu_y, sigma2_y]= prediction(theta, x_tr, y_tr, x_test, kernelfun, meanfun);
+    [mu_y, sigma2_y]= model.prediction(theta, xtrain, ytrain, x_test, []);
     
     
     if i> nopt
         options=[];
-        hyp=[theta.cov; theta.mean];
-
+ 
         %% Multistart optimization of theta
         ncandidates = 10;
-        if strcmp(update, 'mean') || strcmp(update, 'cov') || strcmp(update, 'all')
-            fun = @(hyp)minimize_negloglike(hyp, x_tr, y_tr, kernelfun, meanfun, ncov_hyp, nmean_hyp, update);
-            hyp = multistart_minfunc(fun, lb, ub, ncandidates, options);
-        end
-        %%
-        theta.cov = hyp(1:ncov_hyp);
-        theta.mean = hyp(ncov_hyp+1:ncov_hyp+nmean_hyp);
+
+        theta = model.model_selection(xtrain, ytrain, theta, update);
          
         sigma2_y(sigma2_y<0)=0;
-        bestf = max(y_tr);
+        bestf = max(ytrain);
         EI  = expected_improvement(mu_y, sigma2_y,[], [], bestf, 'max');
         [max_EI, new_i] = max(EI);
         new_x= x(:, new_i);
@@ -173,7 +174,7 @@ for i =1:maxiter
         errorshaded(x, mu_y, sqrt(sigma2_y), 'Color', c(22,:),'DisplayName','Prediction', 'Opacity', 1); hold on;
         plot(x,mu_y,'LineWidth',1.5,'Color', 'k'); hold on;
         plot(x,y,'LineWidth',1.5,'Color', c(end,:)); hold on;
-        scatter(x_tr, y_tr, 'MarkerFaceColor', c(end,:), 'MarkerEdgeColor', 'none'); hold on;
+        scatter(xtrain, ytrain, 'MarkerFaceColor', c(end,:), 'MarkerEdgeColor', 'none'); hold on;
         scatter(new_x, new_y, '*','MarkerFaceColor',c(end,:),  'MarkerEdgeColor', c(end,:), 'LineWidth',1.5) ; hold off;
         xlabel('x','Fontsize',Fontsize)
         ylabel('f(x)','Fontsize',Fontsize)
@@ -205,7 +206,7 @@ for i =1:maxiter
         subplot(2,1,1)
         errorshaded(x, mu_y, sqrt(sigma2_y), 'Color', cmap(1,:),'DisplayName','Prediction', 'Opacity',0.5); hold on
         p1 = plot(x,mu_y,'LineWidth',linewidth, 'Color', cmap(1,:)); hold on;
-        p2 = scatter(x_tr, y_tr,markersize, 'MarkerFaceColor', 'k', 'MarkerEdgeColor', 'none'); hold on;
+        p2 = scatter(xtrain, ytrain,markersize, 'MarkerFaceColor', 'k', 'MarkerEdgeColor', 'none'); hold on;
         p3 = plot(x,y,'LineWidth',linewidth, 'color', cmap(end,:)); hold off;
         set(gca,'XTick',[], 'YTick', [])
         %         xlabel('Encoder parameters','Fontsize',Fontsize)

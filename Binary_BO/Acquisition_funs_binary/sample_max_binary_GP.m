@@ -1,4 +1,4 @@
-function [sample_normalized, sample] = sample_max_binary_GP(approximation, xtrain_norm, ctrain, theta, model, post, s0)
+function [sample_normalized, sample] = sample_max_binary_GP(approximation, xtrain_norm, ctrain, theta, model, post)
  
 options.method = 'lbfgs';
 options.verbose = 1;

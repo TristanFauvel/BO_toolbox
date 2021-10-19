@@ -1,4 +1,4 @@
-function [sample,sample_normalized] = sample_max_GP(approximation, xtrain_norm, ytrain, theta, model)
+function [sample,sample_normalized] = sample_max_GP(theta, xtrain_norm, ytrain, model, post, approximation, optimization)
 
 D = size(xtrain_norm,1);
 phi = approximation.phi;

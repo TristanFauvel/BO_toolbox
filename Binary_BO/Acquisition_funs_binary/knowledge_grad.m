@@ -10,20 +10,19 @@ options.method = 'lbfgs';
 
 post0 =  model.prediction(theta, [xtrain_norm,xt], c0, [], model, []);
 post1 =  model.prediction(theta, [xtrain_norm,xt], c1, [], model, []);
+
+model2 = model;
+model2.ub_norm = ub_norm;
+model2.lb_norm = lb_norm;
+model2.max_muy = xbest;
+
+[xbest1, ybest1] =  model2.maxmean(theta, [xtrain_norm, xt], c1, post1);
+[xbest0, ybest0] =  model2.maxmean(theta, [xtrain_norm, xt], c0, post0);
+
 if strcmp(model.type, 'preference')
-    [xbest1, ybest1] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xt], c1, x, model, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
-    [xbest0, ybest0] = multistart_minConf(@(x)to_maximize_value_function(theta, [xtrain_norm, xt], c0, x, model, post0), lb_norm, ub_norm, ncandidates, init_guess, options);
     xbest1 = [xbest1; model.condition.x0];
     xbest0 = [xbest0; model.condition.x0];
-else
-    init_guess = xbest;
-    [xbest1, ybest1] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c1, x, model, post1), lb_norm, ub_norm, ncandidates, init_guess, options);
-    [xbest0, ybest0] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, [xtrain_norm, xt], c0, x, model, post0), lb_norm, ub_norm, ncandidates, init_guess, options);
-    
 end
-
-ybest1 = - ybest1;
-ybest0 = -ybest0;
 
 U = mu_c.*ybest1 + (1-mu_c).*ybest0 -ybest;
 U = -U;

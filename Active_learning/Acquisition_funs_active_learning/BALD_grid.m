@@ -8,7 +8,7 @@ end
 
 xnorm = (x - model.lb)./(model.ub - model.lb);
 
-L = BALD(theta, xtrain_norm, ctrain, xnorm, post);
+L = BALD(theta, xtrain_norm, ctrain, xnorm, model, post);
 
 idx= find(L==max(L));
 if numel(idx)~=1

@@ -11,7 +11,7 @@ cum_regret=NaN(1, maxiter+1);
 cum_regret(1)=0;
 
  
-y = mvnrnd(zeros(size(y)),model.kernelfun(theta,x,x, true, model.regularization))'; %%%%%%%%%%%%%
+y = mvnrnd(zeros(size(y)),model.kernelfun(theta.cov, x,x, true, model.regularization))'; %%%%%%%%%%%%%
 
 xtrain = NaN(D,maxiter);
 xtrain_norm = NaN(D,maxiter);

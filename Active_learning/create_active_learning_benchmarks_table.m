@@ -27,8 +27,8 @@ fName = categorical(fName);
 Name = categorical(Name);
 benchmarks_table = table(Name, fName, D, ARD, Matern32, Matern52);
 
-Kernel_name = categorical(benchmarks_table.Kernel_name)
-benchmarks_table.Kernel_name  = Kernel_name ;
+kernelname = categorical(benchmarks_table.kernelname)
+benchmarks_table.kernelname  = kernelname ;
 
 Kernel= categorical(benchmarks_table.Kernel)
 benchmarks_table.Kernel  = Kernel ;

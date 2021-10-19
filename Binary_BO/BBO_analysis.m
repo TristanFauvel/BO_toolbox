@@ -1,19 +1,13 @@
 pathname = '/home/tfauvel/Documents/BO_toolbox';
-data_dir =  [pathname,'/Binary_BO/Data_rescaling_with_rescaling_of_the_hyps'];
-% data_dir =  [pathname,'/Binary_BO/Data_rescaling_wo_rescaling_hyps'];
-data_dir =  [pathname,'/Binary_BO/Data'];
-% data_dir =  [pathname,'/Binary_BO/Data_wo_rescaling'];
-
+ data_dir =  [pathname,'/Binary_BO/Data'];
+ 
 figure_folder = [pathname,'/Binary_BO/Figures/'];
 figname =  'PBO_scores_benchmarks';
 
 load('benchmarks_table.mat')
 objectives = benchmarks_table.fName; 
 objectives_names = benchmarks_table.Name; 
-
-% objectives = objectives([11],:);
-% objectives_names = benchmarks_table([11],:).Name; 
-
+ 
 
 nobj =numel(objectives);
 

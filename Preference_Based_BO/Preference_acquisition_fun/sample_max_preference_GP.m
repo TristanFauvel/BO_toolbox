@@ -3,7 +3,7 @@ function [sample_normalized, sample] = sample_max_preference_GP(approximation, x
  
 options.method = 'lbfgs';
 options.verbose = 1;
-ncandidates =model.ncandidates;
+ncandidates = 10;
 
 [sample_g, dsample_g_dx] = sample_value_GP_precomputed_features(approximation, theta, xtrain_norm, ctrain, post);
 

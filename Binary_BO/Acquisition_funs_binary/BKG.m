@@ -6,8 +6,7 @@ init_guess = [];
 options.method = 'lbfgs';
 options.verbose = 1;
 ncandidates = 5;
-[xbest, ybest] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm,  model.ub_norm, ncandidates, init_guess, options);
-ybest = -ybest;
+[xbest, ybest] =  model.maxmean(theta, xtrain_norm, ctrain, post);
 
 c0 = [ctrain(:)', 0];
 c1 = [ctrain(:)',1];

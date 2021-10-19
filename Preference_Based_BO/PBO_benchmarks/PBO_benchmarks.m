@@ -82,21 +82,4 @@ for j = 1:nobj
         end
     end
 end
-% cmap = gray(256);
-% colo= othercolor('GnBu7');
-% colo = jet;
-% Fontsize = 14;
-% fig=figure(5);
-% fig.Name = 'Estimated maximum';
-% fig.Color =  [1 1 1];
-% for i = 1:nacq_func
-%     errorshaded(1:maxiter,toplot(i,:), std_g(i,:), 'Color',  colo(floor(64*i/nacq_func),:),'LineWidth', 1.5, 'Fontsize', 14); hold on
-% end
-% hold off;
-% xlabel('Iteration','Fontsize',Fontsize)
-% ylabel('g(x_c)', 'Fontsize',Fontsize)
-% box off;
-%
-% %%
-% figure()
-% plot(squeeze(mean(experiment.results,2))')
+ 

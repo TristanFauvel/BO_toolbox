@@ -12,3 +12,4 @@ mu_c =  model.prediction(theta, xtrain_norm, ctrain, xt, post);
 U = mu_c.*ybest1 + (1-mu_c).*ybest0 -ybest;
 
 end
+

@@ -1,19 +1,14 @@
 function [new_x, new_x_norm, L] = bivariate_EI_binary(theta, xtrain_norm, ctrain,model, post, ~)
 % Inspired by Bivariate Expected Improvement, as proposed by Nielsen (2015)
-
 % note that this function works in the latent space
-options.method = 'lbfgs';
-options.verbose = 1;
-
-ncandidates= 5;
-init_guess = [];
+ 
+%% Find the maximum of the latent function
+[xbest, ybest] =  model.maxmean(theta, xtrain_norm, ctrain, post);
 
 init_guess = [];
 options.method = 'lbfgs';
 options.verbose = 1;
 ncandidates = 5;
-%% Find the maximum of the latent function
-[xbest, ybest] = multistart_minConf(@(x)to_maximize_mean_bin_GP(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm,  model.ub_norm, ncandidates, init_guess, options);
 
 [new_x_norm,L] = multistart_minConf(@(x)compute_bivariate_expected_improvement(theta, xtrain_norm, x, ctrain, model, xbest, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
  new_x = new_x_norm.*(model.ub-model.lb) + model.lb;
