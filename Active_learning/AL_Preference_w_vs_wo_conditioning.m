@@ -67,7 +67,7 @@ end
 % Fontsize = 14;
 % fig=figure(5);
 % fig.Name = 'Estimated maximum';
-% fig.Color =  [1 1 1];
+% fig.Color =  background_color;
 % for i = 1:nacq_func
 %     errorshaded(1:maxiter,toplot(i,:), std_g(i,:), 'Color',  colo(floor(64*i/nacq_func),:),'LineWidth', 1.5, 'Fontsize', 14); hold on
 % end

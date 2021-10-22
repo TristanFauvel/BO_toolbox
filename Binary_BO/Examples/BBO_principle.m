@@ -60,7 +60,7 @@ mr = 2;
 mc = 3;
 
 fig=figure('units','centimeters','outerposition',1+[0 0 16 height(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 
 i = 0;
 tiledlayout(mr,mc, 'TileSpacing' , 'tight', 'Padding', 'tight')

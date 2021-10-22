@@ -71,7 +71,7 @@ legend_pos = [-0.1,1];
 i=0;
 graphics_style_paper;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth(mc) fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 tiledlayout(mr, mc, 'TileSpacing', 'compact', 'padding','compact');
 nexttile()
 mat = flipud(Best_ranking);

@@ -117,7 +117,7 @@ model2.modeltype = 'laplace';
 % mr = 1;
 % mc = 2;
 % fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(1)]);
-% fig.Color =  [1 1 1];
+% fig.Color =  background_color;
 % layout1 = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
 % i = 0;
 % Xlim = [0,1];
@@ -224,7 +224,7 @@ end
 mr = 1;
 mc = 2;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(1)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 layout1 = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
 i = 0;
 Xlim = [0,1];

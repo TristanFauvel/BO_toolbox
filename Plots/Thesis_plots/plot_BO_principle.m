@@ -123,7 +123,7 @@ max_TS = max(sample);
 mr = 2;
 mc = 3;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(1)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 layout1 = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
 i = 0;
 

@@ -129,7 +129,7 @@ i=0;
 mr = 2;
 mc = 3;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(1)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 colororder(fig, C)
 layout1 = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
 nexttile(layout1, 1, [1,2]);

@@ -45,7 +45,7 @@ new_duel = [x_duel1;x_duel2];
 %     mr = 2;
 %     mc = 3;
 %     fig=figure('units','centimeters','outerposition',1+[0 0 16 0.6*fheight(mr)]);
-%     fig.Color =  [1 1 1];
+%     fig.Color =  background_color;
 %     i = 0;
 %     tiledlayout(mr,mc, 'TileSpacing' , 'tight', 'Padding', 'tight')
 %

@@ -90,7 +90,7 @@ legend_pos = [0.02,1.0];
 letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 layout = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','tight');
 i = 0;
 yl = [-3,3]; %[-2.5,2.5]

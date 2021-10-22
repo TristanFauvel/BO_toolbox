@@ -92,7 +92,7 @@ end
 W = Wasserstein2(mu_f, Sigma2_f, fx);
 
 fig=figure('units','centimeters','outerposition',1+[0 0 16 1.3/2*16]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 subplot(2,1,1)
 errorshaded(x,mu_c, sqrt(var_muc), 'Color',  cmap(11,:),'LineWidth', linewidth, 'Fontsize', Fontsize); hold on
 box off;
@@ -101,7 +101,7 @@ errorshaded(x,mean(link(fx),1), std(link(fx),1), 'Color',  cmap(11,:),'LineWidth
 box off;
 
 fig=figure('units','centimeters','outerposition',1+[0 0 16 1.3/2*16]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 subplot(2,1,1)
 plot(x,mu_c,'LineWidth', linewidth); hold on
 plot(x, mean(link(fx),1),'LineWidth', linewidth); hold off
@@ -118,7 +118,7 @@ legend_pos = [-0.18,1.0];
 letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 layout = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
 i = 0;
 

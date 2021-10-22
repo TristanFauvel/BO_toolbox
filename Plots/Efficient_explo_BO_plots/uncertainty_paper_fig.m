@@ -85,7 +85,7 @@ mr = 2;
 mc = 3;
 fwidth = 8.255
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth 0.6*fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
  
 maxI = max([var_muc, aleatoric_unvar, aleatoric_unvar+var_muc]);

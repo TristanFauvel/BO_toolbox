@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="66d981be-31b6-4d10-846d-d25ca194d069" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1c1pYh4jTG5JxHUadPBC4u6Jzip" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../P2P_latest" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="66d981be-31b6-4d10-846d-d25ca194d069" name="Default Changelist" comment="" />
+      <created>1589706002651</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1589706002651</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="646" y="355" width="618" height="403" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1590147274322">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="646" y="355" width="618" height="403" key="#com.intellij.fileTypes.FileTypeChooser/0.27.1920.1053/1920.0.1680.1050@0.27.1920.1053" timestamp="1590147274322" />
+    <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl" timestamp="1590147338899">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053/1920.0.1680.1050@0.27.1920.1053" timestamp="1590147338899" />
+  </component>
+</project>

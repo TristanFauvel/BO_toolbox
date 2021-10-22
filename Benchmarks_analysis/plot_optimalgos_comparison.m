@@ -36,7 +36,7 @@ else
 end
 mc = 1
 
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 tiledlayout(mr, mc, 'TileSpacing', 'tight', 'padding','compact');
 options.handle = fig;
 options.alpha = 0.2;

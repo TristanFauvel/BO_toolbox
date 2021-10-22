@@ -1,3 +1,5 @@
-pathname = '/home/tfauvel/Documents/BO_toolbox';
+currentFile = mfilename( 'fullpath' );
+[pathname,~,~] = fileparts( currentFile );
 addpath(genpath(pathname))
-addpath(genpath('/home/tfauvel/Documents/GP_toolbox'))
+
+addpath(genpath([fileparts(pathname), '/GP_toolbox']))

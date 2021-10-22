@@ -40,7 +40,7 @@ end
 % Fontsize=14;
 % fig=figure();
 % fig.Name = 'Acquisition function';
-% fig.Color =  [1 1 1];
+% fig.Color =  background_color;
 % imagesc(x,x,mu_y-mu_y'); hold on;
 % xlabel('x1','Fontsize',Fontsize)
 % ylabel('x2', 'Fontsize',Fontsize)
@@ -52,6 +52,6 @@ end
 % [mu_c_acq,  mu_y_acq, sigma2_y_acq] = model.prediction(theta, xtrain, ctrain, [x; 0.5*ones(size(x))], kernelfun, base_name, modeltype, post, regularization);
 % Fontsize=14;
 % fig=figure();
-% fig.Color =  [1 1 1];
+% fig.Color =  background_color;
 % errorshaded(x, mu_y_acq, sqrt(sigma2_y_acq)); hold on;
 % scatter(PFx(:), zeros(2*200,1), 30,'k','filled'); hold off

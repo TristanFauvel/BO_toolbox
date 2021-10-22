@@ -118,7 +118,7 @@ mr =2;
 mc = 3;
 
 fig=figure('units','centimeters','outerposition',1+[0 0 16 fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 legend_pos = [-0.2,1.15];
 
 i = 0;

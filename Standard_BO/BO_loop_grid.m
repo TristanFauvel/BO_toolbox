@@ -1,4 +1,4 @@
-function [x_tr, y_tr, cum_regret]= BO_loop_grid(n,maxiter, nopt, model, theta, x, y, acquisition, ninit)
+function [xtrain, ytrain, cum_regret]= BO_loop_grid(n,maxiter, nopt, model, theta, x, y, acquisition, ninit)
 
 idx= randsample(n,maxiter); % for random sampling
 
@@ -11,8 +11,8 @@ end
 new_x = x(:,i_tr);
 new_y = y(:,i_tr);
 
-x_tr = [];
-y_tr = [];
+xtrain = [];
+ytrain = [];
 
 cum_regret_i =0;
 cum_regret=NaN(1, maxiter+1);
@@ -21,39 +21,28 @@ cum_regret(1)=0;
 if strcmp(acquisition, 'random')
     nopt= maxiter +1;
 end
-options_theta.method = 'lbfgs';
-options_theta.verbose = 1;
-ncov_hyp = numel(theta.cov);
-nmean_hyp = numel(theta.mean);
 
-hyp_lb = -8*ones(ncov_hyp  + nmean_hyp ,1);
-hyp_lb(end) = 0;
-hyp_ub = 10*ones(ncov_hyp  + nmean_hyp ,1);
-hyp_ub(end) = 0;
-regularization = 'nugget';
+update = 'cov';
+
 for i =1:maxiter
-    x_tr = [x_tr, new_x];
-    y_tr = [y_tr, new_y];
-    cum_regret_i  =cum_regret_i + max(y)-max(y_tr);
+    xtrain = [xtrain, new_x];
+    ytrain = [ytrain, new_y];
+    cum_regret_i  =cum_regret_i + max(y)-max(ytrain);
     cum_regret(i+1) = cum_regret_i;
 
-   
-    [mu_y, sigma2_y, ~, ~, Sigma2_y]= model.prediction(theta, x_tr, y_tr, x, []);
-    
+
+    [mu_y, sigma2_y, ~, ~, Sigma2_y]= model.prediction(theta, xtrain, ytrain, x, []);
+
     if i > ninit
-        update = 'cov';       
-        init_guess = [theta.cov; theta.mean];
-        hyp = multistart_minConf(@(hyp)minimize_negloglike(hyp, x_tr, y_tr, kernelfun, meanfun, ncov_hyp, nmean_hyp, update), hyp_lb, hyp_ub,10, init_guess, options_theta); 
-        theta.cov = hyp(1:ncov_hyp);
-        theta.mean = hyp(ncov_hyp+1:ncov_hyp+nmean_hyp);
+        theta = model.model_selection(xtrain, ytrain, theta, update);
     end
-    if i> nopt              
+    if i> nopt
         sigma2_y(sigma2_y<0)=0;
-        bestf = max(y_tr);
-        
+        bestf = max(ytrain);
+
         if strcmp(acquisition, 'EI')
-        EI  = expected_improvement(mu_y, sigma2_y,[], [], bestf, 'max');
-        [max_EI, new_i] = max(EI);
+            EI  = expected_improvement(mu_y, sigma2_y,[], [], bestf, 'max');
+            [max_EI, new_i] = max(EI);
         elseif strcmp(acquisition, 'TS')
             sample = mvnrnd(mu_y,Sigma2_y);
             [~, new_i] = max(sample);
@@ -65,8 +54,7 @@ for i =1:maxiter
     else
         i_tr= idx(i); %random sampling
         new_x = x(:,i_tr);
-        new_y = y(:,i_tr); % no noise %%%%%%%%%%%%%%%%%%%       
-        
+        new_y = y(:,i_tr); % no noise %%%%%%%%%%%%%%%%%%%
     end
 end
 

@@ -85,7 +85,7 @@ nyticks =5;
 mr = 2;
 mc = 4;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth 0.8*fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 tiledlayout(mr,mc, 'TileSpacing' , 'tight', 'Padding', 'tight')
 i = 1;
 nexttile(i)
@@ -223,7 +223,7 @@ mc = 1;
 legend_pos = [-0.18,1];
 
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(1)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 options.handle = fig;
 options.alpha = 0.2;
 options.error= 'sem';
@@ -265,7 +265,7 @@ saveas(fig, [folder,'/' , figname,'.png']);
 mr = 1;
 mc = 2;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 
 tiledlayout(mr,mc, 'TileSpacing' , 'tight', 'Padding', 'tight')
 plot(x, mu_c_x0,'color', C(2,:), 'linewidth', linewidth); hold on;
@@ -285,7 +285,7 @@ box off
 % mr = 3;
 % mc = 2;
 % fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
-% fig.Color =  [1 1 1];
+% fig.Color =  background_color;
 % tiledlayout(mr,mc, 'TileSpacing' , 'tight', 'Padding', 'tight')
 % nexttile()
 % ax1 = imagesc(x, x, reshape(mu_c, n,n)); hold on;
@@ -454,7 +454,7 @@ scores{2} = cell2mat(score_w');
 legends = {'Without conditionning', 'With conditionning'};
 
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 tiledlayout(mr, mc, 'TileSpacing', 'tight', 'padding','compact');
 options.handle = fig;
 options.alpha = 0.2;

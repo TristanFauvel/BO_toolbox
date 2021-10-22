@@ -70,7 +70,7 @@ legend_pos = [-0.18,1];
 mr = 1;
 mc = 3;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 layout = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
 
 i = 0;
@@ -152,7 +152,7 @@ mr = 3;
 mc = 3;
 i = 0;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 tiledlayout(mr,mc, 'TileSpacing' , 'tight', 'Padding', 'tight')
 nexttile()
 i=i+1;
@@ -269,7 +269,7 @@ i=0;
 mr = 2;
 mc = 3;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth 0.7*fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
 % nexttile();
 % i=i+1;
@@ -395,7 +395,7 @@ exportgraphics(fig, [folder,'/' , figname, '.png'], 'Resolution', 300);
 mr = 1;
 mc = 3;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 tiledlayout(1,mc, 'TileSpacing', 'tight', 'padding','compact');
 nexttile();
 imagesc(mu_y_range, sigma2_y_range, reshape(mu_c,N,N)); hold on;
@@ -444,7 +444,7 @@ set(get(cb,'Title'),'String','(nats)', 'Interpreter', 'latex')
 mr = 1;
 mc = 3;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 tiledlayout(1,mc, 'TileSpacing', 'tight', 'padding','compact');
 nexttile();
 imagesc(mu_y_range, sigma2_y_range, reshape(mu_c,N,N)); hold on;

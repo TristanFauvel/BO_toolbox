@@ -61,7 +61,9 @@ hyps.hyp_ub = 10*ones(hyps.ncov_hyp  + hyps.nmean_hyp,1);
 lb = 0;
 ub = 1;
 
-model = gp_classification_model(D, meanfun, kernelfun, regularization, hyps, lb,ub, type, link, modeltype);
+condition.x0 = x0;
+condition.y0 = 0;
+model = gp_classification_model(D, meanfun, kernelfun, regularization, hyps, lb,ub, type, link, modeltype, base_kernelname, condition);
 
       
 [mu_c_cond,  mu_f_cond, sigma2_f_cond] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), x2d, post);
@@ -77,7 +79,7 @@ mr = 2;
 mc = 2;
 i = 0;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth 1.1*fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 
 
 tiledlayout(mr,mc, 'TileSpacing' , 'tight', 'Padding', 'tight')

@@ -3,8 +3,7 @@ classdef optimization
         task % Type of task
         maxiter % Number of iterations
         nopt % 
-        ninit %Number of time steps before starting learning hyperparameters
-         
+        ninit %Number of time steps before starting learning hyperparameters         
         update_period
         identification
         hyps_update
@@ -20,13 +19,14 @@ classdef optimization
             optim.ninit = ninit;
             optim.ns = ns;
             optim.nopt = nopt;
+            optim.update_period = update_period;
+            optim.hyps_update = hyps_update;
         end
         
         function [xtrain, ctrain, score, xbest,theta_evo] = BOloop(optim, seed, theta, g, model)
             xtrain = [];
             xtrain_norm = [];
             ctrain = [];
-            xbounds = [model.lb(:), model.ub(:)];
             rng(seed)
             new_x_norm = rand_interval(model.lb_norm,model.ub_norm);
             new_x = new_x_norm.*(model.ub - model.lb)+model.lb;

@@ -11,8 +11,9 @@ letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 link = @normcdf; %inverse link function
 
 n = 1000;
-x = linspace(0,1, n);
-d =1;
+lb = 0; ub = 1;
+x = linspace(lb, ub, n);
+D =1;
 ntr = 100;
 
 x0 = x(:,1);
@@ -25,20 +26,24 @@ link = @normcdf; %inverse link function for the classification model
 model.regularization = 'nugget';
 model.kernelfun = kernelfun;
 
-model.link = link;
-model.modeltype = modeltype;
-model.kernelname = kernelname;
-model.lb_norm  = 0;
-model.ub_norm  = 1;
-model.lb = 0;
-model.ub = 1;
-model.ns = 0;
-model.task = 'max';
+
 post = [];
-model.D = 1;
-regularization = 'none';
 theta.cov= [-1;1];
-g = 4*mvnrnd(zeros(1,n),kernelfun(theta, x, x, 'false', regularization));
+
+condition = [];
+
+meanfun = @contant_mean;
+regularization = 'nugget';
+type = 'regression';
+hyps.ncov_hyp =2; % number of hyperparameters for the covariance function
+hyps.nmean_hyp =1; % number of hyperparameters for the mean function
+hyps.hyp_lb = -10*ones(hyps.ncov_hyp  + hyps.nmean_hyp,1);
+hyps.hyp_ub = 10*ones(hyps.ncov_hyp  + hyps.nmean_hyp,1);
+model = gp_classification_model(D, meanfun, kernelfun, ...
+regularization, hyps, lb, ub,type, link, modeltype, kernelname, condition);
+ 
+
+g = 4*mvnrnd(zeros(1,n),kernelfun(theta.cov, x, x, 'false', regularization));
 
 if strcmp(model.kernelname, 'Matern52') || strcmp(model.kernelname, 'Matern32') || strcmp(model.kernelname, 'ARD')
     approximation.method = 'RRGP';
@@ -68,6 +73,7 @@ post = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), [], post);
 [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx, dmuy_dx, dsigma2y_dx, dSigma2y_dx, ...
     var_muc] = model.prediction(theta, xtrain(:,1:ntr), ctrain(1:ntr), x, post);
 
+ 
 sample_g = sample_GP(theta, x, g(:), model, approximation);
 legend_pos = [-0.15,1];
 Y = normcdf(mvnrnd(mu_y,Sigma2_y,5000));
@@ -85,7 +91,7 @@ Y = normcdf(mvnrnd(mu_y,Sigma2_y,5000));
 mr = 2;
 mc = 2;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 layout1 = tiledlayout(mr,mc, 'TileSpacing', 'compact', 'padding','compact');
 i = 0;
 Xlim = [0,1];
@@ -211,7 +217,7 @@ ucb_Phi = mu_c + e*sigma_c;
 mr = 1;
 mc = 4;
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 tiledlayout(1,mc, 'TileSpacing', 'compact', 'padding','compact');
 nexttile(1);
 y_best = 0;

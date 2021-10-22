@@ -80,7 +80,7 @@ mr = 1;
 mc = 3;
 x0 = [x; zeros(D-1,n)];
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 layout1 = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','compact');
 nexttile()
 plot(x, g(x0), 'color', C(1,:), 'linewidth', linewidth); hold on;

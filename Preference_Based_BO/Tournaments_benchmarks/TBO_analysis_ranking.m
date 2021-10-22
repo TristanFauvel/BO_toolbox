@@ -27,7 +27,7 @@ graphics_style_paper;
 mr = 4;
 mc = 2;
 fig=figure('units','centimeters','outerposition',1+[0 0 width height(mr)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 tiledlayout(mr, mc, 'TileSpacing', 'tight', 'padding','compact');
 options.handle = fig;
 options.alpha = 0; %0.2;

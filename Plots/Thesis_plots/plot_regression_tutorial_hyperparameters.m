@@ -69,7 +69,7 @@ mc = 3;
 legend_pos = [-0.18,1];
 
 fig=figure('units','centimeters','outerposition',1+[0 0 fwidth fheight(1)]);
-fig.Color =  [1 1 1];
+fig.Color =  background_color;
 layout = tiledlayout(mr,mc, 'TileSpacing', 'tight', 'padding','tight');
 i = 0;
 
