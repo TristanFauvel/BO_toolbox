@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2, new_duel] = Brochu_EI(theta, xtrain_norm, ctrain, model, post, approximation)
+function  [new_x, new_x_norm] = Brochu_EI(theta, xtrain_norm, ctrain, model, post, approximation)
 % Expected Improvement, as proposed by Brochu (2010)
 
 D = size(xtrain_norm,1)/2;
@@ -13,19 +13,17 @@ condition = model.condition;
 x = [xtrain_norm(1:D,:), xtrain_norm((D+1):end,:)];
 [g_mu_c,  g_mu_y] = model.prediction(theta, xtrain_norm, ctrain, [x;condition.x0*ones(1,2*n)], post);
 [max_mu_y,b]= max(g_mu_y);
-x_duel1 = x(:,b);
+x_duel1_norm = x(:,b);
 
 
 % x_duel2 = minFuncBC(@(x)expected_improvement_for_classification(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun,kernelname, x0, modeltype), x_init, lb_norm, ub_norm, options);
 % x_duel2 = multistart_minfuncBC(@(x)expected_improvement_for_classification(theta, xtrain_norm, x, ctrain, lb_norm, ub_norm, kernelfun,kernelname, x0, x_best, modeltype), lb_norm, ub_norm, ncandidates, options);
 
-init_guess = x_duel1;
-x_duel2 = multistart_minConf(@(x)expected_improvement_preference(theta, xtrain_norm, x, ctrain, max_mu_y, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+init_guess = x_duel1_norm;
+x_duel2_norm = multistart_minConf(@(x)expected_improvement_preference(theta, xtrain_norm, x, ctrain, max_mu_y, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
 
-x_duel1 = x_duel1.*(model.max_x(1:D)-model.min_x(1:D)) + model.min_x(1:D);
-x_duel2 = x_duel2.*(model.max_x(D+1:2*D)-model.min_x(D+1:2*D)) + model.min_x(D+1:2*D);
-
-new_duel = [x_duel1;x_duel2];
+new_x_norm = [x_duel1_norm;x_duel2_norm];
+new_x = new_x_norm.*([model.ub;model.ub] - [model.lb; model.lb])+[model.lb; model.lb];
 
 % if isequal(x_duel1, x_duel2)
 %     error('x_duel1 is the same as x_duel2')

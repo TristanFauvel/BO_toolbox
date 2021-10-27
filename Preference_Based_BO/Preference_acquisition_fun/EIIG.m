@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2, new_duel] = EIIG(theta, xtrain_norm, ctrain, model, post, approximation)
+function  [new_x, new_x_norm] = EIIG(theta, xtrain_norm, ctrain, model, post, approximation)
 % EIIG, (Benavoli 2020)
 
 D = size(xtrain_norm,1)/2;
@@ -6,23 +6,20 @@ n = size(xtrain_norm,2);
 %% Find the maximum of the value function
 options.method = 'lbfgs';
 
-ncandidates =model.ncandidates;
+ncandidates = 10;
 
 init_guess = [];
-
-if ~isnan(post.x_best_norm)
-    xduel1_norm = post.x_best_norm;
+if ~isnan(model.xbest_norm)
+    x_duel1_norm = model.xbest_norm;
 else
-    xduel1_norm = multistart_minConf(@(x)to_maximize_value_function(theta, xtrain_norm, ctrain, x, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+    x_duel1_norm =  model.maxmean(theta, xtrain_norm, ctrain, post);
 end
 
+x_duel2_norm = multistart_minConf(@(x)eiig(theta, xtrain_norm, x, ctrain, model, x_duel1_norm, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
 
-xduel2_norm = multistart_minConf(@(x)eiig(theta, xtrain_norm, x, ctrain, model, xduel1_norm, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
 
-x_duel1 = xduel1_norm.*(model.max_x(1:D)-model.min_x(1:D)) + model.min_x(1:D);
-x_duel2 = xduel2_norm.*(model.max_x(D+1:2*D)-model.min_x(D+1:2*D)) + model.min_x(D+1:2*D);
-
-new_duel = [x_duel1;x_duel2];
+new_x_norm = [x_duel1_norm;x_duel2_norm];
+new_x = new_x_norm.*([model.ub;model.ub] - [model.lb; model.lb])+[model.lb; model.lb];
 
 end
 

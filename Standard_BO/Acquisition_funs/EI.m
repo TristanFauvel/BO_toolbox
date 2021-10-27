@@ -1,4 +1,4 @@
-function [new_x, new_x_norm] = EI(theta, xtrain_norm, ytrain, model, post, approximation, optimization)
+function [new_x, new_x_norm] = EI(theta, xtrain_norm, ytrain, model, post, approximation)
 options.method = 'lbfgs';
 mu_y =  model.prediction(theta, xtrain_norm, ytrain, xtrain_norm, post);
 y_best = max(mu_y);

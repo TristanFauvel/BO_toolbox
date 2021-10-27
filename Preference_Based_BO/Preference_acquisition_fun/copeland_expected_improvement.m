@@ -1,4 +1,4 @@
-function [x_duel1, x_duel2, new_duel]= copeland_expected_improvement(theta, xtrain_norm, ctrain, model, post, ~)
+function  [new_x, new_x_norm] = copeland_expected_improvement(theta, xtrain_norm, ctrain, model, post, ~)
 
 d = size(xtrain_norm, 1)/2;
 
@@ -43,7 +43,6 @@ new_id= find(CEI==max(CEI));
 if numel(new_id)~=1
     new_id = randsample(new_id,1);    
 end
-new_duel= xduels(:,new_id);
-new_duel = new_duel.*(max_x -min_x) + min_x;
-x_duel1 = new_duel(1:d,:);
-x_duel2 = new_duel(d+1:end,:);
+new_x_norm= xduels(:,new_id); 
+new_x = new_x_norm.*([model.ub;model.ub] - [model.lb; model.lb])+[model.lb; model.lb];
+

@@ -1,4 +1,5 @@
-function [new_x, new_x_norm, L] = bivariate_EI_binary(theta, xtrain_norm, ctrain,model, post, ~)
+function [new_x, new_x_norm, L] = bivariate_EI_binary(theta, xtrain_norm, ctrain,model, post, approximation)
+
 % Inspired by Bivariate Expected Improvement, as proposed by Nielsen (2015)
 % note that this function works in the latent space
  

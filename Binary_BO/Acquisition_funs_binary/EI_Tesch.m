@@ -1,4 +1,4 @@
-function [new_x, new_x_norm] = EI_Tesch(theta, xtrain_norm, ctrain,model, post, ~)
+function [new_x, new_x_norm] = EI_Tesch(theta, xtrain_norm, ctrain,model, post, approximation, optimization)
 %Expected improvement criterion by Tesch et al 2013
 if ~strcmp(func2str(model.link), 'normcdf')
     error('Function only implemented for a normcdf link')

@@ -57,7 +57,7 @@ end
 new_x = x(:,i_tr);
 new_y = y(:,i_tr);
 
-x_tr = [];
+xtrain = [];
 y_tr = [];
 
 
@@ -70,11 +70,11 @@ D = 1;
 model = gp_regression_model(D, meanfun, kernelfun, regularization, hyps, lb, ub, kernelname);
 
  for i =1:2
-    x_tr = [x_tr, new_x];
+    xtrain = [xtrain, new_x];
     y_tr = [y_tr, new_y];
     
     
-    [mu_y, sigma2_y, ~, ~, Sigma2_y]= model.prediction(theta, x_tr, y_tr, x, []);
+    [mu_y, sigma2_y, ~, ~, Sigma2_y]= model.prediction(theta, xtrain, y_tr, x, []);
     
     
     if i> nopt
@@ -133,8 +133,8 @@ i=i+1;
 % errorshaded(x,mu_y, sqrt(sigma2_y), 'Color',  C(1,:),'LineWidth', linewidth, 'Fontsize', Fontsize); hold on
 h1 = plot_gp(x,mu_y, sigma2_y, C(1,:), linewidth); hold on
 h2 = plot(x, y, 'Color',  C(2,:),'LineWidth', linewidth); hold on;
-h3 = plot(x_tr, y_tr, 'ro', 'MarkerSize', 10, 'color', C(2,:)); hold on;
-h4 = scatter(x_tr, y_tr, markersize, C(2,:), 'filled'); hold on;
+h3 = plot(xtrain, y_tr, 'ro', 'MarkerSize', 10, 'color', C(2,:)); hold on;
+h4 = scatter(xtrain, y_tr, markersize, C(2,:), 'filled'); hold on;
 % xlabel('$x$')
 ylabel('$f(x)$')
 set(gca, 'Fontsize', Fontsize, 'Xlim', Xlim); %,  'Ylim',Ylim)

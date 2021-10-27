@@ -28,7 +28,7 @@ y = mvnrnd(mu_y_ard, Kard);
 D = 1;
 ntr = 2;
 i_tr= randsample(n,ntr);
- x_tr = x(:,i_tr);
+ xtrain = x(:,i_tr);
 y_tr = y(:, i_tr);
 
 sample_prior = mvnrnd(mu_y_ard, Kard);
@@ -40,12 +40,12 @@ hyps.hyp_lb = -10*ones(hyps.ncov_hyp  + hyps.nmean_hyp,1);
 hyps.hyp_ub = 10*ones(hyps.ncov_hyp  + hyps.nmean_hyp,1);
 model = gp_regression_model(D, meanfun, kernelfun, regularization, hyps, lb, ub, kernelname);
 
-[mu_y, sigma2_y,dmu_dx, sigma2_dx, Sigma2_y, dSigma2_dx, post] = model.prediction(theta, x_tr, y_tr, x, []);
+[mu_y, sigma2_y,dmu_dx, sigma2_dx, Sigma2_y, dSigma2_dx, post] = model.prediction(theta, xtrain, y_tr, x, []);
 sample_post = mvnrnd(mu_y, Sigma2_y);
 
 theta_w = theta;
 theta_w.cov = [4,3];
-[mu_y_w, sigma2_y_w,~,~, Sigma2_y_w] = model.prediction(theta_w, x_tr, y_tr, x, []);
+[mu_y_w, sigma2_y_w,~,~, Sigma2_y_w] = model.prediction(theta_w, xtrain, y_tr, x, []);
 sample_post_w = mvnrnd(mu_y, Sigma2_y);
 
 %%
@@ -77,8 +77,8 @@ fig.Color =  background_color;
 h1 = plot_gp(x,mu_y, sigma2_y, C(1,:),linewidth, 'background', background);
 h2 = plot(x, y, 'Color',  C(2,:),'LineWidth', linewidth); hold on;
 % errorshaded(x,mu_y, sqrt(sigma2_y), 'Color',  C(1,:),'LineWidth', linewidth, 'Fontsize', Fontsize); hold on
-h3 = plot(x_tr, y_tr, 'ro', 'MarkerSize', 10, 'color', C(2,:)); hold on;
-scatter(x_tr, y_tr, 2*markersize, C(2,:), 'filled'); hold on;
+h3 = plot(xtrain, y_tr, 'ro', 'MarkerSize', 10, 'color', C(2,:)); hold on;
+scatter(xtrain, y_tr, 2*markersize, C(2,:), 'filled'); hold on;
 plot(x, sample_post, 'Color',  k,'LineWidth', linewidth/2); hold off;
 ylabel('$f(x)$')
 box off

@@ -1,11 +1,5 @@
-function [new_x,new_x_norm] = UCB_binary_latent(theta, xtrain_norm, ctrain, model, post, approximation, varargin)
-opts = namevaluepairtostruct(struct( ...
-    'task', 'max',...
-    'e', 1 ...
-    ), varargin);
-UNPACK_STRUCT(opts, false)
-
-
+function [new_x,new_x_norm] = UCB_binary_latent(theta, xtrain_norm, ctrain,model, post, approximation)
+e = 1;
 options.method = 'lbfgs';
 
 ncandidates= 10;

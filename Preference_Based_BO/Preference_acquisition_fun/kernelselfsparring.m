@@ -1,33 +1,36 @@
-function [x_duel1, x_duel2, new_duel] = kernelselfsparring(theta, xtrain_norm, ctrain, model, post, approximation)
-
-
-  
-for k =1:model.nsamples %sample g* from p(g*|D)
+function  [new_x, new_x_norm] = kernelselfsparring(theta, xtrain_norm, ctrain, model, post, approximation)
+nsamples = 2;
+for k =1:nsamples %sample g* from p(g*|D)
     loop = 1;
     while loop
         loop = 0;
-        [x_duel1_norm, new] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, post);
-        
+        [new_norm, new] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, post);
+
         if k == 2  && all(x_duel1 == new)
             loop =1;
         end
     end
     if k==1
         x_duel1 = new;
+        x_duel1_norm = new_norm;
     elseif k ==2
         x_duel2 = new;
+        x_duel2_norm = new_norm;
+
     end
 end
-new_duel= [x_duel1; x_duel2];
+new_x= [x_duel1; x_duel2];
+new_x_norm = [x_duel1_norm;x_duel2_norm];
+
 end
 
-% 
-% 
+%
+%
 % %% Analysis of the function in the case where nd = 2
 % nsamples = 100;
-% 
+%
 % %% On training data
-% 
+%
 % xtest_norm = [xtrain_norm(1:d,:), xtrain_norm(d+1:end,:)];
 % xtest_norm = sort(xtest_norm);
 % % xtest = [xtest; x0.*ones(1,size(xtest,2))];
@@ -40,9 +43,9 @@ end
 %     x_init =  rand_interval(lb_norm,ub_norm);
 %     new(:,k) = minFuncBC(@(x)deriv(x,sample_g, dsample_g_dx), x_init, lb_norm, ub_norm, options); %bounds constraints.
 % end
-% 
+%
 % [~,  test_value, test_variance, ~] = model.prediction(theta, xtrain_norm, ctrain, [xtest_norm; x0.*ones(d,size(xtest_norm,2))], post);
-% 
+%
 % if d==1
 %     figure()
 %     errorshaded(xtest_norm,test_value, sqrt(test_variance)); hold on;
@@ -59,7 +62,7 @@ end
 %     set(gca,'YDir','normal')
 %     pbaspect([1 1 1])
 %     colorbar
-%     
+%
 %     figure()
 %     subplot(1,2,1)
 %     scatter(xtest_norm(1,:), xtest_norm(2,:), 25, test_variance, 'filled')
@@ -72,19 +75,19 @@ end
 %     pbaspect([1 1 1])
 %     colorbar
 % end
-% 
-% 
+%
+%
 % %% On the array
-% 
+%
 % m=25;
 % xrange1 =linspace(lb_norm(1),ub_norm(1),m);
 % xrange2 = linspace(lb_norm(2),ub_norm(2),m);
 % [p,q] = meshgrid(xrange1,xrange2);
 % x_array = [p(:),q(:)]';
-% 
+%
 % [~,  test_value_array, test_variance_array, ~] = model.prediction(theta, xtrain_norm, ctrain, [x_array; x0.*ones(1,size(x_array,2))], post);
-% 
-% 
+%
+%
 % test= zeros(nsamples,size(x_array,2));
 % new = NaN(2,nsamples);
 % for k =1:model.nsamples %sample g* from p(g*|D)
@@ -94,8 +97,8 @@ end
 %     x_init =  rand_interval(lb_norm,ub_norm);
 %     new(:,k) = minFuncBC(@(x)deriv(x,sample_g, dsample_g_dx), x_init, lb_norm, ub_norm, options); %bounds constraints.
 % end
-% 
-% 
+%
+%
 % figure()
 % subplot(1,2,1)
 % imagesc(xrange1, xrange2, reshape(test_value_array, m,m))
@@ -107,8 +110,8 @@ end
 % set(gca,'YDir','normal')
 % colorbar
 % pbaspect([1 1 1])
-% 
-% 
+%
+%
 % figure()
 % subplot(1,2,1)
 % imagesc(xrange1, xrange2, reshape(test_variance_array, m,m))
@@ -120,8 +123,8 @@ end
 % pbaspect([1 1 1])
 % set(gca,'YDir','normal')
 % colorbar
-% 
-% 
+%
+%
 % %%
 % k=0;
 % for i = 1:6
@@ -135,7 +138,7 @@ end
 %         scatter(new(1,k),new(2,k), 25, 'k', 'filled'); hold off;
 %     end
 % end
-% 
+%
 % ns = 1000;
 % n = 100;
 % x= linspace(0,1,n);
@@ -150,9 +153,9 @@ end
 %         [sample_g, dsample_g_dx] = sample_value_GP_precomputed_features(approximation, theta, xtrain_norm, ctrain, post);(phi_pref, dphi_pref_dx, xtrain_norm, y, x0);
 %         val(i,:) = sample_g(x);
 % end
-% 
+%
 % [~,  mu_y, sigma2y, Sigma2_y] = model.prediction(theta, xtrain_norm, ctrain, [x; x0*ones(1,n)], post);
-% 
+%
 % figure()
 % errorshaded(x, mu_y, sqrt(sigma2y));
 % figure()
@@ -160,8 +163,8 @@ end
 % figure();
 % plot(mu_y); hold on;
 % plot(mean(val)); hold off
-% 
+%
 % figure();
 % plot(sqrt(sigma2y)); hold on;
 % plot(sqrt(var(val))); hold off
-% 
+%

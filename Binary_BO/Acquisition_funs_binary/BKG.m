@@ -1,4 +1,4 @@
-function [new_x, new_x_norm] = BKG(theta, xtrain_norm, ctrain,model, post, approximation)
+function [new_x, new_x_norm] = BKG((theta, xtrain_norm, ctrain,model, post, approximation)
 if ~strcmp(model.modeltype, 'laplace')
     error('This acquisition function is only implemented with Laplace approximation')
 end

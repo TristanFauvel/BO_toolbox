@@ -7,13 +7,16 @@ close all
 
 
 acquisition_funs = {'bivariate_EI','Dueling_UCB','EIIG','random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI', 'Thompson_challenge','DTS'};
-% acquisition_funs = {'bivariate_EI'};
-% acquisition_funs = {'EIIG'};
 
+acquisition_funs = {'Thompson_challenge','DTS'};
 maxiter = 80;%100; %total number of iterations : 200
 nreplicates = 40; %20;
 
- 
+maxiter = 20;%100; %total number of iterations : 200
+nreplicates = 1; %20;
+
+ninit = 5;
+nopt = 5;
 nacq = numel(acquisition_funs);
 
 
@@ -37,17 +40,16 @@ nobj =numel(objectives);
 seeds = 1:nreplicates;
 update_period = maxiter+2;
 more_repets = 0;
-
+task = 'max';
+hyps_update = 'none';
+link = @normcdf;
+identification = 'mu_c';
+ns = 0;
 for j = 1:nobj
     objective = char(objectives(j));
     
-    [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling);
-    model.link = @normcdf;
-    
-    model.max_x = [model.ub;model.ub];
-    model.min_x = [model.lb;model.lb];
-    model.type = 'preference';
-    close all
+    [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling, 'preference');
+     close all
     for a =1:nacq
         acquisition_name = acquisition_funs{a};
         if strcmp(acquisition_name, 'PKG')
@@ -61,6 +63,8 @@ for j = 1:nobj
         
         filename = [data_dir,objective,'_',acquisition_name];
         
+        optim = preferential_BO(g, task, identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns);
+
         if more_repets
             load(filename, 'experiment')
             n = numel(experiment.(['xtrain_',acquisition_name]));
@@ -73,12 +77,11 @@ for j = 1:nobj
             save(filename, 'experiment')
             
         else
-            for r=1:nreplicates  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                seed  = seeds(r)
-                %             waitbar(((a-1)*nreplicates+r)/(nreplicates*nacq),wbar,'Computing...');
-                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}, xbest{r}] =  PBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model);
+            for r=1:nreplicates   
+                seed  = seeds(r);
+                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}, xbest{r}] = optim.optimization_loop(seed, theta, model);
             end
-            save_benchmark_results(acquisition_name, xtrain, xtrain_norm, ctrain, score, xbest, g, objective, data_dir)
+            %save_benchmark_results(acquisition_name, xtrain, xtrain_norm, ctrain, score, xbest, g, objective, data_dir)
         end
     end
 end

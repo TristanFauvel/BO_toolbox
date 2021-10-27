@@ -1,17 +1,19 @@
-function [x_duel1, x_duel2, new_duel] = DTS(theta, xtrain_norm, ctrain, model, post, approximation)
+function  [new_x, new_x_norm] = DTS(theta, xtrain_norm, ctrain, model, post, approximation)
 
 D= model.D;
 init_guess = [];
 
-[x_duel1_norm, x_duel1] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, post);
+[x_duel1_norm, x_duel1] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, post);
 
 options.method = 'lbfgs';
 options.verbose = 1;
-ncandidates =model.ncandidates;
- new = multistart_minConf(@(x)pref_var(theta, xtrain_norm, ctrain, x_duel1_norm , x, model, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
+ncandidates = 10 ;
+x_duel2_norm = multistart_minConf(@(x)pref_var(theta, xtrain_norm, ctrain, x_duel1_norm , x, model, post), model.lb_norm, model.ub_norm, ncandidates,init_guess, options);
 
-x_duel2 =  new.*(model.ub(1:D)-model.lb(1:D)) + model.lb(1:D);
-new_duel = [x_duel1;x_duel2];
+
+ new_x_norm = [x_duel1_norm;x_duel2_norm];
+new_x = new_x_norm.*([model.ub;model.ub] - [model.lb; model.lb])+[model.lb; model.lb];
+
 end
 
 function [var_muc, dvar_muc_dx] = pref_var(theta, xtrain_norm, ctrain, x_duel1_norm, x, model, post)
