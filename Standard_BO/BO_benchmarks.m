@@ -59,6 +59,6 @@ for j = 1:nobj
             seed = seeds(k);
             [xtrain{k}, xtrain_norm{k}, ytrain{k}, score{k}, xbest{k}]= optim.optimization_loop(seed, theta, model);
         end
-        save_benchmark_results(acquisition_name, xtrain, xtrain_norm, ytrain, score, xbest, g, objective, data_dir)
+       save_benchmark_results(acquisition_name, xtrain, xtrain_norm, ytrain, score, xbest, g, objective, data_dir)
     end
 end

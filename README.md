@@ -10,22 +10,14 @@ This toolbox was primarily intended to perform preferential Bayesian optimizatio
 * Bayesian optimization with continuous outputs
 * Bayesian optimization with binary outputs
 * Preferential Bayesian optimization
-* State-of-the art acquisition functions :
-  * For standard Bayesian optimization :
-    * Thompson sampling
-    * Expected improvement
-    * GP-UCB
-  * For optimization with binary outputs
-  * For preference-based optimization
-    * Bivariate Expected Improvement
-    * Expected improvement
-    * KernelSelfSparring
-* This toolbox is based on the GP_toolbox (https://github.com/TristanFauvel/GP_toolbox), which uses state-of-the art methods for approximate sampling from GP posteriors and for preference learning with GP.
+* State-of-the art acquisition functions (see the documentation)
+* This toolbox is based on the GP_toolbox (https://github.com/TristanFauvel/GP_toolbox), which implements state-of-the art methods for approximate sampling from GP posteriors and for preference learning with GP.
 
 ## Installation
 * Simply add BO_toolbox to your Matlab path
 
 ## User guide
+* Check out the `documentation.md`
 * Explanations are provided in the /Examples subfolders
 
 ## License

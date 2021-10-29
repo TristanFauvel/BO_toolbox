@@ -10,6 +10,7 @@ classdef optimization
         acquisition_fun
         ns % Context variables
         objective
+        tsize = 1; %batch size, default is 1 (one query at each iteration)
     end
     methods
         function optim = optimization(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns)
@@ -32,11 +33,8 @@ classdef optimization
             rng(seed)
             [new_x, new_x_norm] = optim.random_scheme(model);
 
-
             theta_evo = zeros(numel(theta.cov), optim.maxiter);
 
-            options.method = 'lbfgs';
-            ncandidates= 10;
             %% Compute the kernel approximation if needed
             if strcmp(model.kernelname, 'Matern52') || strcmp(model.kernelname, 'Matern32') || strcmp(model.kernelname, 'ARD')
                 approximation.method = 'RRGP';
@@ -59,6 +57,16 @@ classdef optimization
             for i =1:optim.maxiter
                 disp(i)
                 new_c = optim.query(new_x);
+
+                if optim.tsize>1      
+                    if ~strcmp(model.type, 'preference')
+                        error('Batch only available for PBO')
+                    end
+                        ids = nchoosek(1:optim.tsize,2)';    
+                    n = size(ids,2); 
+                    new_x = reshape(new_x(:,ids(:)),2*model.D, n);
+                    new_x_norm = reshape(new_x_norm(:,ids(:)),2*model.D, numel(c));
+                end
                 xtrain = [xtrain, new_x];
                 xtrain_norm = [xtrain_norm, new_x_norm];
                 ctrain = [ctrain, new_c];

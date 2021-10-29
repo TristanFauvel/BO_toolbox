@@ -1,7 +1,4 @@
 %Preference learning: synthetic experiments
-
-% function preference_learning(randinit, varargin)
-
 add_bo_module;
 close all
 
@@ -9,18 +6,16 @@ close all
 acquisition_funs = {'bivariate_EI','Dueling_UCB','EIIG','random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI', 'Thompson_challenge','DTS'};
 
 acquisition_funs = {'Thompson_challenge','DTS'};
-maxiter = 80;%100; %total number of iterations : 200
-nreplicates = 40; %20;
+maxiter = 80;
+nreplicates = 40;
 
-maxiter = 20;%100; %total number of iterations : 200
-nreplicates = 1; %20;
+maxiter = 20;
+nreplicates = 1; 
 
 ninit = 5;
 nopt = 5;
 nacq = numel(acquisition_funs);
 
-
-% wbar = waitbar(0,'Computing...');
 rescaling = 1;
 if rescaling ==0
     load('benchmarks_table.mat')
@@ -30,9 +25,7 @@ else
     data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data_rescaling/'];
 end
 
-%%%%%%
-    data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data/'];
-%%%%%%
+
 objectives = benchmarks_table.fName;
 
 
@@ -72,10 +65,9 @@ for j = 1:nobj
                 
                 disp(['Repetition : ', num2str(n+k)])
                 seed =n+k;
-                [experiment.(['xtrain_',acquisition_name]){n+k}, experiment.(['xtrain_norm_',acquisition_name]){n+k}, experiment.(['ctrain_',acquisition_name]){n+k}, experiment.(['score_',acquisition_name]){n+k},experiment.(['xbest_',acquisition_name]){n+k}]=  PBO_loop(acquisition_fun, seed, maxiter, theta, g, update_period, model);
+                [experiment.(['xtrain_',acquisition_name]){n+k}, experiment.(['xtrain_norm_',acquisition_name]){n+k}, experiment.(['ctrain_',acquisition_name]){n+k}, experiment.(['score_',acquisition_name]){n+k},experiment.(['xbest_',acquisition_name]){n+k}]= optim.optimization_loop(seed, theta, model);
             end
-            save(filename, 'experiment')
-            
+            save(filename, 'experiment')            
         else
             for r=1:nreplicates   
                 seed  = seeds(r);

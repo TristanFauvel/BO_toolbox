@@ -37,9 +37,3 @@ dfdx = dfdx(:);
 end
 
 
-% xx = linspace(0,1,1000);
-% for i = 1:1000
-%     vf(i) = f(xx(i));
-% end
-% figure()
-% plot(xx, vf)

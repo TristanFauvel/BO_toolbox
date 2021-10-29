@@ -15,7 +15,7 @@ model2 = model;
 model2.lb_norm = [model.lb_norm;x_best_norm];
 model2.ub_norm = [model.ub_norm;x_best_norm];
 
-[x_duel2, x_duel2_norm] = active_sampling_binary(theta, xtrain_norm, ctrain, model2, post);
+[x_duel2, x_duel2_norm] = BALD(theta, xtrain_norm, ctrain, model2, post);
 
 x_duel2_norm = x_duel2_norm(1:D);
  
