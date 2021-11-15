@@ -1,4 +1,4 @@
-function new_x = MVT(theta, xtrain_norm, ctrain, model, post, ~,nsamples)
+function new_x = batch_MUC(theta, xtrain_norm, ctrain, model, post, ~,nsamples)
  options.method = 'lbfgs';
 options.verbose = 1;
 D = size(xtrain_norm,1)/2;

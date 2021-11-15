@@ -4,7 +4,7 @@ figure_folder = [pathname,'/Preference_Based_BO/Figures/'];
 figname =  'TBO_scores_benchmarks';
 
  
-acq_funs = {'random_acquisition_tour','kernelselfsparring_tour','MVT'};
+acq_funs = {'random_acquisition_tour','kernelselfsparring_tour','batch_MUC'};
 
 load('/home/tfauvel/Documents/BO_toolbox/Acquisition_funs_table','T')
 acquisition_funs = cellstr(char(T(any(T.acq_funs == acq_funs,2),:).acq_funs)); 

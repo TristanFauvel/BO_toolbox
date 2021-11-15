@@ -7,7 +7,7 @@ close all
 
 data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_tournaments_data/'];
 
-acquisition_funs = {'MVT','kernelselfsparring_tour','random_acquisition_tour'};
+acquisition_funs = {'batch_MUC','kernelselfsparring_tour','random_acquisition_tour'};
 acquisition_funs = {'batch_MUC'};
  maxiter =30; 
 nreplicates = 10; 
