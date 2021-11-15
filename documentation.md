@@ -3,7 +3,7 @@
 >This software is distributed under the MIT License. Please refer to the file LICENCE.txt included for details
 
 **BO_toolbox** is a **Matlab** toolbox for Bayesian optimization, with a focus on binary and preferential Bayesian optimization.
-This is based on **GP_toolbox** (https://github.com/TristanFauvel/GP_toolbox).
+It is based on **GP_toolbox** (https://github.com/TristanFauvel/GP_toolbox).
 
 ## Installation
   Simply add **BO_toolbox** to your Matlab path
@@ -58,6 +58,7 @@ For each type of optimization problem, you can create an optimization object usi
 - `DTS`: Duel Thompson Sampling (Gonzalez et al, 2017)
 - `Thomspon_challenge` :  Dueling Thompson (Benavoli et al 2020).
 - `PKG`: preferential knowledge gradient
+- `MUC`: maximally uncertain challenge (Fauvel & Chalk, 2021)
 
 ### Active learning:
 Active learning for GP classification and preference learning models.

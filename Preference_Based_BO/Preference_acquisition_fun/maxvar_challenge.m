@@ -1,4 +1,4 @@
-function  [new_x, new_x_norm] = maxvar_challenge(theta, xtrain_norm, ctrain, model, post, approximation)
+function  [new_x, new_x_norm] = MUC(theta, xtrain_norm, ctrain, model, post, approximation)
 
 options.method = 'lbfgs';
 options.verbose = 1;

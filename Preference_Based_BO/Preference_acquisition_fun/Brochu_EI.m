@@ -6,7 +6,7 @@ n = size(xtrain_norm,2);
 %% Find the maximum of the value function
 options.method = 'lbfgs';
 
-ncandidates= 5;
+ncandidates= 10;
 
 condition = model.condition;
 

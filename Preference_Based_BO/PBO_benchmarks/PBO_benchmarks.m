@@ -3,7 +3,7 @@ add_bo_module;
 close all
 
 
-acquisition_funs = {'bivariate_EI','Dueling_UCB','EIIG','random_acquisition_pref','kernelselfsparring','maxvar_challenge','Brochu_EI', 'Thompson_challenge','DTS'};
+acquisition_funs = {'bivariate_EI','Dueling_UCB','EIIG','random_acquisition_pref','kernelselfsparring','MUC','Brochu_EI', 'Thompson_challenge','DTS'};
 
 acquisition_funs = {'Thompson_challenge','DTS'};
 maxiter = 80;

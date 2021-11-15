@@ -13,13 +13,6 @@ new_x = new_x_norm.*(model.ub-model.lb) + model.lb;
 
 end
 
-% x = linspace(0,1,1000);
-% for i = 1:1000
-%     [ucb_val(i), ducb_dx]= ucb(theta, xtrain_norm, x(i), ctrain, model, post, task, e);
-% end
-% figure();
-% plot(x, ucb_val)
-
 function [ucb_val, ducb_dx]= ucb(theta, xtrain_norm, x, ctrain, model, post, e)
 
 % if strcmp(task, 'max')

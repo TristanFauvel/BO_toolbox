@@ -12,7 +12,7 @@ end
 
 figname =  'PBO_scores_benchmarks';
 
-all_acq_funs = {'EIIG', 'Dueling_UCB',  'DTS','random_acquisition_pref','kernelselfsparring','maxvar_challenge', 'bivariate_EI', 'Brochu_EI', 'Thompson_challenge'};
+all_acq_funs = {'EIIG', 'Dueling_UCB',  'DTS','random_acquisition_pref','kernelselfsparring','MUC', 'bivariate_EI', 'Brochu_EI', 'Thompson_challenge'};
 
 acq_funs = all_acq_funs;
 load('/home/tfauvel/Documents/BO_toolbox/Acquisition_funs_table','T')
@@ -73,7 +73,7 @@ exportgraphics(fig, [figure_file, '.png'], 'Resolution', 300);
 % acquisition_names = acquisition_names(s,:); 
 % acquisition_names_citation = acquisition_names_citation(s,:); 
 % short_acq_names = short_acq_names(s,:);
-acq_funs = {'Dueling_UCB', 'maxvar_challenge', 'bivariate_EI', 'DTS', 'Thompson_challenge'};
+acq_funs = {'Dueling_UCB', 'MUC', 'bivariate_EI', 'DTS', 'Thompson_challenge'};
 acquisition_funs = cellstr(char(T(any(T.acq_funs == acq_funs,2),:).acq_funs)); 
 acquisition_names = char(T(any(T.acq_funs == acq_funs,2),:).names); 
 acquisition_names_citation = char(T(any(T.acq_funs == acq_funs,2),:).names_citations); 
