@@ -11,6 +11,7 @@ classdef optimization
         ns % Context variables
         objective
         tsize = 1; %batch size, default is 1 (one query at each iteration)
+        grid = false;
     end
     methods
         function optim = optimization(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns)

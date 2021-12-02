@@ -1,4 +1,4 @@
-function [t, Best_ranking, AUC_ranking,b, signobj, ranking, final_values, AUCs] = ranking_analysis(data_path, names, objectives, algos, nreps, suffix, prefix, optim, score_measure)
+function [t, Best_ranking, AUC_ranking,b, signobj, ranking, final_values, AUCs] = ranking_analysis(data_path, names, objectives, algos, nreps, niter, suffix, prefix, optim, score_measure)
 
 %optim = 'max' or 'min'
 nobj = numel(objectives);
@@ -30,7 +30,8 @@ for j = 1:nobj
         elseif strcmp(optim, 'max_proba')
             score= normcdf(score);
         end
-        scores{a} = score;
+        score = score(1:nreps, 1:niter);
+        scores{a} = score;         
         final_values(a,j,:) = score(:,end);
         AUCs(a,j,:) = mean(score,2);       
     end
