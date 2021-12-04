@@ -27,8 +27,13 @@ classdef standard_BO < optimization
         end       
 
         function [new_x, new_x_norm] = random_scheme(optim, model)           
-            new_x_norm = rand_interval(model.lb_norm,model.ub_norm);
-            new_x = new_x_norm.*(model.ub - model.lb)+model.lb;
+
+          if optim.grid
+                new_id = randsample(size(model.grid,2),1);
+                new_x_norm = model.grid(:,new_id);
+            else
+                new_x_norm = rand_interval(model.lb_norm,model.ub_norm);                 
+            end
         end
     end
 end
