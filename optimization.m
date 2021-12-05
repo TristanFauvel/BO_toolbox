@@ -117,7 +117,7 @@ classdef optimization
                 post =  model.prediction(theta, xtrain_norm, ctrain, [], []);
 
                 if i> optim.nopt
-                    [new_x, new_x_norm] = optim.acquisition_fun(theta, xtrain_norm, ctrain,model, post, approximation);
+                    [new_x, new_x_norm] = optim.acquisition_fun(theta, xtrain_norm, ctrain,model, post, approximation, optim);
                 else
                     [new_x, new_x_norm] = optim.random_scheme(model);
                 end

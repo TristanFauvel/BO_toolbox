@@ -1,4 +1,4 @@
-function [new_x,new_x_norm, L] = UCB_binary(theta, xtrain_norm, ctrain,model, post, approximation)
+function [new_x,new_x_norm, L] = UCB_binary(theta, xtrain_norm, ctrain,model, post, approximation,optim)
 
 e = norminv(0.99);
 
