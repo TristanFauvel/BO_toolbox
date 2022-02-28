@@ -1,7 +1,7 @@
 classdef binary_BO < optimization
     methods
-        function optim = binary_BO(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns)
-            optim = optim@optimization(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns)
+        function optim = binary_BO(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, D, ns)
+            optim = optim@optimization(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, D, ns)
         end
 
         function new_c = query(optim, new_x)
@@ -19,7 +19,7 @@ classdef binary_BO < optimization
         function [new_x, new_x_norm] = random_scheme(optim, model)   
 
             if optim.grid
-                new_x = optim.
+                %new_x = optim.
             else
                 new_x_norm = rand_interval(model.lb_norm,model.ub_norm);                 
             end

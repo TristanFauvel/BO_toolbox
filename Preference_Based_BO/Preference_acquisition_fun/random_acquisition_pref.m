@@ -1,4 +1,4 @@
-function [new_x, new_x_norm] = random_acquisition_pref(theta, xtrain_norm, ctrain, model, post, approximation)
+function [new_x, new_x_norm] = random_acquisition_pref(theta, xtrain_norm, ctrain, model, post, approximation, optim)
 
 samples = rand_interval(model.lb_norm, model.ub_norm, 'nsamples', 2);
 

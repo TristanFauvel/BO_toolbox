@@ -1,14 +1,15 @@
-function [new_x,new_x_norm, L] = UCB_binary(theta, xtrain_norm, ctrain,model, post, approximation,optim)
+function [new_x,new_x_norm, L] = UCB_binary(theta, xtrain_norm, ctrain,model, post, approximation,optim,varargin)
+opts = namevaluepairtostruct(struct( ...
+    'e', norminv(0.99) ...
+    ), varargin);
 
-e = norminv(0.99);
-
+UNPACK_STRUCT(opts, false)
 
 options.method = 'lbfgs';
 
-ncandidates= 10;
+ncandidates= optimization.AF_ncandidates;
 init_guess = [];
-[new_x_norm, L] = multistart_minConf(@(x)ucb(theta, xtrain_norm, x, ctrain, model, post, e), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
-L = -L;
+[new_x_norm, L] = optimize_AF(@(x)ucb(theta, xtrain_norm, x, ctrain, model, post, e), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
 new_x = new_x_norm.*(model.ub-model.lb) + model.lb;
 
 end
@@ -24,8 +25,7 @@ function [ucb_val, ducb_dx]= ucb(theta, xtrain_norm, x, ctrain, model, post, e)
 %     dsigma_c_dx = integral(@(s) fdsigma_c_dx(theta, xtrain_norm, ctrain, [s;x*ones(1,size(s,2))], model, post), zeros(1,model.ns), ones(1,model.ns), 'ArrayValued', true);
 % end
 ucb_val = mu_c + e*sigma_c;
-ucb_val = -ucb_val;
-ducb_dx = -(dmuc_dx(:) + e*dsigma_c_dx(:));
+ducb_dx = (dmuc_dx(:) + e*dsigma_c_dx(:));
 end
 
 function mu_c = fmu_c(theta, xtrain_norm, ctrain, x, model, post)

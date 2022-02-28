@@ -1,11 +1,11 @@
 classdef preferential_BO < optimization
     methods
-        function optim = preferential_BO(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns)
-            optim = optim@optimization(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns)
+        function optim = preferential_BO(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, D, ns)
+            optim = optim@optimization(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, D, ns)
         end
 
         function new_c = query(optim, new_duel)
-            D = size(new_duel,1)/2;
+            D = optim.D;
             x_duel1 = new_duel(1:D,:);
             x_duel2 = new_duel(D+1:(2*D),:);
             %Generate a binary sample
@@ -25,10 +25,7 @@ classdef preferential_BO < optimization
             x_duel1 = samples(:,1);
             x_duel2 = samples(:,2);
             new_x_norm= [x_duel1; x_duel2];
-
-
             new_x = new_x_norm.*([model.ub;model.ub] - [model.lb; model.lb])+[model.lb; model.lb];
-
         end
     end
 end

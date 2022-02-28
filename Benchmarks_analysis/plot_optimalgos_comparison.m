@@ -57,11 +57,13 @@ for j = 1:nobj
         legends{a}=char(names(a,:));
         n=['a',num2str(a)];
 
-        score = cell2mat(eval([score_measure, '_', acquisition])'); %%%%%%%%
+          struct_name =regexprep(acquisition, '=', '_');   
+         struct_name =regexprep(struct_name, '\.', '_dot_');   
+         score= cell2mat(experiment.([score_measure, '_', struct_name])');
 
         if strcmp(optim, 'min')
             score= -score;
-        elseif strcmp(optim, 'max_proba') && ~strcmp(score_measure, 'score_c')
+        elseif strcmp(optim, 'max') && ~strcmp(score_measure, 'mu_c')
             score= normcdf(score);
         end
 
@@ -75,9 +77,9 @@ for j = 1:nobj
     box off
 
     if mod(j,2)==1
-        if strcmp(score_measure, 'score_c')
+        if strcmp(score_measure, 'mu_c')
             ylabel('$P(c = 1|x^*_t)$');
-        elseif strcmp(score_measure, 'score_g') || strcmp(score_measure, 'score')
+        elseif strcmp(score_measure, 'mu_g') || strcmp(score_measure, 'score')
             ylabel('Value $g(x^*_t)$');
         end
     end

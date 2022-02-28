@@ -1,7 +1,7 @@
 classdef active_learning < optimization
     methods
         function optim = active_learning(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns)
-            optim = optim@optimization(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns)
+            optim = optim@optimization(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, D, ns)
         end
 
         function new_c = query(optim, new_x)

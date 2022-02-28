@@ -1,64 +1,62 @@
+function PBO_benchmarks(pathname)
+
+
 %Preference learning: synthetic experiments
-add_bo_module;
-close all
 
+data_dir =  [pathname,'/Data/Data_PBO'];
 
-acquisition_funs = {'bivariate_EI','Dueling_UCB','EIIG','random_acquisition_pref','kernelselfsparring','MUC','Brochu_EI', 'Thompson_challenge','DTS'};
+ 
+settings= load([pathname, '/Experiments_parameters.mat'],'Experiments_parameters');
+settings = settings.Experiments_parameters;
+settings = settings({'PBO'},:);
 
-acquisition_funs = {'Thompson_challenge','DTS'};
-maxiter = 80;
-nreplicates = 40;
-
-maxiter = 20;
-nreplicates = 1; 
-
-ninit = 5;
-nopt = 5;
+% List of acquisition functions tested in the experiment
+acquisition_funs = settings.acquisition_funs{:};
+maxiter = settings.maxiter;
+nreplicates = settings.nreplicates;
+ninit = settings.ninit;
+nopt = settings.nopt;
 nacq = numel(acquisition_funs);
+task =  settings.task{:};
+hyps_update = settings.hyps_update{:};
+link = settings.link{:};
+identification = settings.identification{:};
+ns = settings.ns;
+update_period = settings.update_period;
+modeltype = settings.modeltype;
 
-rescaling = 1;
+rescaling = settings.rescaling;
 if rescaling ==0
     load('benchmarks_table.mat')
-    data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data_wo_rescaling/'];
 else
     load('benchmarks_table_rescaled.mat')
-    data_dir =  [pathname,'/Preference_Based_BO/Data/synthetic_exp_duels_data_rescaling/'];
 end
 
-
-objectives = benchmarks_table.fName;
-
-
+objectives = settings.objectives{:};
 nobj =numel(objectives);
+
 seeds = 1:nreplicates;
-update_period = maxiter+2;
 more_repets = 0;
-task = 'max';
-hyps_update = 'none';
-link = @normcdf;
-identification = 'mu_c';
-ns = 0;
+
 for j = 1:nobj
-    objective = char(objectives(j));
-    
-    [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling, 'preference');
-     close all
+    objective = char(objectives(j));     
+            [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling, 'preference', 'modeltype', modeltype, 'link',link);
     for a =1:nacq
-        acquisition_name = acquisition_funs{a};
-        if strcmp(acquisition_name, 'PKG')
-            modeltype = 'laplace';
-        else
-            modeltype = 'exp_prop';
-        end
-        model.modeltype = modeltype;
+         acquisition_name = acquisition_funs{a};
+%         if strcmp(acquisition_name, 'PKG')
+%             modeltype = 'laplace';
+%         else
+%             modeltype = 'exp_prop';
+%         end
+ 
         acquisition_fun = str2func(acquisition_name);
         clear('xtrain', 'xtrain_norm', 'ctrain', 'score');
         
         filename = [data_dir,objective,'_',acquisition_name];
         
-        optim = preferential_BO(g, task, identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns);
+        optim = preferential_BO(g, task, identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, model.D, ns);
 
-        if more_repets
+        if more_repets==1
             load(filename, 'experiment')
             n = numel(experiment.(['xtrain_',acquisition_name]));
             for k = 1:nrepets
@@ -71,10 +69,10 @@ for j = 1:nobj
         else
             for r=1:nreplicates   
                 seed  = seeds(r);
-                [xtrain{r}, xtrain_norm{r}, ctrain{r}, score{r}, xbest{r}] = optim.optimization_loop(seed, theta, model);
+                [xtrain{r}, ctrain{r}, score{r}, xbest{r}] = optim.optimization_loop(seed, theta, model);
             end
-            %save_benchmark_results(acquisition_name, xtrain, xtrain_norm, ctrain, score, xbest, g, objective, data_dir)
+            structure_name= acquisition_name;
+            save_benchmark_results(acquisition_name, structure_name, xtrain, ctrain, score, xbest, objective, data_dir, task)
         end
     end
 end
- 

@@ -4,7 +4,7 @@ classdef standard_BO < optimization
     end
     methods
         function optim = standard_BO(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns, noise)
-            optim = optim@optimization(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns)
+            optim = optim@optimization(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, D, ns)
             optim.noise = noise;
         end
 

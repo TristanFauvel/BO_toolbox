@@ -1,4 +1,4 @@
-function  [new_x, new_x_norm] = Thompson_challenge(theta, xtrain_norm, ctrain, model, post, approximation)
+function  [new_x, new_x_norm] = Thompson_challenge(theta, xtrain_norm, ctrain, model, post, approximation, optim)
 % This function is called Dueling Thompson in Benavoli 2020.
 
 if ~isnan(model.xbest_norm)
@@ -10,7 +10,7 @@ end
 loop = 1;
 while loop
     loop = 0;
-     new = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, post);
+     new = model.sample_max_GP(approximation, xtrain_norm, ctrain, theta, post);
 
     if all(x_duel1_norm == new)
         loop =1;

@@ -1,6 +1,5 @@
 function [t, Best_ranking, AUC_ranking,b, signobj, ranking, final_values, AUCs] = ranking_analysis(data_path, names, objectives, algos, nreps, niter, suffix, prefix, optim, score_measure)
 
-%optim = 'max' or 'min'
 nobj = numel(objectives);
 nacq = numel(algos);
 graphics_style_paper;
@@ -13,18 +12,16 @@ AUCs = zeros(nacq,nobj, nreps);
 
 
 for j = 1:nobj
-    %     objective = objectives{j};
     objective = char(objectives(j));
     
     for a = 1:nacq
         acquisition = algos{a};
-        filename = [data_path,'/', prefix, objective, '_',acquisition,suffix];
-        %         try
+        filename = [data_path,'/', prefix, objective, '_',acquisition,suffix, '.mat'];
         load(filename, 'experiment');
         
-         score= cell2mat(experiment.([score_measure, '_', acquisition])');%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%         score= cell2mat(experiment.(['score_', acquisition])');
+         struct_name =regexprep(acquisition, '=', '_');   
+         struct_name =regexprep(struct_name, '\.', '_dot_');   
+         score= cell2mat(experiment.([score_measure, '_', struct_name])');
         if strcmp(optim, 'min')
             score= -score;
         elseif strcmp(optim, 'max_proba')
@@ -36,7 +33,6 @@ for j = 1:nobj
         AUCs(a,j,:) = mean(score,2);       
     end
     benchmarks_results{j} = scores;
-    %     [ranks, average_ranks]= compute_rank(scores, ninit);
 end
 alpha = 5e-4;
 

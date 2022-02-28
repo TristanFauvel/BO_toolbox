@@ -146,7 +146,7 @@ for i =1:maxiter
         options=[];
  
         %% Multistart optimization of theta
-        ncandidates = 10;
+        ncandidates = optim.AF_ncandidates;
 
         theta = model.model_selection(xtrain, ytrain, theta, update);
          

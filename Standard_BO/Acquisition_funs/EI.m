@@ -4,8 +4,8 @@ mu_y =  model.prediction(theta, xtrain_norm, ytrain, xtrain_norm, post);
 y_best = max(mu_y);
 
 x_init = [];
-ncandidates = 10;
-new_x_norm = multistart_minConf(@(x)expected_improvement(theta, xtrain_norm, x, ytrain, model, post, y_best), model.lb_norm, model.ub_norm, ncandidates, x_init, options);
+ncandidates = optim.AF_ncandidates;
+new_x_norm = optimize_AF(@(x)expected_improvement(theta, xtrain_norm, x, ytrain, model, post, y_best), model.lb_norm, model.ub_norm, ncandidates, x_init, options);
 new_x = new_x_norm.*(model.ub-model.lb) + model.lb;
 
 end

@@ -1,4 +1,8 @@
 classdef optimization
+     properties (Constant)
+          AF_ncandidates = 10;
+     end
+     
     properties
         task % Type of task
         maxiter % Number of iterations
@@ -7,17 +11,18 @@ classdef optimization
         update_period
         identification
         hyps_update
-        acquisition_fun         
+        acquisition_fun
         objective
-        tsize = 1; %batch size, default is 1 (one query at each iteration)
-        grid = false;   
+        batch_size = 1; %batch size, default is 1 (one query at each iteration)
+        grid = false;
         D
+        ns = 0;
 %         xdims
 %         sdims
 %         s0
     end
     methods
-        function optim = optimization(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, D)
+        function optim = optimization(objective, task,identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, D, ns)
             optim.task = task;
             optim.identification =  identification;
             optim.acquisition_fun = acquisition_fun;
@@ -26,8 +31,9 @@ classdef optimization
             optim.nopt = nopt;
             optim.update_period = update_period;
             optim.hyps_update = hyps_update;
-            optim.objective = objective;       
+            optim.objective = objective;
             optim.D = D;
+            optim.ns = ns;
         end
 
         function [xtrain, ctrain, score, xbest, theta_evo] = optimization_loop(optim, seed, theta, model)
@@ -51,22 +57,22 @@ classdef optimization
             model = approximate_kernel(model, theta, approximation);
 %             if strcmp(model.type, 'preference')
 %                 [approximation.phi_pref, approximation.dphi_pref_dx, approximation.phi, approximation.dphi_dx]= sample_features_preference_GP(theta, model, approximation);
-% 
-% 
+%
+%
 %                 %% Change this in future releases
 %                 if optim.context
 %                     approximation.phi_pref = @(x) x(1,:)'.*kphi_pref(x(2:end,:)); % ntest x nfeatures
 %                     approximation.dphi_pref_dx = @(x) [kphi_pref(x(2:end,:))',x(1,:)'.*dkphi_pref_dx(x(2:end,:))]; % nfeatures x D+1
-% 
+%
 %                     approximation.phi = @(x) x(1,:)'.*kphi(x(2:end,:)); %
 %                     approximation.dphi_dx = @(x) [kphi(x(2:end,:))',x(1,:)'.*dkphi_dx(x(2:end,:))]; % nfeatures x D+1
-% 
-% 
-% 
-% 
+%
+%
+%
+%
 %                 else
 %                 [approximation.phi, approximation.dphi_dx] = sample_features_GP(theta, model, approximation);
-                    
+
                 %% Change this in future releases
 %                 if optim.context
 %                 if strcmp(model.task, 'max')
@@ -78,24 +84,24 @@ classdef optimization
 %                 end
 %                 end
                 %%
-           
 
-             xbest_norm = zeros(model.D, optim.maxiter);
-            xbest = zeros(model.D, optim.maxiter);
+
+             xbest_norm = zeros(model.D- model.ns, optim.maxiter);
+            xbest = zeros(model.D- model.ns, optim.maxiter);
             score = zeros(1,optim.maxiter);
 
             for i =1:optim.maxiter
                 disp(i)
                 new_c = optim.query(new_x);
 
-                if optim.tsize>1      
+                if optim.batch_size>1
                     if ~strcmp(model.type, 'preference')
                         error('Batch only available for PBO')
                     end
-                        ids = nchoosek(1:optim.tsize,2)';    
-                    n = size(ids,2); 
+                    ids = nchoosek(1:optim.batch_size,2)';
+                    n = size(ids,2);
                     new_x = reshape(new_x(:,ids(:)),2*model.D, n);
-                    new_x_norm = reshape(new_x_norm(:,ids(:)),2*model.D, numel(c));
+                    new_x_norm = reshape(new_x_norm(:,ids(:)),2*model.D, size(ids,2));
                 end
                 xtrain = [xtrain, new_x];
                 xtrain_norm = [xtrain_norm, new_x_norm];
@@ -130,4 +136,3 @@ classdef optimization
         end
     end
 end
-

@@ -1,76 +1,70 @@
-clear all
+function BBO_benchmarks(pathname)
 
-add_bo_module;
-
-data_dir =  [pathname,'/Binary_BO/Data/'];
+data_dir =  [pathname,'/Data/Data_BBO'];
 
  
-acquisition_funs = {'EI_Tesch', 'TS_binary','random_acquisition', 'UCB_binary', 'UCB_binary_latent'}; %, 'bivariate_EI_binary'};
+ 
+settings= load([pathname, '/Experiments_parameters.mat'],'Experiments_parameters');
+settings = settings.Experiments_parameters;
+settings = settings({'BBO'},:);
 
-maxiter = 100;
-nreplicates = 60;
-update_period = 15000;
-
-ninit = 5000;
-
+% List of acquisition functions tested in the experiment
+acquisition_funs = settings.acquisition_funs{:};
+maxiter = settings.maxiter;
+nreplicates = settings.nreplicates;
+ninit = settings.ninit;
+nopt = settings.nopt;
 nacq = numel(acquisition_funs);
-nopt = 2;
-
+task =  settings.task{:};
+hyps_update = settings.hyps_update{:};
+link = settings.link{:};
+identification = settings.identification{:};
+ns = settings.ns;
+update_period = settings.update_period;
+modeltype = settings.modeltype;
+rescaling = settings.rescaling;
 seeds = 1:nreplicates;
-update_period = maxiter+2; % do not update the hyperparameters;
+more_repets = 0;
 
-rescaling = 1;
 if rescaling == 0
     load('benchmarks_table.mat')
 else
     load('benchmarks_table_rescaled.mat')
 end
 
-objectives = benchmarks_table.fName;
+objectives = settings.objectives{:};
 nobj =numel(objectives);
-task = 'max';
-hyps_update = 'none';
-link = @normcdf;
-identification = 'mu_c';
-ns = 0;
 
 for j = 1:nobj
     objective = char(objectives(j));
-    [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling, 'classification');
     close all    
+      [g, theta, model] = load_benchmarks(objective, [], benchmarks_table, rescaling, 'classification', 'modeltype', modeltype, 'link', link);
+  
     for a =1:nacq
-        acquisition_name = acquisition_funs{a};
-        if strcmp(acquisition_name, 'BKG')
-            modeltype = 'laplace';
-        else
-            modeltype = 'exp_prop';
-        end
-        model.modeltype = modeltype;
-
+        acquisition_name = acquisition_funs{a};      
         acquisition_fun = str2func(acquisition_name);
         clear('xtrain', 'xtrain_norm', 'ctrain', 'score');
 
-        optim = binary_BO(g, task, identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, ns);
+        optim = binary_BO(g, task, identification, maxiter, nopt, ninit, update_period, hyps_update, acquisition_fun, model.D, ns);
 
-        for k=1:nreplicates
-            seed  = seeds(k)
-            [xtrain{k}, xtrain_norm{k}, ctrain{k}, score{k}, xbest{k}]= optim.optimization_loop(seed, theta, model);
+
+        if more_repets == 1
+            load(filename, 'experiment')
+            n = numel(experiment.(['xtrain_',acquisition_name]));
+            for k = 1:nrepets
+                
+                disp(['Repetition : ', num2str(n+k)])
+                seed =n+k;
+                [experiment.(['xtrain_',acquisition_name]){n+k}, experiment.(['xtrain_norm_',acquisition_name]){n+k}, experiment.(['ctrain_',acquisition_name]){n+k}, experiment.(['score_',acquisition_name]){n+k},experiment.(['xbest_',acquisition_name]){n+k}]= optim.optimization_loop(seed, theta, model);
+            end
+            save(filename, 'experiment')            
+        else
+            for r=1:nreplicates   
+                seed  = seeds(r);
+                [xtrain{r}, ctrain{r}, score{r}, xbest{r}] = optim.optimization_loop(seed, theta, model);
+            end
+            structure_name= acquisition_name;
+            save_benchmark_results(acquisition_name, structure_name, xtrain, ctrain, score, xbest, objective, data_dir, task)
         end
-        fi = ['xtrain_',acquisition_name];
-        experiment.(fi) = xtrain;
-        fi = ['xtrain_norm_',acquisition_name];
-        experiment.(fi) = xtrain_norm;
-        fi = ['ctrain_',acquisition_name];
-        experiment.(fi) = ctrain;
-
-        fi = ['score_',acquisition_name];
-        experiment.(fi) = score;
-        fi = ['xbest_',acquisition_name];
-        experiment.(fi) = xbest;
-
-        filename = [data_dir,objective,'_',acquisition_name];
-        %         save(filename, 'experiment')        
-
     end
 end
-

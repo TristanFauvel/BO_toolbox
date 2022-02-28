@@ -1,11 +1,11 @@
 function [new_x, new_x_norm] = GP_UCB(theta, xtrain_norm, ytrain, model, post, approximation)   
 options.verbose = 1;
-ncandidates = 10;
+ncandidates = optim.AF_ncandidates;
 
 delta = 0.1;
 [D,t] = size(xtrain_norm);
 e= sqrt(2*log(t.^(0.5*D+2)*pi^2/(3*delta)));
-new_x_norm = multistart_minConf(@(x) UCB(theta, xtrain_norm, ytrain, x,model,e, post), model.lb_norm, model.ub_norm, ncandidates,[], options);
+new_x_norm = optimize_AF(@(x) UCB(theta, xtrain_norm, ytrain, x,model,e, post), model.lb_norm, model.ub_norm, ncandidates,[], options);
 new_x = new_x_norm.*(model.ub-model.lb) + model.lb;
 end
 

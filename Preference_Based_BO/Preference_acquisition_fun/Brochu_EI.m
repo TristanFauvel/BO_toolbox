@@ -1,4 +1,4 @@
-function  [new_x, new_x_norm] = Brochu_EI(theta, xtrain_norm, ctrain, model, post, approximation)
+function  [new_x, new_x_norm] = Brochu_EI(theta, xtrain_norm, ctrain, model, post, approximation, optim)
 % Expected Improvement, as proposed by Brochu (2010)
 
 D = size(xtrain_norm,1)/2;
@@ -6,7 +6,7 @@ n = size(xtrain_norm,2);
 %% Find the maximum of the value function
 options.method = 'lbfgs';
 
-ncandidates= 10;
+ncandidates= optimization.AF_ncandidates;
 
 condition = model.condition;
 
@@ -16,7 +16,7 @@ x = [xtrain_norm(1:D,:), xtrain_norm((D+1):end,:)];
 x_duel1_norm = x(:,b);
 
 init_guess = x_duel1_norm;
-x_duel2_norm = multistart_minConf(@(x)expected_improvement_preference(theta, xtrain_norm, x, ctrain, max_mu_y, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
+x_duel2_norm = optimize_AF(@(x)expected_improvement_preference(theta, xtrain_norm, x, ctrain, max_mu_y, model, post), model.lb_norm, model.ub_norm, ncandidates, init_guess, options);
 
 new_x_norm = [x_duel1_norm;x_duel2_norm];
 new_x = new_x_norm.*([model.ub;model.ub] - [model.lb; model.lb])+[model.lb; model.lb];
@@ -54,8 +54,7 @@ if nargout>1
     dd_dx = (-dmuy_dx.*g_sigma_y - (max_mu_y - g_mu_y).*dsigma_y_dx)./g_sigma2_y;
     dd_dx(g_sigma2_y==0,:) = 0;
     dEI_dx = dmuy_dx.*normcdf_d - (max_mu_y - g_mu_y).*normpdf_d.*dd_dx + dsigma_y_dx.*normpdf_d +g_sigma_y.*gaussder_d.*dd_dx;
-    dEI_dx = -squeeze(dEI_dx);%This is because the goal is to maximize EI, and I use a minimization algorithm
+    dEI_dx = squeeze(dEI_dx);
 end
 
-EI = -EI; %This is because the goal is to maximize EI, and I use a minimization algorithm
 end

@@ -1,11 +1,11 @@
-function new_x = kernelselfsparring_tour(theta, xtrain_norm, ctrain, model, post, approximation, nsamples)
+function [new_x, new_x_norm]= kernelselfsparring_tour(theta, xtrain_norm, ctrain, model, post, approximation, optim)
 
 D = model.D;
-xnorm = zeros(D, nsamples);
-for k =1:nsamples %sample g* from p(g*|D)
-        [xnorm(:,k), new] = sample_max_preference_GP(approximation, xtrain_norm, ctrain, theta, model, post);
+new_x_norm = zeros(D, optim.batch_size);
+new_x = zeros(D, optim.batch_size);
+for k =1:optim.batch_size %sample g* from p(g*|D)
+        [new_x_norm(:,k), new_x(:,k)] = model.sample_max_GP(approximation, xtrain_norm, ctrain, theta, post);     
 end
-new_x = xnorm.*(model.ub-model.lb) + model.lb;
 
 end
 
