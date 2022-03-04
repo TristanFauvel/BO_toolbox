@@ -24,8 +24,8 @@ function [ucb_val, ducb_dx]= dUCB(theta, xtrain_norm, x, ctrain, x_duel1, model,
 [mu_c,  mu_y, sigma2_y, Sigma2_y, dmuc_dx,~,~,~, var_muc, dvar_muc_dx] =  model.prediction(theta, xtrain_norm, ctrain, [x;x_duel1], post);
 D = model.D;
 e = norminv(0.975);
-var_muc = -var_muc;
-dvar_muc_dx = -dvar_muc_dx(1:D)';
+
+dvar_muc_dx = dvar_muc_dx(1:D)';
 
 ucb_val = mu_c + e*sqrt(var_muc);
 

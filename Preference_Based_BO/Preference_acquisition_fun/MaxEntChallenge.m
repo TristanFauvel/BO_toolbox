@@ -15,7 +15,7 @@ model2.ub_norm = [model.ub_norm;x_duel1_norm];
 model2.lb = [model.lb;x_duel1];
 model2.ub = [model.ub;x_duel1];
 
-[x_duel2, x_duel2_norm] = BALD(theta, xtrain_norm, ctrain, model2, post);
+[x_duel2, x_duel2_norm] = BALD(theta, xtrain_norm, ctrain, model2, post, [], optim);
 
 x_duel2 = x_duel2(1:D);
 x_duel2_norm = x_duel2_norm(1:D);

@@ -55,38 +55,7 @@ classdef optimization
             approximation.nfeatures = 4096;
 
             model = approximate_kernel(model, theta, approximation);
-%             if strcmp(model.type, 'preference')
-%                 [approximation.phi_pref, approximation.dphi_pref_dx, approximation.phi, approximation.dphi_dx]= sample_features_preference_GP(theta, model, approximation);
-%
-%
-%                 %% Change this in future releases
-%                 if optim.context
-%                     approximation.phi_pref = @(x) x(1,:)'.*kphi_pref(x(2:end,:)); % ntest x nfeatures
-%                     approximation.dphi_pref_dx = @(x) [kphi_pref(x(2:end,:))',x(1,:)'.*dkphi_pref_dx(x(2:end,:))]; % nfeatures x D+1
-%
-%                     approximation.phi = @(x) x(1,:)'.*kphi(x(2:end,:)); %
-%                     approximation.dphi_dx = @(x) [kphi(x(2:end,:))',x(1,:)'.*dkphi_dx(x(2:end,:))]; % nfeatures x D+1
-%
-%
-%
-%
-%                 else
-%                 [approximation.phi, approximation.dphi_dx] = sample_features_GP(theta, model, approximation);
-
-                %% Change this in future releases
-%                 if optim.context
-%                 if strcmp(model.task, 'max')
-%                     approximation.phi = @(x) x(1,:)'.*kphi(x(2:end,:)); %
-%                     approximation.dphi_dx = @(x) [kphi(x(2:end,:))',x(1,:)'.*dkphi_dx(x(2:end,:))]; % nfeatures x D+1
-%                 else
-%                     approximation.phi = kphi; %
-%                     approximation.dphi_dx = dkphi_dx; % nfeatures x D+1
-%                 end
-%                 end
-                %%
-
-
-             xbest_norm = zeros(model.D- model.ns, optim.maxiter);
+            xbest_norm = zeros(model.D- model.ns, optim.maxiter);
             xbest = zeros(model.D- model.ns, optim.maxiter);
             score = zeros(1,optim.maxiter);
 
@@ -112,11 +81,6 @@ classdef optimization
                     %Local optimization of hyperparameters
                     if mod(i, optim.update_period) ==0
                         theta = model.model_selection(xtrain_norm, ctrain, theta, optim. hyps_update);
-%                         if strcmp(model.type, 'preference')
-%                             [approximation.phi_pref, approximation.dphi_pref_dx, approximation.phi, approximation.dphi_dx]= sample_features_preference_GP(theta, model, approximation);
-%                         else
-%                             [approximation.phi, approximation.dphi_dx] = sample_features_GP(theta, model, approximation);
-%                         end
                         model = approximate_kernel(model, theta, approximation);
                     end
                 end
@@ -130,7 +94,7 @@ classdef optimization
 
                 [xbest_norm(:,i),xbest(:,i)] = optim.identify(model, theta, xtrain_norm, ctrain, post);
                 model.xbest_norm = xbest_norm(:,i);
-                score(i) = optim.eval(xbest(:,i), model);
+                score(i) = optim.eval(xbest(:,i));
                 theta_evo(:, i) = theta.cov;
             end
         end

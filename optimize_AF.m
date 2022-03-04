@@ -47,7 +47,6 @@ p  = exp(temperature*zscore(v));
 p = p/sum(p);
 starting_points = X(dims,randsample(n0, ncandidates, true, p));
 
-%starting_points = rand_interval(lb, ub, 'nsamples', ncandidates);
 if ~isempty(init_guess)
     starting_points(:,1)= init_guess;
 end

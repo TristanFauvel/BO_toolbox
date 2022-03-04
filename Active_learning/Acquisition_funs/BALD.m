@@ -1,4 +1,4 @@
-function [new_x, new_x_norm] = BALD(theta, xtrain_norm, ctrain, model, post, ~)
+function [new_x, new_x_norm] = BALD(theta, xtrain_norm, ctrain, model, post, ~, optim)
 ncandidates = optim.AF_ncandidates;
 init_guess = [];
 options.method = 'lbfgs';
