@@ -31,5 +31,5 @@ ucb_val = mu_c + e*sqrt(var_muc);
 
 dsigma_c_dx = dvar_muc_dx(1:D)./(2*var_muc);
 
-ducb_dx = (dmuc_dx(1:D) + e*dsigma_c_dx);
+ducb_dx = (dmuc_dx(1:D) + e*dsigma_c_dx)';
 end
